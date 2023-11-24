@@ -35,6 +35,7 @@ Neuron make::neuron(make::NeuronOptions options) {
     std::uniform_real_distribution<> dist(l, h);
 
     vd weights;
+    weights.reserve(n);
     for (size_t i = 0; i < n; ++i) { weights.push_back(dist(gen)); }
 
     PRINT_ITER("Created neuron with weights:", weights)

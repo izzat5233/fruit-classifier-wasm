@@ -15,6 +15,15 @@ namespace nn {
 
     class Layer;
 
+    class OutputLayer;
+
+    namespace act {}
+
+    namespace make {
+        struct NeuronOptions;
+        struct LayerOptions;
+    }
+
     using vd = std::vector<double>;
     using vn = std::vector<Neuron>;
 }

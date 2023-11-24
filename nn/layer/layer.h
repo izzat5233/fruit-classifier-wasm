@@ -23,6 +23,17 @@ private:
 
     friend Layer make::layer(make::LayerOptions options);
 
+protected:
+
+    /**
+     * Processes the inputs through the each neuron.
+     * Doesn't apply the activation function yet.
+     *
+     * @param inputs A vector of input values to the layer.
+     * @return A vector of output values from each neuron.
+     */
+    [[nodiscard]] vd calculateOutputs(const vd &inputs) const;
+
 public:
     /**
      * Constructor for the Layer class that initializes the layer with a given set of neurons
@@ -35,25 +46,12 @@ public:
 
     /**
      * Processes the inputs through the layer by activating each neuron.
+     * Activation function is applied to every neuron.
      *
      * @param inputs A vector of input values to the layer.
      * @return A vector of output values from each neuron.
      */
-    [[nodiscard]] vd process(const vd &inputs) const;
-
-    /**
-     * Sets the activation function for all neurons in the layer.
-     *
-     * @param activationFunction An activation function.
-     */
-    void setActivationFunction(const act::type &activationFunction);
-
-    /**
-     * Gets the activation function used by neurons in the layer.
-     *
-     * @return The activation function.
-     */
-    [[nodiscard]] act::type getActivationFunction() const;
+    [[nodiscard]] virtual vd process(const vd &inputs) const;
 
     auto begin() noexcept { return neurons.begin(); }
 
