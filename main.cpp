@@ -1,6 +1,10 @@
+#define DEBUG
+
 #include <iostream>
+#include "lib/neuron.h"
+#include "lib/activation.h"
 
 int main() {
-    std::cout << "Hello, World!" << std::endl;
+
     return 0;
 }

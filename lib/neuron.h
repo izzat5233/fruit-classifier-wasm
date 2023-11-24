@@ -12,12 +12,16 @@
 
 #include "debug.h"
 
+namespace nn {
+    class Neuron;
+}
+
 /**
  * Class representing a single neuron in a neural network.
  * This class encapsulates the neuron's weights and bias,
  * and provides functionality for computing the neuron's output.
  */
-class Neuron {
+class nn::Neuron {
 private:
     using vdl = std::vector<double>;
     vdl weights;
@@ -43,7 +47,6 @@ public:
     void adjustWeights(const vdl &deltas) {
         ASSERT(weights.size() == deltas.size())
         std::transform(weights.begin(), weights.end(), deltas.begin(), weights.begin(), std::plus<>());
-        PRINT("Weights adjusted")
     }
 
     /**
