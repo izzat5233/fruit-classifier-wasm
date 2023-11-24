@@ -11,6 +11,9 @@ using namespace nn;
 
 Layer::Layer(vn neurons, act::type function)
         : neurons(std::move(neurons)), function(std::move(function)) {
+    ASSERT(std::all_of(this->neurons.begin(), this->neurons.end(), [this](const auto &n) {
+        return n.size() == this->neurons[0].size();
+    }))
     PRINT("Layer created with " << this->neurons.size() << " neurons")
 }
 

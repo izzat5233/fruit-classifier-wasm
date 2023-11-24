@@ -5,8 +5,8 @@
 #ifndef FRUIT_CLASSIFIER_WASM_NEURON_H
 #define FRUIT_CLASSIFIER_WASM_NEURON_H
 
-#include "nn.h"
-#include "make.h"
+#include "../nn.h"
+#include "../make.h"
 #include <vector>
 
 /**
@@ -35,6 +35,11 @@ public:
      * @param deltas Vector of changes to be applied to each weight.
      */
     void adjustWeights(const vd &deltas);
+
+    /**
+     * @return The number of weights (or inputs) in the neuron
+     */
+    [[nodiscard]] size_t size() const;
 
     /**
      * Calculates the weighted sum of inputs and the bias.

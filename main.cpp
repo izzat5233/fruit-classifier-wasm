@@ -1,5 +1,5 @@
 #include <iostream>
-#include "lib/nn/layer.h"
+#include "nn/layer/layer.h"
 
 using std::cout, std::cin, std::vector;
 

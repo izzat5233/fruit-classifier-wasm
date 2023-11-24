@@ -5,12 +5,17 @@
 #ifndef FRUIT_CLASSIFIER_WASM_LAYER_H
 #define FRUIT_CLASSIFIER_WASM_LAYER_H
 
-#include "nn.h"
-#include "make.h"
-#include "neuron.h"
-#include "act.h"
+#include "../nn.h"
+#include "../make.h"
+#include "../neuron/neuron.h"
+#include "../act.h"
 #include <vector>
 
+/**
+ * Represents a layer in a neural network. A layer is a collection of neurons that
+ * processes inputs and produces outputs based on the defined activation function.
+ * All neurons in the layer are processing using the same activation function
+ */
 class nn::Layer {
 private:
     vn neurons;
@@ -48,7 +53,7 @@ public:
      *
      * @return The activation function.
      */
-    act::type getActivationFunction() const;
+    [[nodiscard]] act::type getActivationFunction() const;
 
     auto begin() noexcept { return neurons.begin(); }
 

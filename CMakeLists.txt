@@ -8,10 +8,10 @@ add_definitions(-DDEBUG)
 add_executable(fruit_classifier_wasm
         main.cpp
         util/debug.h
-        lib/nn/act.h
-        lib/nn/neuron.h
-        lib/nn/layer.h
-        lib/nn/neuron.cpp
-        lib/nn/make.h
-        lib/nn/layer.cpp
-        lib/nn/nn.h)
+        nn/act.h
+        nn/neuron/neuron.h
+        nn/layer/layer.h
+        nn/neuron/neuron.cpp
+        nn/make.h
+        nn/layer/layer.cpp
+        nn/nn.h)

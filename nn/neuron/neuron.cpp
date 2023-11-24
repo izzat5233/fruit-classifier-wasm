@@ -40,3 +40,7 @@ Neuron make::neuron(make::NeuronOptions options) {
     PRINT_ITER("Created neuron with weights:", weights)
     return Neuron(weights, b);
 }
+
+size_t Neuron::size() const {
+    return weights.size();
+}
