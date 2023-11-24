@@ -3,8 +3,15 @@ project(fruit_classifier_wasm)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(fruit_classifier_wasm main.cpp
-        lib/debug.h
-        lib/activation.h
-        lib/neuron.h
-)
+add_definitions(-DDEBUG)
+
+add_executable(fruit_classifier_wasm
+        main.cpp
+        util/debug.h
+        lib/nn/act.h
+        lib/nn/neuron.h
+        lib/nn/layer.h
+        lib/nn/neuron.cpp
+        lib/nn/make.h
+        lib/nn/layer.cpp
+        lib/nn/nn.h)

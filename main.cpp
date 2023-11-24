@@ -1,10 +1,12 @@
-#define DEBUG
-
 #include <iostream>
-#include "lib/neuron.h"
-#include "lib/activation.h"
+#include "lib/nn/layer.h"
+
+using std::cout, std::cin, std::vector;
 
 int main() {
-
-    return 0;
+    vector<double> inputs = {1, 2};
+    auto neuronOptions = nn::make::NeuronOptions{inputs.size(), -1, 1};
+    auto layerOptions = nn::make::LayerOptions{4, neuronOptions, nn::act::linear};
+    auto layer = nn::make::layer(layerOptions);
+    auto res = layer.process(inputs);
 }

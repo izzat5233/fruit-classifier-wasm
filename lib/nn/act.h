@@ -2,8 +2,8 @@
 // Created by Izzat on 11/24/2023.
 //
 
-#ifndef FRUIT_CLASSIFIER_WASM_ACTIVATION_H
-#define FRUIT_CLASSIFIER_WASM_ACTIVATION_H
+#ifndef FRUIT_CLASSIFIER_WASM_ACT_H
+#define FRUIT_CLASSIFIER_WASM_ACT_H
 
 #include <functional>
 #include <cmath>
@@ -11,8 +11,11 @@
 /*
  * Activation Functions Namespace
  */
-namespace act {
-    using function = std::function<double(double)>;
+namespace nn::act {
+    /**
+     * The general type for any activation function
+     */
+    using type = std::function<double(double)>;
 
     constexpr double step(double x) noexcept {
         return x >= 0 ? 1 : 0;
@@ -39,4 +42,4 @@ namespace act {
     }
 }
 
-#endif //FRUIT_CLASSIFIER_WASM_ACTIVATION_H
+#endif //FRUIT_CLASSIFIER_WASM_ACT_H
