@@ -15,7 +15,7 @@
  * and provides functionality for computing the neuron's output.
  */
 class nn::Neuron {
-    vd weights;
+    vd_t weights;
     double bias;
 
     friend Neuron make::neuron(make::NeuronOptions options);
@@ -27,14 +27,14 @@ public:
      * @param initialWeights Vector of initial weights.
      * @param threshold Initial bias for the neuron, defaulting to -1.
      */
-    explicit Neuron(vd initialWeights, double threshold);
+    explicit Neuron(vd_t initialWeights, double threshold);
 
     /**
      * Adjusts the weights of the neuron.
      *
      * @param deltas Vector of changes to be applied to each weight.
      */
-    void adjustWeights(const vd &deltas);
+    void adjust(const vd_t &deltas);
 
     /**
      * @return The number of weights (or inputs) in the neuron
@@ -48,7 +48,7 @@ public:
      * @param inputs Vector of input values.
      * @return The weighted sum.
      */
-    [[nodiscard]] double process(const vd &inputs) const;
+    [[nodiscard]] double process(const vd_t &inputs) const;
 
     auto begin() noexcept { return weights.begin(); }
 

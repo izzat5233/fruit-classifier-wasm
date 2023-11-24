@@ -7,10 +7,8 @@
 
 #include "layer.h"
 
-#include <utility>
-
 namespace nn::act {
-    vd softmax(const vd &x);
+    vd_t softmax(const vd_t &x);
 }
 
 /**
@@ -23,7 +21,7 @@ public:
      *
      * @param neurons A vector of Neuron objects.
      */
-    explicit OutputLayer(vn neurons);
+    explicit OutputLayer(vn_t neurons);
 
     /**
      * Processes the inputs through the layer by activating each neuron.
@@ -32,7 +30,7 @@ public:
      * @param inputs A vector of input values to the layer.
      * @return A vector of output values from each neuron.
      */
-    [[nodiscard]] vd process(const vd &inputs) const override;
+    [[nodiscard]] vd_t process(const vd_t &inputs) const override;
 };
 
 #endif //FRUIT_CLASSIFIER_WASM_OUTPUT_LAYER_H

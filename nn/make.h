@@ -39,17 +39,17 @@ namespace nn::make {
     struct LayerOptions {
         size_t numNeurons;
         NeuronOptions neuronOpts;
-        act::type activationFunction;
+        fd_t function;
 
         /**
          * Constructor for LayerOptions.
          *
          * @param numNeurons Number of neurons in the layer.
          * @param neuronOpts Options for creating each neuron in the layer.
-         * @param activationFunction Activation function to be used for the layer.
+         * @param function Activation function to be used for the layer.
          */
-        LayerOptions(size_t numNeurons, NeuronOptions neuronOpts, act::type activationFunction)
-                : numNeurons(numNeurons), neuronOpts(neuronOpts), activationFunction(std::move(activationFunction)) {}
+        LayerOptions(size_t numNeurons, NeuronOptions neuronOpts, fd_t function)
+                : numNeurons(numNeurons), neuronOpts(neuronOpts), function(std::move(function)) {}
     };
 
     /**

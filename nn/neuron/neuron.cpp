@@ -12,17 +12,17 @@
 
 using namespace nn;
 
-Neuron::Neuron(vd initialWeights, double threshold)
+Neuron::Neuron(vd_t initialWeights, double threshold)
         : weights(std::move(initialWeights)), bias(threshold) {
     PRINT("Neuron created with " << weights.size() << " weights and bias " << bias)
 }
 
-void Neuron::adjustWeights(const vd &deltas) {
+void Neuron::adjust(const vd_t &deltas) {
     ASSERT(weights.size() == deltas.size())
     std::transform(weights.begin(), weights.end(), deltas.begin(), weights.begin(), std::plus<>());
 }
 
-double Neuron::process(const vd &inputs) const {
+double Neuron::process(const vd_t &inputs) const {
     ASSERT(inputs.size() == weights.size())
     return std::inner_product(weights.begin(), weights.end(), inputs.begin(), 0.0) + bias;
 }
@@ -34,7 +34,7 @@ Neuron make::neuron(make::NeuronOptions options) {
     auto [n, l, h, b] = options;
     std::uniform_real_distribution<> dist(l, h);
 
-    vd weights;
+    vd_t weights;
     weights.reserve(n);
     for (size_t i = 0; i < n; ++i) { weights.push_back(dist(gen)); }
 

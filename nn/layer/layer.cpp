@@ -11,7 +11,7 @@
 
 using namespace nn;
 
-Layer::Layer(vn neurons, act::type function)
+Layer::Layer(vn_t neurons, fd_t function)
         : neurons(std::move(neurons)), function(std::move(function)) {
     ASSERT(std::all_of(this->neurons.begin(), this->neurons.end(), [this](const auto &n) {
         return n.size() == this->neurons[0].size();
@@ -19,8 +19,8 @@ Layer::Layer(vn neurons, act::type function)
     PRINT("Layer created with " << this->neurons.size() << " neurons")
 }
 
-vd Layer::calculateOutputs(const vd &inputs) const {
-    vd outputs(neurons.size());
+vd_t Layer::calculateOutputs(const vd_t &inputs) const {
+    vd_t outputs(neurons.size());
     std::transform(neurons.begin(), neurons.end(), outputs.begin(), [&inputs](const auto &n) {
         return n.process(inputs);
     });
@@ -29,8 +29,8 @@ vd Layer::calculateOutputs(const vd &inputs) const {
     return outputs;
 }
 
-vd Layer::process(const nn::vd &inputs) const {
-    vd outputs(calculateOutputs(inputs));
+vd_t Layer::process(const nn::vd_t &inputs) const {
+    vd_t outputs(calculateOutputs(inputs));
     std::transform(outputs.begin(), outputs.end(), outputs.begin(), this->function);
     PRINT_ITER("Then activated them to:", outputs)
     return outputs;
@@ -38,24 +38,24 @@ vd Layer::process(const nn::vd &inputs) const {
 
 Layer make::layer(make::LayerOptions options) {
     auto [n, o, f] = std::move(options);
-    vn neurons;
+    vn_t neurons;
     neurons.reserve(n);
-    for (int i = 0; i < n; ++i) { neurons.push_back(make::neuron(o)); }
+    for (size_t i = 0; i < n; ++i) { neurons.push_back(make::neuron(o)); }
     return Layer(neurons, f);
 }
 
-vd act::softmax(const vd &x) {
+vd_t act::softmax(const vd_t &x) {
     auto total = std::accumulate(x.begin(), x.end(), 0.0, [](auto acc, auto i) { return acc + exp(i); });
-    vd outputs(x);
+    vd_t outputs(x);
     std::transform(outputs.begin(), outputs.end(), outputs.begin(), [total](auto i) { return exp(i) / total; });
     PRINT_ITER("Softmax result:", outputs)
     return outputs;
 }
 
-OutputLayer::OutputLayer(vn neurons) : Layer(std::move(neurons), act::linear) {
+OutputLayer::OutputLayer(vn_t neurons) : Layer(std::move(neurons), nullptr) {
     PRINT("And it was an output layer")
 }
 
-vd OutputLayer::process(const vd &inputs) const {
+vd_t OutputLayer::process(const vd_t &inputs) const {
     return act::softmax(calculateOutputs(inputs));
 }

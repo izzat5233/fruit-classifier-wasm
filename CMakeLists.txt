@@ -15,4 +15,5 @@ add_executable(fruit_classifier_wasm
         nn/make.h
         nn/layer/layer.cpp
         nn/nn.h
-        nn/layer/output_layer.h)
+        nn/layer/output_layer.h
+)

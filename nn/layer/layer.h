@@ -18,8 +18,8 @@
  */
 class nn::Layer {
 private:
-    vn neurons;
-    act::type function;
+    vn_t neurons;
+    fd_t function;
 
     friend Layer make::layer(make::LayerOptions options);
 
@@ -32,7 +32,7 @@ protected:
      * @param inputs A vector of input values to the layer.
      * @return A vector of output values from each neuron.
      */
-    [[nodiscard]] vd calculateOutputs(const vd &inputs) const;
+    [[nodiscard]] vd_t calculateOutputs(const vd_t &inputs) const;
 
 public:
     /**
@@ -42,7 +42,7 @@ public:
      * @param neurons A vector of Neuron objects.
      * @param function An activation function to be used for the neurons.
      */
-    explicit Layer(vn neurons, act::type function);
+    explicit Layer(vn_t neurons, fd_t function);
 
     /**
      * Processes the inputs through the layer by activating each neuron.
@@ -51,7 +51,7 @@ public:
      * @param inputs A vector of input values to the layer.
      * @return A vector of output values from each neuron.
      */
-    [[nodiscard]] virtual vd process(const vd &inputs) const;
+    [[nodiscard]] virtual vd_t process(const vd_t &inputs) const;
 
     auto begin() noexcept { return neurons.begin(); }
 

@@ -6,6 +6,8 @@
 #define FRUIT_CLASSIFIER_WASM_NN_H
 
 #include <vector>
+#include <functional>
+#include <memory>
 
 /**
  * Neural Network Namespace
@@ -17,15 +19,24 @@ namespace nn {
 
     class OutputLayer;
 
-    namespace act {}
+    class Network;
 
     namespace make {
         struct NeuronOptions;
         struct LayerOptions;
     }
 
-    using vd = std::vector<double>;
-    using vn = std::vector<Neuron>;
+    namespace act {
+        struct Function;
+        using ptr = std::unique_ptr<Function>;
+    }
+
+    inline namespace type {
+        using vd_t = std::vector<double>;
+        using vn_t = std::vector<Neuron>;
+        using vl_t = std::vector<std::unique_ptr<Layer>>;
+        using fd_t = std::function<double(double)>;
+    }
 }
 
 #endif //FRUIT_CLASSIFIER_WASM_NN_H

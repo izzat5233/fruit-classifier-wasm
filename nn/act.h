@@ -13,33 +13,66 @@
  */
 namespace nn::act {
     /**
-     * The general type for any activation function
+     * Abstract base struct for activation functions in a neural network.
+     * This struct defines the interface for activation functions and their derivatives,
+     * allowing for polymorphic use of different activation functions within the network.
      */
-    using type = std::function<double(double)>;
+    struct Function {
+        /**
+         * Virtual destructor to ensure proper cleanup of derived classes.
+         */
+        virtual ~Function() = default;
 
-    constexpr double step(double x) noexcept {
-        return x >= 0 ? 1 : 0;
-    }
+        /**
+         * The activation function.
+         * @param x input
+         * @return output
+         */
+        [[nodiscard]] virtual double fun(double x) const noexcept = 0;
 
-    constexpr double sign(double x) noexcept {
-        return x >= 0 ? 1 : -1;
-    }
+        /**
+         * The derivative of the activation function.
+         * @param x input
+         * @return output
+         */
+        [[nodiscard]] virtual double der(double x) const noexcept = 0;
+    };
 
-    constexpr double linear(double x) noexcept {
-        return x;
-    }
+    struct Step : Function {
+        [[nodiscard]] double fun(double x) const noexcept override { return x >= 0 ? 1 : 0; }
 
-    constexpr double relu(double x) noexcept {
-        return x >= 0 ? x : 0;
-    }
+        [[nodiscard]] double der(double x) const noexcept override { return 0; }
+    };
 
-    constexpr double sigmoid(double x) noexcept {
-        return 1 / (1 + exp(-x));
-    }
+    struct Sign : Function {
+        [[nodiscard]] double fun(double x) const noexcept override { return x >= 0 ? 1 : -1; }
 
-    constexpr double tanh(double x) noexcept {
-        return 2 / (1 + exp(-2 * x)) - 1;
-    }
+        [[nodiscard]] double der(double x) const noexcept override { return 0; }
+    };
+
+    struct Linear : Function {
+        [[nodiscard]] double fun(double x) const noexcept override { return x; }
+
+        [[nodiscard]] double der(double x) const noexcept override { return 1; }
+    };
+
+    struct ReLU : Function {
+        [[nodiscard]] double fun(double x) const noexcept override { return x >= 0 ? x : 0; }
+
+        [[nodiscard]] double der(double x) const noexcept override { return x >= 0 ? 1 : 0; }
+    };
+
+    struct Sigmoid : Function {
+        [[nodiscard]] double fun(double x) const noexcept override { return 1 / (1 + exp(-x)); }
+
+        [[nodiscard]] double der(double x) const noexcept override { return fun(x) * (1 - fun(x)); }
+    };
+
+    struct Tanh : Function {
+        [[nodiscard]] double fun(double x) const noexcept override { return 1 / (1 + exp(-x)); }
+
+        [[nodiscard]] double der(double x) const noexcept override { return 1 - fun(x) * fun(x); }
+    };
 }
 
 #endif //FRUIT_CLASSIFIER_WASM_ACT_H
