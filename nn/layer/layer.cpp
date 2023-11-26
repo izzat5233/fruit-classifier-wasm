@@ -5,8 +5,6 @@
 #include "layer.h"
 #include "hidden_layer.h"
 #include "output_layer.h"
-#include "../neuron/neuron.h"
-#include "../make.h"
 #include "../../util/debug.h"
 
 #include <utility>
@@ -48,14 +46,14 @@ vd_t Layer::calculateErrors(const vd_t &gradients, const HiddenLayer &previousLa
     auto m = previousLayer.size();
     ASSERT(n == neurons.size())
     ASSERT(m == neurons[0].size())
+
     vd_t errors(m);
     for (int i = 0; i < n; ++i) {
         auto &neuron = neurons[i];
         auto sigma = gradients[i];
-        for (size_t j = 0; j < m; ++j) {
-            errors[j] += neuron.weights[j] * sigma;
-        }
+        for (size_t j = 0; j < m; ++j) { errors[j] += neuron.weights[j] * sigma; }
     }
+
     return errors;
 }
 
@@ -76,13 +74,4 @@ vd_t act::softmax(const vd_t &x) {
 
 vd_t OutputLayer::activate(const vd_t &inputs) const {
     return act::softmax(Layer::process(inputs));
-}
-
-Layer make::layer(nn::make::LayerOptions options) {
-    auto [numInputs, numNeurons] = options;
-    make::NeuronOptions neuronOptions(numInputs, -numNeurons / 2.4, numNeurons / 2.4);
-    vn_t neurons;
-    neurons.reserve(numNeurons);
-    for (int i = 0; i < numNeurons; ++i) { neurons.push_back(make::neuron(neuronOptions)); }
-    return Layer(neurons);
 }

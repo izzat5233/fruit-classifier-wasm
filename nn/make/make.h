@@ -5,7 +5,7 @@
 #ifndef FRUIT_CLASSIFIER_WASM_MAKE_H
 #define FRUIT_CLASSIFIER_WASM_MAKE_H
 
-#include "nn.h"
+#include "../nn.h"
 #include <cstdlib>
 #include <utility>
 

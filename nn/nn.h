@@ -6,7 +6,6 @@
 #define FRUIT_CLASSIFIER_WASM_NN_H
 
 #include <vector>
-#include <functional>
 
 /**
  * Neural Network Namespace

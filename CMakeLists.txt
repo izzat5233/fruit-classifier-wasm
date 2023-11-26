@@ -10,11 +10,12 @@ add_executable(fruit_classifier_wasm
         util/debug.h
         nn/layer/hidden_layer.h
         nn/neuron/neuron.cpp
-        nn/make.h
+        nn/make/make.h
         nn/layer/layer.cpp
         nn/nn.h
         nn/layer/output_layer.h
         nn/neuron/neuron.h
         nn/layer/layer.h
         nn/act/act.cpp
+        nn/make/make.cpp
 )

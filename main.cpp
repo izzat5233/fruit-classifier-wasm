@@ -1,7 +1,6 @@
 #include <iostream>
 #include "nn/nn.h"
-#include "nn/make.h"
-#include "nn/neuron/neuron.h"
+#include "nn/make/make.h"
 #include "nn/layer/hidden_layer.h"
 #include "nn/layer/output_layer.h"
 
