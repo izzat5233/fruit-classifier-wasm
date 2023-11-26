@@ -6,67 +6,46 @@
 #define FRUIT_CLASSIFIER_WASM_MAKE_H
 
 #include "nn.h"
-#include "act.h"
 #include <cstdlib>
+#include <utility>
 
-/**
- * The Factory SubNamespace
- */
 namespace nn::make {
-
     /**
      * Struct to encapsulate options for creating a Neuron.
      */
     struct NeuronOptions {
         size_t numInputs;
-        double lowBound, highBound, bias;
+        double lowBound, highBound;
 
         /**
          * Constructor for NeuronOptions.
+         * Weights and bias are given random values between the given boundaries.
          *
          * @param numInputs Number of inputs for the neuron.
          * @param lowBound Lower bound for random weight initialization.
          * @param highBound Upper bound for random weight initialization.
-         * @param bias Bias value for the neuron, defaulting to -1.
          */
-        NeuronOptions(size_t numInputs, double lowBound, double highBound, double bias = -1)
-                : numInputs(numInputs), lowBound(lowBound), highBound(highBound), bias(bias) {}
+        NeuronOptions(size_t numInputs, double lowBound, double highBound)
+                : numInputs(numInputs), lowBound(lowBound), highBound(highBound) {}
     };
 
     /**
      * Struct to encapsulate options for creating a Layer.
      */
     struct LayerOptions {
-        size_t numNeurons;
-        NeuronOptions neuronOpts;
-        fd_t function;
+        size_t numInputs, numNeurons;
 
         /**
          * Constructor for LayerOptions.
+         * Neurons weights and bias are given random values in the range:
+         * [-numNeurons / 2.4, +numNeurons / 2.4].
          *
-         * @param numNeurons Number of neurons in the layer.
-         * @param neuronOpts Options for creating each neuron in the layer.
-         * @param function Activation function to be used for the layer.
+         * @param numInputs Number of inputs for the neurons.
+         * @param numNeurons Number of neurons for the layer.
          */
-        LayerOptions(size_t numNeurons, NeuronOptions neuronOpts, fd_t function)
-                : numNeurons(numNeurons), neuronOpts(neuronOpts), function(std::move(function)) {}
+        LayerOptions(size_t numInputs, size_t numNeurons)
+                : numInputs(numInputs), numNeurons(numNeurons) {}
     };
-
-    /**
-     * Creates a Neuron with the specified options.
-     *
-     * @param options The NeuronOptions struct containing configuration for the neuron.
-     * @return A Neuron object configured as per the provided options.
-     */
-    Neuron neuron(NeuronOptions options);
-
-    /**
-     * Creates a Layer with the specified options.
-     *
-     * @param options The LayerOptions struct containing configuration for the layer.
-     * @return A Layer object configured as per the provided options.
-     */
-    Layer layer(LayerOptions options);
 }
 
 #endif //FRUIT_CLASSIFIER_WASM_MAKE_H

@@ -3,8 +3,10 @@
 //
 
 #include "neuron.h"
+#include "../make.h"
 #include "../../util/debug.h"
 
+#include <utility>
 #include <vector>
 #include <algorithm>
 #include <numeric>
@@ -12,14 +14,19 @@
 
 using namespace nn;
 
-Neuron::Neuron(vd_t initialWeights, double threshold)
-        : weights(std::move(initialWeights)), bias(threshold) {
-    PRINT("Neuron created with " << weights.size() << " weights and bias " << bias)
+Neuron::Neuron(vd_t weights, double threshold)
+        : weights(std::move(weights)), bias(threshold) {
+    PRINT("Neuron created with " << this->weights.size() << " weights and bias " << bias)
 }
 
-void Neuron::adjust(const vd_t &deltas) {
-    ASSERT(weights.size() == deltas.size())
-    std::transform(weights.begin(), weights.end(), deltas.begin(), weights.begin(), std::plus<>());
+nn::size_t Neuron::size() const {
+    return static_cast<size_t>(weights.size());
+}
+
+void Neuron::adjust(const vd_t &weightDeltas, double biasDelta) {
+    ASSERT(weights.size() == weightDeltas.size())
+    std::transform(weights.begin(), weights.end(), weightDeltas.begin(), weights.begin(), std::plus<>());
+    bias += biasDelta;
 }
 
 double Neuron::process(const vd_t &inputs) const {
@@ -31,17 +38,12 @@ Neuron make::neuron(make::NeuronOptions options) {
     static std::random_device rd;
     static std::mt19937 gen(rd());
 
-    auto [n, l, h, b] = options;
+    auto [n, l, h] = options;
     std::uniform_real_distribution<> dist(l, h);
 
-    vd_t weights;
-    weights.reserve(n);
-    for (size_t i = 0; i < n; ++i) { weights.push_back(dist(gen)); }
+    vd_t weights(n);
+    for (auto &i: weights) { i = dist(gen); }
 
-    PRINT_ITER("Created neuron with weights:", weights)
-    return Neuron(weights, b);
-}
-
-size_t Neuron::size() const {
-    return weights.size();
+    PRINT_ITER("Random weights:", weights)
+    return Neuron(weights, dist(gen));
 }

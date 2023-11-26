@@ -5,32 +5,25 @@
 #ifndef FRUIT_CLASSIFIER_WASM_OUTPUT_LAYER_H
 #define FRUIT_CLASSIFIER_WASM_OUTPUT_LAYER_H
 
-#include "layer.h"
+#include "hidden_layer.h"
 
-namespace nn::act {
-    vd_t softmax(const vd_t &x);
-}
-
-/**
- * A special layer that uses Softmax activation function.
- */
 class nn::OutputLayer : public nn::Layer {
 public:
     /**
-     * Constructor for the OutputLayer class that initializes the layer with a given set of neurons.
+     * Constructor for the OutputLayer class that initializes the layer with a given core layer.
      *
-     * @param neurons A vector of Neuron objects.
+     * @param layer A core layer which is a collection of neurons.
      */
-    explicit OutputLayer(vn_t neurons);
+    explicit OutputLayer(Layer layer);
 
     /**
-     * Processes the inputs through the layer by activating each neuron.
+     * Processes and cashes the inputs through the layer by activating each neuron.
      * Uses Softmax activation function.
      *
      * @param inputs A vector of input values to the layer.
      * @return A vector of output values from each neuron.
      */
-    [[nodiscard]] vd_t process(const vd_t &inputs) const override;
+    [[nodiscard]] vd_t activate(const vd_t &inputs) const;
 };
 
 #endif //FRUIT_CLASSIFIER_WASM_OUTPUT_LAYER_H

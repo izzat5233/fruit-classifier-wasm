@@ -1,19 +1,19 @@
 #include <iostream>
-#include "nn/layer/layer.h"
+#include "nn/nn.h"
+#include "nn/make.h"
+#include "nn/neuron/neuron.h"
+#include "nn/layer/hidden_layer.h"
 #include "nn/layer/output_layer.h"
 
 using std::cout, std::cin, std::vector;
 
 int main() {
     vector<double> inputs = {1, 2};
-    auto neuronOptions = nn::make::NeuronOptions{inputs.size(), -1, 1};
 
-    vector<nn::Neuron> neurons;
-    neurons.reserve(4);
-    for (int i = 0; i < 4; ++i) {
-        neurons.push_back(nn::make::neuron(neuronOptions));
-    }
+    auto hiddenLayer = nn::HiddenLayer(nn::make::layer({2, 3}), nn::act::tanh.fun);
+    auto outputLayer = nn::OutputLayer(nn::make::layer({3, 3}));
 
-    auto layer = nn::OutputLayer(neurons);
-    auto res = layer.process(inputs);
+    auto output = outputLayer.activate(hiddenLayer.activate(inputs));
+    cout << "Result: ";
+    for (auto i: output) { cout << i << ' '; }
 }
