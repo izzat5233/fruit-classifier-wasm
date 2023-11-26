@@ -6,6 +6,7 @@
 #include "../../util/debug.h"
 
 #include <valarray>
+#include <numeric>
 
 namespace nn::act {
     Function step{
@@ -39,8 +40,9 @@ namespace nn::act {
     };
 
     vd_t softmax(const vd_t &x) {
-        auto exps = std::exp(x);
-        vd_t outputs = exps / exps.sum();
+        auto sum = std::accumulate(x.begin(), x.end(), 0.0, [](auto t, auto i) { return t + std::exp(i); });
+        vd_t outputs(x);
+        std::transform(outputs.begin(), outputs.end(), outputs.begin(), [sum](auto i) { return std::exp(i) / sum; });
         PRINT_ITER("Softmax activated outputs:", outputs)
         return outputs;
     }

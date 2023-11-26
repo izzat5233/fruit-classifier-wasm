@@ -7,14 +7,15 @@
 #include "output_layer.h"
 #include "../../util/debug.h"
 
-#include <utility>
-#include <numeric>
-#include <valarray>
+#include <algorithm>
 
 using namespace nn;
 
 Layer::Layer(vn_t neurons) : vn_t(std::move(neurons)) {
-    ASSERT(std::all_of(begin(), end(), [this](auto &n) { return n.size() == (*this)[0].size(); }))
+    ASSERT([this] {
+        auto n = (*this)[0].size();
+        return std::all_of(begin(), end(), [n](auto &i) { return i.size() == n; });
+    }())
     PRINT("Layer created with " << size() << " neurons")
 }
 
@@ -29,7 +30,7 @@ OutputLayer::OutputLayer(Layer layer) : Layer(std::move(layer)) {
 
 vd_t Layer::process(const vd_t &inputs) const {
     vd_t outputs(size());
-    for (size_t i = 0; i < size(); ++i) { outputs[i] = (*this)[i].process(inputs); }
+    std::transform(begin(), end(), outputs.begin(), [&inputs](auto &n) { return n.process(inputs); });
     PRINT_ITER("Layer processed inputs:", inputs)
     PRINT_ITER("To raw outputs:", outputs)
     return outputs;
@@ -42,17 +43,18 @@ vd_t Layer::calculateErrors(const vd_t &gradients, const HiddenLayer &previousLa
     ASSERT(m == (*this)[0].size())
 
     vd_t errors(m);
-    for (int i = 0; i < n; ++i) {
+    for (std::size_t i = 0; i < n; ++i) {
         auto &neuron = (*this)[i];
         auto sigma = gradients[i];
-        for (size_t j = 0; j < m; ++j) { errors[j] += neuron[j] * sigma; }
+        std::transform(neuron.begin(), neuron.end(), errors.begin(), [sigma](auto &i) { return i * sigma; });
     }
 
     return errors;
 }
 
 vd_t HiddenLayer::activate(const vd_t &inputs) const {
-    vd_t outputs(Layer::process(inputs).apply(this->actFun));
+    vd_t outputs(Layer::process(inputs));
+    std::transform(outputs.begin(), outputs.end(), outputs.begin(), this->actFun);
     PRINT_ITER("Then to activated outputs:", outputs)
     return outputs;
 }

@@ -5,6 +5,9 @@
 #include "neuron.h"
 #include "../../util/debug.h"
 
+#include <algorithm>
+#include <numeric>
+
 using namespace nn;
 
 Neuron::Neuron(vd_t weights, double threshold)
@@ -14,12 +17,11 @@ Neuron::Neuron(vd_t weights, double threshold)
 
 void Neuron::adjust(const vd_t &weightDeltas, double biasDelta) {
     ASSERT(size() == weightDeltas.size())
-    *this += weightDeltas;
+    std::transform(begin(), end(), weightDeltas.begin(), begin(), std::plus<>());
     bias += biasDelta;
 }
 
 double Neuron::process(const vd_t &inputs) const {
     ASSERT(size() == inputs.size())
-    auto weightedSum = (*this * inputs).sum();
-    return weightedSum + bias;
+    return std::inner_product(begin(), end(), inputs.begin(), 0.0) + bias;
 }

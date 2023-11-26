@@ -1,8 +1,9 @@
-#include <iostream>
 #include "nn/nn.h"
 #include "nn/make/make.h"
 #include "nn/layer/hidden_layer.h"
 #include "nn/layer/output_layer.h"
+
+#include <iostream>
 
 using std::cout, std::cin, std::vector;
 
