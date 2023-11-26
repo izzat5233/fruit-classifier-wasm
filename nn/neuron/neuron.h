@@ -7,8 +7,7 @@
 
 #include "../nn.h"
 
-class nn::Neuron {
-    vd_t weights;
+class nn::Neuron : public vd_t {
     double bias;
 
     friend Neuron make::neuron(make::NeuronOptions options);
@@ -25,11 +24,6 @@ public:
     explicit Neuron(vd_t weights, double threshold);
 
     /**
-     * @return The number of weights (or inputs) in the neuron
-     */
-    [[nodiscard]] size_t size() const;
-
-    /**
      * Adjusts the weights and bias of the neuron.
      *
      * @param weightDeltas Vector of changes to be applied to each weight.
@@ -44,14 +38,6 @@ public:
      * @return The weighted sum.
      */
     [[nodiscard]] double process(const vd_t &inputs) const;
-
-    auto begin() noexcept { return weights.begin(); }
-
-    auto end() noexcept { return weights.end(); }
-
-    [[nodiscard]] auto begin() const noexcept { return weights.cbegin(); }
-
-    [[nodiscard]] auto end() const noexcept { return weights.cend(); }
 };
 
 #endif //FRUIT_CLASSIFIER_WASM_NEURON_H

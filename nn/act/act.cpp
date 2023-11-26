@@ -3,6 +3,8 @@
 //
 
 #include "../nn.h"
+#include "../../util/debug.h"
+
 #include <valarray>
 
 namespace nn::act {
@@ -27,12 +29,19 @@ namespace nn::act {
     };
 
     Function sigmoid{
-            [](double x) -> double { return 1 / (1 + exp(-x)); },
+            [](double x) -> double { return 1 / (1 + std::exp(-x)); },
             [](double y) -> double { return y * (1 - y); }
     };
 
     Function tanh{
-            [](double x) -> double { return 2 / (1 + exp(-2 * x)) - 1; },
+            [](double x) -> double { return 2 / (1 + std::exp(-2 * x)) - 1; },
             [](double y) -> double { return 1 - y * y; }
     };
+
+    vd_t softmax(const vd_t &x) {
+        auto exps = std::exp(x);
+        vd_t outputs = exps / exps.sum();
+        PRINT_ITER("Softmax activated outputs:", outputs)
+        return outputs;
+    }
 }

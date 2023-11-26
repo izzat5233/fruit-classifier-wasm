@@ -5,6 +5,7 @@
 #ifndef FRUIT_CLASSIFIER_WASM_NN_H
 #define FRUIT_CLASSIFIER_WASM_NN_H
 
+#include <valarray>
 #include <vector>
 
 /**
@@ -45,8 +46,7 @@ namespace nn {
      * Different types used frequently in nn namespace
      */
     inline namespace type {
-        using size_t = unsigned char;
-        using vd_t = std::vector<double>;
+        using vd_t = std::valarray<double>;
         using vn_t = std::vector<Neuron>;
         using vl_t = std::vector<HiddenLayer>;
         using vvd_t = std::vector<std::vector<double>>;
@@ -127,6 +127,8 @@ namespace nn {
 
         /**
          * Special activation function used for output layers
+         * The softmax function converts a vector of real values into a probability distribution.
+         *
          * @param x Vector of all input values
          * @return Vector of all output values
          */

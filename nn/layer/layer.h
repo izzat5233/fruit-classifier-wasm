@@ -8,10 +8,8 @@
 #include "../nn.h"
 #include "../neuron/neuron.h"
 
-class nn::Layer {
-protected:
-    vn_t neurons;
-
+class nn::Layer : public vn_t {
+private:
     friend Layer make::layer(nn::make::LayerOptions options);
 
     friend class Network;
@@ -20,14 +18,9 @@ public:
     /**
      * Constructor for the Layer class that initializes the layer with a given set of neurons.
      *
-     * @param neurons A vector of Neuron objects.
+     * @param n A vector of Neuron objects.
      */
-    explicit Layer(vn_t neurons);
-
-    /**
-     * @return The number of neurons in the layer
-     */
-    [[nodiscard]] size_t size() const;
+    explicit Layer(vn_t n);
 
     /**
      * Processes the inputs through the each neuron of the layer.
@@ -52,14 +45,6 @@ public:
      * @return A vector of error values for the previous layer.
      */
     [[nodiscard]] vd_t calculateErrors(const vd_t &gradients, const HiddenLayer &previousLayer) const;
-
-    auto begin() noexcept { return neurons.begin(); }
-
-    auto end() noexcept { return neurons.end(); }
-
-    [[nodiscard]] auto begin() const noexcept { return neurons.cbegin(); }
-
-    [[nodiscard]] auto end() const noexcept { return neurons.cend(); }
 };
 
 #endif //FRUIT_CLASSIFIER_WASM_LAYER_H

@@ -13,11 +13,9 @@
 
 using namespace nn;
 
-Layer::Layer(vn_t neurons) : neurons(std::move(neurons)) {
-    ASSERT(std::all_of(this->neurons.begin(), this->neurons.end(), [this](auto &n) {
-        return n.size() == this->neurons[0].size();
-    }))
-    PRINT("Layer created with " << this->neurons.size() << " neurons")
+Layer::Layer(vn_t neurons) : vn_t(std::move(neurons)) {
+    ASSERT(std::all_of(begin(), end(), [this](auto &n) { return n.size() == (*this)[0].size(); }))
+    PRINT("Layer created with " << size() << " neurons")
 }
 
 HiddenLayer::HiddenLayer(Layer layer, fdd_t actFun)
@@ -29,13 +27,9 @@ OutputLayer::OutputLayer(Layer layer) : Layer(std::move(layer)) {
     PRINT("And its an output layer")
 }
 
-nn::size_t Layer::size() const {
-    return static_cast<size_t>(neurons.size());
-}
-
 vd_t Layer::process(const vd_t &inputs) const {
-    vd_t outputs(neurons.size());
-    std::transform(neurons.begin(), neurons.end(), outputs.begin(), [&inputs](auto &n) { return n.process(inputs); });
+    vd_t outputs(size());
+    for (size_t i = 0; i < size(); ++i) { outputs[i] = (*this)[i].process(inputs); }
     PRINT_ITER("Layer processed inputs:", inputs)
     PRINT_ITER("To raw outputs:", outputs)
     return outputs;
@@ -44,31 +38,22 @@ vd_t Layer::process(const vd_t &inputs) const {
 vd_t Layer::calculateErrors(const vd_t &gradients, const HiddenLayer &previousLayer) const {
     auto n = gradients.size();
     auto m = previousLayer.size();
-    ASSERT(n == neurons.size())
-    ASSERT(m == neurons[0].size())
+    ASSERT(n == size())
+    ASSERT(m == (*this)[0].size())
 
     vd_t errors(m);
     for (int i = 0; i < n; ++i) {
-        auto &neuron = neurons[i];
+        auto &neuron = (*this)[i];
         auto sigma = gradients[i];
-        for (size_t j = 0; j < m; ++j) { errors[j] += neuron.weights[j] * sigma; }
+        for (size_t j = 0; j < m; ++j) { errors[j] += neuron[j] * sigma; }
     }
 
     return errors;
 }
 
 vd_t HiddenLayer::activate(const vd_t &inputs) const {
-    vd_t outputs(Layer::process(inputs));
-    std::transform(outputs.begin(), outputs.end(), outputs.begin(), this->actFun);
+    vd_t outputs(Layer::process(inputs).apply(this->actFun));
     PRINT_ITER("Then to activated outputs:", outputs)
-    return outputs;
-}
-
-vd_t act::softmax(const vd_t &x) {
-    auto total = std::accumulate(x.begin(), x.end(), 0.0, [](auto acc, auto i) { return acc + exp(i); });
-    vd_t outputs(x);
-    std::transform(outputs.begin(), outputs.end(), outputs.begin(), [total](auto i) { return exp(i) / total; });
-    PRINT_ITER("Softmax activated outputs:", outputs)
     return outputs;
 }
 

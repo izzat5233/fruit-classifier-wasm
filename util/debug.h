@@ -31,7 +31,7 @@ static auto $FAST_IO = [] {
 #define PRINT_ITER(prompt, iter) { \
     std::ostringstream oss; \
     oss << prompt << " ["; \
-    for (auto i: (iter)) { oss << i << ","; } \
+    for (std::size_t i = 0; i < iter.size(); ++i) { oss << iter[i] << ","; } \
     oss << "]"; \
     std::cout << oss.str() << std::endl; \
 }
