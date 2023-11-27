@@ -33,18 +33,16 @@ public:
     [[nodiscard]] vd_t process(const vd_t &inputs) const;
 
     /**
-     * Calculates the error values for the previous (always hidden) layer in the network.
+     * Calculates the error gradient values for the previous (always hidden) layer in the network.
      * This method is typically used in the backpropagation algorithm to propagate
-     * the error backward through the network.
+     * the gradient errors backward through the network.
+     * The derivative function of the previous layer is used.
      *
-     * The returned error values are not gradient.
-     * The derivative activation function must be applied to each value first.
-     *
-     * @param gradients The vector of error gradients for the current layer.
-     * @param previousLayer The previous layer in the neural network.
-     * @return A vector of error values for the previous layer.
+     * @param w A vector of error gradients for the current layer.
+     * @param acc A previous layer in the neural network.
+     * @return A vector of gradient errors for the previous layer.
      */
-    [[nodiscard]] vd_t calculateErrors(const vd_t &gradients, const HiddenLayer &previousLayer) const;
+    [[nodiscard]] vd_t backPropagate(const vd_t &w, const HiddenLayer &acc) const;
 };
 
 #endif //FRUIT_CLASSIFIER_WASM_LAYER_H

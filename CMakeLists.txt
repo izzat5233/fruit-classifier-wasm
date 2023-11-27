@@ -18,4 +18,6 @@ add_executable(fruit_classifier_wasm
         nn/layer/layer.h
         nn/act/act.cpp
         nn/make/make.cpp
+        nn/network/network.h
+        nn/network/network.cpp
 )

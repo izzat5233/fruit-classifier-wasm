@@ -17,7 +17,7 @@ public:
     explicit OutputLayer(Layer layer);
 
     /**
-     * Processes and cashes the inputs through the layer by activating each neuron.
+     * Processes the inputs through the layer by activating each neuron.
      * Uses Softmax activation function.
      *
      * @param inputs A vector of input values to the layer.

@@ -19,8 +19,8 @@ Layer::Layer(vn_t neurons) : vn_t(std::move(neurons)) {
     PRINT("Layer created with " << size() << " neurons")
 }
 
-HiddenLayer::HiddenLayer(Layer layer, fdd_t actFun)
-        : Layer(std::move(layer)), actFun(actFun) {
+HiddenLayer::HiddenLayer(Layer layer, act::Function function)
+        : Layer(std::move(layer)), function(function) {
     PRINT("And its a hidden layer")
 }
 
@@ -36,25 +36,29 @@ vd_t Layer::process(const vd_t &inputs) const {
     return outputs;
 }
 
-vd_t Layer::calculateErrors(const vd_t &gradients, const HiddenLayer &previousLayer) const {
+vd_t Layer::backPropagate(const vd_t &gradients, const HiddenLayer &previous) const {
     auto n = gradients.size();
-    auto m = previousLayer.size();
+    auto m = previous.size();
     ASSERT(n == size())
     ASSERT(m == (*this)[0].size())
 
-    vd_t errors(m);
-    for (std::size_t i = 0; i < n; ++i) {
-        auto &neuron = (*this)[i];
-        auto sigma = gradients[i];
-        std::transform(neuron.begin(), neuron.end(), errors.begin(), [sigma](auto &i) { return i * sigma; });
+    vd_t e(m);
+    auto j = gradients.begin();
+    for (auto i = begin(); i != end(); ++i, ++j) {
+        auto &neuron = *i;
+        auto s = *j;
+        std::transform(e.begin(), e.end(), neuron.begin(), e.begin(), [s](auto acc, auto w) {
+            return acc + w * s;
+        });
     }
 
-    return errors;
+    std::transform(e.begin(), e.end(), e.begin(), previous.function.der);
+    return e;
 }
 
 vd_t HiddenLayer::activate(const vd_t &inputs) const {
     vd_t outputs(Layer::process(inputs));
-    std::transform(outputs.begin(), outputs.end(), outputs.begin(), this->actFun);
+    std::transform(outputs.begin(), outputs.end(), outputs.begin(), this->function.fun);
     PRINT_ITER("Then to activated outputs:", outputs)
     return outputs;
 }

@@ -19,6 +19,17 @@ void Neuron::adjust(const vd_t &weightDeltas, double biasDelta) {
     ASSERT(size() == weightDeltas.size())
     std::transform(begin(), end(), weightDeltas.begin(), begin(), std::plus<>());
     bias += biasDelta;
+    PRINT_ITER("Neuron adjusted weights to: ", *this)
+    PRINT("Neuron adjust bias to: " << bias)
+}
+
+void Neuron::adjust(const vd_t &inputs, double gradient, double alpha) {
+    vd_t deltas(inputs.size());
+    std::transform(inputs.begin(), inputs.end(), deltas.begin(), [alpha, gradient](auto y) {
+        return alpha * y * gradient;
+    });
+    auto biasDelta = alpha * -1 * gradient;
+    adjust(deltas, biasDelta);
 }
 
 double Neuron::process(const vd_t &inputs) const {
