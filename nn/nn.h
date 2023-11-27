@@ -117,14 +117,15 @@ namespace nn {
          * Creates a Layer with the specified options
          * which can be used to create a HiddenLayer or an OutputLayer.
          * Neurons weights and bias are given random values in the range:
-         * [-numNeurons / 2.4, +numNeurons / 2.4].
+         * [-numNeurons / rangeFactor, +numNeurons / rangeFactor].
          * Use this function only if specific network functionality is needed.
          *
          * @param numInputs Number of inputs for the neurons.
          * @param numNeurons Number of neurons for the layer.
+         * @param rangeFactor Random values range factor. Default is 2.4.
          * @return A Layer object configured as per the provided options.
          */
-        Layer layer(const ui_t &numInputs, const ui_t &numNeurons);
+        Layer layer(const ui_t &numInputs, const ui_t &numNeurons, double rangeFactor = 2.4);
 
         /**
          * Creates a Network with the specified options.

@@ -24,9 +24,10 @@ Neuron make::neuron(const ui_t &numInputs, double lowBound, double highBound) {
     return Neuron(weights, dist(gen));
 }
 
-Layer make::layer(const ui_t &numInputs, const ui_t &numNeurons) {
-    auto lowBound = -numNeurons / 2.4;
-    auto highBound = numNeurons / 2.4;
+Layer make::layer(const ui_t &numInputs, const ui_t &numNeurons, double rangeFactor) {
+    ASSERT(rangeFactor > 0)
+    auto lowBound = -numNeurons / rangeFactor;
+    auto highBound = numNeurons / rangeFactor;
 
     vn_t neurons;
     neurons.reserve(numNeurons);

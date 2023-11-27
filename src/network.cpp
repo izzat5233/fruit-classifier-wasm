@@ -15,7 +15,7 @@ Network::Network(vl_t layers, OutputLayer outputLayer, double alpha)
     ASSERT(!this->layers.empty())
     ASSERT([this] {
         for (auto i = std::next(this->layers.begin()); i != this->layers.end(); ++i) {
-            if (i[0].size() != std::prev(i)->size()) { return false; }
+            if ((*i)[0].size() != std::prev(i)->size()) { return false; }
         }
         return this->outputLayer[0].size() == this->layers.rbegin()->size();
     }())
@@ -41,7 +41,7 @@ void Network::backwardPropagate(const vd_t &output) {
     if (size <= 2) { return; }
 
     // Rest of layers
-    for (std::size_t j = 1; j <= size - 3; ++j) {
+    for (std::size_t j = 0; j < size - 2; ++j) {
         auto i = size - 3 - j;
         e_cash[i] = layers[i + 1].backPropagate(e_cash[i + 1], layers[i]);
     }
