@@ -2,8 +2,8 @@
 // Created by Izzat on 11/24/2023.
 //
 
-#include "neuron.h"
-#include "../../util/debug.h"
+#include "../nn/neuron.h"
+#include "../util/debug.h"
 
 #include <algorithm>
 #include <numeric>

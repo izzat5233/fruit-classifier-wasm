@@ -111,7 +111,7 @@ namespace nn {
          * @param highBound Upper bound for random weight initialization.
          * @return A Neuron object configured as per the provided options.
          */
-        Neuron neuron(const ui_t &numInputs, const double &lowBound, const double &highBound);
+        Neuron neuron(const ui_t &numInputs, double lowBound, double highBound);
 
         /**
          * Creates a Layer with the specified options

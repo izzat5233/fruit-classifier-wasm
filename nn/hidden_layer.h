@@ -5,7 +5,7 @@
 #ifndef FRUIT_CLASSIFIER_WASM_HIDDEN_LAYER_H
 #define FRUIT_CLASSIFIER_WASM_HIDDEN_LAYER_H
 
-#include "../nn.h"
+#include "nn.h"
 #include "layer.h"
 
 #include <vector>

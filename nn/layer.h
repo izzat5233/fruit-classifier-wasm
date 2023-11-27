@@ -5,8 +5,8 @@
 #ifndef FRUIT_CLASSIFIER_WASM_LAYER_H
 #define FRUIT_CLASSIFIER_WASM_LAYER_H
 
-#include "../nn.h"
-#include "../neuron/neuron.h"
+#include "nn.h"
+#include "neuron.h"
 
 class nn::Layer : public vn_t {
 private:

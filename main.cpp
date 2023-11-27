@@ -1,4 +1,4 @@
-#include "nn/network/network.h"
+#include "nn/network.h"
 
 #include <iostream>
 #include <vector>

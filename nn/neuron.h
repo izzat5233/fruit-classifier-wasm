@@ -5,12 +5,11 @@
 #ifndef FRUIT_CLASSIFIER_WASM_NEURON_H
 #define FRUIT_CLASSIFIER_WASM_NEURON_H
 
-#include "../nn.h"
+#include "nn.h"
 
 class nn::Neuron : public vd_t {
+private:
     double bias;
-
-    friend Neuron make::neuron(const ui_t &numInputs, const double &lowBound, const double &highBound);
 
     friend class Layer;
 

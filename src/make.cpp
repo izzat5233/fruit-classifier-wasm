@@ -2,17 +2,17 @@
 // Created by Izzat on 11/26/2023.
 //
 
-#include "../nn.h"
-#include "../neuron/neuron.h"
-#include "../layer/layer.h"
-#include "../network/network.h"
-#include "../../util/debug.h"
+#include "../nn/nn.h"
+#include "../nn/neuron.h"
+#include "../nn/layer.h"
+#include "../nn/network.h"
+#include "../util/debug.h"
 
 #include <random>
 
 using namespace nn;
 
-Neuron make::neuron(const ui_t &numInputs, const double &lowBound, const double &highBound) {
+Neuron make::neuron(const ui_t &numInputs, double lowBound, double highBound) {
     static std::random_device rd;
     static std::mt19937 gen(rd());
     std::uniform_real_distribution<> dist(lowBound, highBound);

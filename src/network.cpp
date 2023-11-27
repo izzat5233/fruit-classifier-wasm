@@ -4,8 +4,8 @@
 
 #include <numeric>
 #include <algorithm>
-#include "network.h"
-#include "../../util/debug.h"
+#include "../nn/network.h"
+#include "../util/debug.h"
 
 using namespace nn;
 
@@ -40,7 +40,7 @@ void Network::backwardPropagate(const vd_t &output) {
     e_cash[size - 2] = outputLayer.backPropagate(e_cash[size - 1], layers[size - 2]);
     if (size <= 2) { return; }
 
-    // Rest
+    // Rest of layers
     for (std::size_t j = 1; j <= size - 3; ++j) {
         auto i = size - 3 - j;
         e_cash[i] = layers[i + 1].backPropagate(e_cash[i + 1], layers[i]);

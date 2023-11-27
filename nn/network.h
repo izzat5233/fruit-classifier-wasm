@@ -5,9 +5,9 @@
 #ifndef FRUIT_CLASSIFIER_WASM_NETWORK_H
 #define FRUIT_CLASSIFIER_WASM_NETWORK_H
 
-#include "../nn.h"
-#include "../layer/hidden_layer.h"
-#include "../layer/output_layer.h"
+#include "nn.h"
+#include "hidden_layer.h"
+#include "output_layer.h"
 
 class nn::Network {
 private:
@@ -18,7 +18,7 @@ private:
     vvd_t y_cash;
     vvd_t e_cash;
 
-/**
+    /**
      * Forward-propagates the inputs vector through the network.
      * Uses the activation function for each layer to activate the outputs.
      * Cashes all outputs on the way.
