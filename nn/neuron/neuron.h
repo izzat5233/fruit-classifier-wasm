@@ -10,7 +10,7 @@
 class nn::Neuron : public vd_t {
     double bias;
 
-    friend Neuron make::neuron(make::NeuronOptions options);
+    friend Neuron make::neuron(const ui_t &numInputs, const double &lowBound, const double &highBound);
 
     friend class Layer;
 

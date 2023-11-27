@@ -10,8 +10,6 @@
 
 class nn::Layer : public vn_t {
 private:
-    friend Layer make::layer(nn::make::LayerOptions options);
-
     friend class Network;
 
 public:

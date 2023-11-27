@@ -16,11 +16,10 @@ Layer::Layer(vn_t neurons) : vn_t(std::move(neurons)) {
         auto n = (*this)[0].size();
         return std::all_of(begin(), end(), [n](auto &i) { return i.size() == n; });
     }())
-    PRINT("Layer created with " << size() << " neurons")
+    PRINT("Layer created with " << this->size() << " neurons")
 }
 
-HiddenLayer::HiddenLayer(Layer layer, act::Function function)
-        : Layer(std::move(layer)), function(function) {
+HiddenLayer::HiddenLayer(Layer layer, Function function) : Layer(std::move(layer)), function(function) {
     PRINT("And its a hidden layer")
 }
 

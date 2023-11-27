@@ -12,7 +12,7 @@
 
 class nn::HiddenLayer : public nn::Layer {
 private:
-    act::Function function;
+    Function function;
 
     friend class Layer;
 
@@ -24,7 +24,7 @@ public:
      * @param layer A core layer which is a collection of neurons.
      * @param function An activation function to be used for the neurons.
      */
-    explicit HiddenLayer(Layer layer, act::Function function);
+    explicit HiddenLayer(Layer layer, Function function);
 
     /**
      * Processes the inputs through the layer by activating each neuron.

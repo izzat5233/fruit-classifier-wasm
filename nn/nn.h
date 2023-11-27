@@ -38,86 +38,48 @@ namespace nn {
 
     /**
      * Represents a neural network, which is a collection of layers.
+     * Uses gradient descent training algorithm.
      */
     class Network;
+
+    /**
+     * Base struct for activation functions in a neural network.
+     * This struct defines the interface for activation functions and their derivatives,
+     * allowing for polymorphic use of different activation functions within the network.
+     */
+    struct Function;
 
     /**
      * Different types used frequently in nn namespace
      */
     inline namespace type {
-        using size_t = unsigned char;
+        using ui_t = unsigned short int;
+        using vi_t = std::vector<ui_t>;
         using vd_t = std::vector<double>;
         using vn_t = std::vector<Neuron>;
         using vl_t = std::vector<HiddenLayer>;
+        using vf_t = std::vector<Function>;
         using vvd_t = std::vector<std::vector<double>>;
         using fdd_t = double (*)(double);
     }
 
-    /**
-     * The Factory SubNamespace
-     */
-    namespace make {
+    struct Function {
         /**
-         * Struct to encapsulate options for creating a Neuron.
+         * The activation function.
+         * A function from x to y.
          */
-        struct NeuronOptions;
+        const fdd_t &fun;
         /**
-         * Struct to encapsulate options for creating a Layer.
+         * The derivative of the activation function.
+         * A function from y to y'.
          */
-        struct LayerOptions;
-        /**
-         * Struct to encapsulate options for creating a Network.
-         */
-        struct NetworkOptions;
-
-        /**
-         * Creates a Neuron with the specified options.
-         *
-         * @param options The NeuronOptions struct containing configuration for the neuron.
-         * @return A Neuron object configured as per the provided options.
-         */
-        Neuron neuron(NeuronOptions options);
-
-        /**
-         * Creates a Layer with the specified options.
-         * Use this core layer it to create a HiddenLayer or an OutputLayer.
-         *
-         * @param options The LayerOptions struct containing configuration for the layer.
-         * @return A Layer object configured as per the provided options.
-         */
-        Layer layer(LayerOptions options);
-
-        /**
-         * Creates a Network with the specified options.
-         *
-         * @param options The NetworkOptions struct containing configuration for the layer.
-         * @return A Network object configured as per the provided options.
-         */
-        Network network(NetworkOptions options);
-    }
+        const fdd_t &der;
+    };
 
     /*
      * Activation Functions Namespace
      */
     namespace act {
-        /**
-         * Abstract base struct for activation functions in a neural network.
-         * This struct defines the interface for activation functions and their derivatives,
-         * allowing for polymorphic use of different activation functions within the network.
-         */
-        struct Function {
-            /**
-             * The activation function.
-             * A function from x to y.
-             */
-            fdd_t fun;
-            /**
-             * The derivative of the activation function.
-             * A function from y to y'.
-             */
-            fdd_t der;
-        };
-
         extern Function step;
         extern Function sign;
         extern Function linear;
@@ -133,6 +95,65 @@ namespace nn {
          * @return Vector of all output values
          */
         vd_t softmax(const vd_t &t);
+    }
+
+    /**
+     * The Factory Namespace
+     */
+    namespace make {
+        /**
+         * Creates a Neuron with the specified options.
+         * Weights and bias are given random values between the given boundaries.
+         * Use this function only if specific weights are needed.
+         *
+         * @param numInputs Number of inputs for the neuron.
+         * @param lowBound Lower bound for random weight initialization.
+         * @param highBound Upper bound for random weight initialization.
+         * @return A Neuron object configured as per the provided options.
+         */
+        Neuron neuron(const ui_t &numInputs, const double &lowBound, const double &highBound);
+
+        /**
+         * Creates a Layer with the specified options
+         * which can be used to create a HiddenLayer or an OutputLayer.
+         * Neurons weights and bias are given random values in the range:
+         * [-numNeurons / 2.4, +numNeurons / 2.4].
+         * Use this function only if specific network functionality is needed.
+         *
+         * @param numInputs Number of inputs for the neurons.
+         * @param numNeurons Number of neurons for the layer.
+         * @return A Layer object configured as per the provided options.
+         */
+        Layer layer(const ui_t &numInputs, const ui_t &numNeurons);
+
+        /**
+         * Creates a Network with the specified options.
+         * It's recommended to use this method for creating neural networks.
+         *
+         * @param dimensions Dimensions of the neural network.
+         * First value represents the number of inputs for the network.
+         * Mid values represents the number of neurons for each hidden layer.
+         * Last value represents the number of neurons for the output layer.
+         * @param functions Activation functions used for each hidden layer in the neural network.
+         * For N dimensions there should be N - 2 functions.
+         * @param alpha Initial learning rate used for the neural network.
+         * @return A Network object configured as per the provided options.
+         */
+        Network network(const vi_t &dimensions, const vf_t &functions, double alpha);
+
+        /**
+         * Creates a Network with the specified options.
+         * It's recommended to use this method for creating neural networks.
+         *
+         * @param dimensions Dimensions of the neural network.
+         * First value represents the number of inputs for the network.
+         * Mid values represents the number of neurons for each hidden layer.
+         * Last value represents the number of neurons for the output layer.
+         * @param function Activation function used for all hidden layers in the network.
+         * @param alpha Initial learning rate used for the neural network.
+         * @return A Network object configured as per the provided options.
+         */
+        Network network(const vi_t &dimensions, const Function &function, double alpha);
     }
 }
 

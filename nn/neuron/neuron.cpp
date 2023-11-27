@@ -20,7 +20,7 @@ void Neuron::adjust(const vd_t &weightDeltas, double biasDelta) {
     std::transform(begin(), end(), weightDeltas.begin(), begin(), std::plus<>());
     bias += biasDelta;
     PRINT_ITER("Neuron adjusted weights to: ", *this)
-    PRINT("Neuron adjust bias to: " << bias)
+    PRINT("Neuron adjusted bias to: " << bias)
 }
 
 void Neuron::adjust(const vd_t &inputs, double gradient, double alpha) {
