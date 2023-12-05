@@ -1,19 +1,29 @@
+#include "util/debug.h"
 #include "nn/network.h"
+#include <chrono>
+#include <iostream>
 
 int main() {
-    // Create a neural network with specific dimensions and activation functions
-    // The following network has 3 inputs and 2 hidden layers with [6, 4] neurons respectively,
-    // and output layer with 2 neurons. With initial learning rate 0.01.
-    // First hidden layer uses ReLU activation function, second one uses Sigmoid.
-    nn::Network network = nn::make::network({3, 6, 4, 2}, {nn::act::relu, nn::act::sigmoid}, 0.01);
+    auto start = std::chrono::high_resolution_clock::now();
 
-    // Train the network with your data...
-    // For input {1, 2, 3} we expect an output {1, 0}
-    network.train({1, 2, 3}, {1, 0});
+    auto network = nn::make::network({2, 2, 2}, nn::act::relu, 0.01);
+    nn::vpvd_t data = {
+            {{0, 0}, {1, 0}},
+            {{0, 1}, {0, 1}},
+            {{1, 0}, {0, 1}},
+            {{1, 1}, {1, 0}}
+    };
+    network.train(data, 10000, 0.1);
 
-    // Now use it to predict outputs...
-    // vd_t is a vector of double values.
-    nn::vd_t output = network.predict({2, 3, 1});
+    std::cout << "Training Done.\n";
+    for (const auto &p: data) {
+        PRINT_ITER("Input: ", p.first)
+        auto res = network.predict(p.first);
+        PRINT_ITER("Output: ", res)
+    }
 
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    std::cout << "duration: " << duration.count() / (long double) 1000.0 << "s\n";
     return 0;
 }

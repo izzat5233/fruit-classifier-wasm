@@ -19,4 +19,5 @@ add_executable(fruit_classifier_wasm
         src/make.cpp
         nn/network.h
         src/network.cpp
+        src/util.cpp
 )

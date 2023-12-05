@@ -54,8 +54,11 @@ void Network::propagate(const vd_t &input, const vd_t &output) {
     PRINT("Backward propagation done")
 }
 
-void Network::train(const vd_t &input, const vd_t &output) {
+double Network::train(const vd_t &input, const vd_t &output) {
     propagate(input, output);
+    double sse = util::sse(output, y_cash[size - 1]);
+    PRINT("Propagation error: " << sse)
+
     for (std::size_t i = 0; i < layers.size(); ++i) {
         for (std::size_t j = 0; j < layers[i].size(); ++j) {
             auto &neuron = layers[i][j];
@@ -64,16 +67,26 @@ void Network::train(const vd_t &input, const vd_t &output) {
             neuron.adjust(y, e, alpha);
         }
     }
+
     for (std::size_t j = 0; j < outputLayer.size(); ++j) {
         auto &neuron = outputLayer[j];
         auto &y = y_cash[size - 2];
         auto e = e_cash[size - 1][j];
         neuron.adjust(y, e, alpha);
     }
+
+    return sse;
 }
 
-void Network::train(const std::vector<std::pair<vd_t, vd_t>> &data) {
-    for (const auto &p: data) { train(p.first, p.second); }
+void Network::train(const vpvd_t &data, std::size_t epochsLimit, double errorThreshold) {
+    for (std::size_t i = 0; i < epochsLimit; ++i) {
+        PRINT("Epoch: " << i + 1)
+        double worstError = errorThreshold - 1;
+        for (const auto &p: data) {
+            worstError = std::max(worstError, train(p.first, p.second));
+        }
+        if (worstError < errorThreshold) { break; }
+    }
 }
 
 vd_t Network::predict(const vd_t &input) const {

@@ -58,18 +58,24 @@ public:
 
     /**
      * Trains the neural network on a given input-output pair.
+     * Calculates SSE during propagation and returns it.
      *
      * @param input Vector of given input values
      * @param output Vector of expected output values
+     * @return The SSE calculated after forward propagation.
      */
-    void train(const vd_t &input, const vd_t &output);
+    double train(const vd_t &input, const vd_t &output);
 
     /**
      * Trains the neural network on a given set of input-output pairs.
+     * Keeps training until either epochs limit is reached
+     * or the error value for all iterations is below the given threshold.
      *
      * @param data Vector of input-output pairs for training.
+     * @param epochsLimit A limit to how many epochs the training is allowed to continue.
+     * @param errorThreshold A threshold all iteration is below the training stops.
      */
-    void train(const std::vector<std::pair<vd_t, vd_t>> &data);
+    void train(const vpvd_t &data, std::size_t epochsLimit, double errorThreshold);
 
     /**
      * Makes predictions based on input data.

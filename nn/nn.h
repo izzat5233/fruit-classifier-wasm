@@ -59,8 +59,9 @@ namespace nn {
         using vn_t = std::vector<Neuron>;
         using vl_t = std::vector<HiddenLayer>;
         using vf_t = std::vector<Function>;
-        using vvd_t = std::vector<std::vector<double>>;
         using fdd_t = double (*)(double);
+        using vvd_t = std::vector<std::vector<double>>;
+        using vpvd_t = std::vector<std::pair<vd_t, vd_t>>;
     }
 
     struct Function {
@@ -95,6 +96,27 @@ namespace nn {
          * @return Vector of all output values
          */
         vd_t softmax(const vd_t &t);
+    }
+
+    /**
+     * Utility Functions Namespace
+     */
+    namespace util {
+        /**
+         * Calculates the Sum Square Error.
+         * @param desired Desired output values
+         * @param actual Actual output values
+         * @return The Sum Square Error
+         */
+        double sse(const vd_t& desired, const vd_t& actual);
+
+        /**
+         * Calculates the Mean Square Error.
+         * @param desired Desired output values
+         * @param actual Actual output values
+         * @return The Mean Square Error
+         */
+        double mse(const vd_t& desired, const vd_t& actual);
     }
 
     /**
