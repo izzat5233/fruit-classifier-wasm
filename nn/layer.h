@@ -31,14 +31,21 @@ public:
     [[nodiscard]] vd_t process(const vd_t &inputs) const;
 
     /**
-     * Calculates the error gradient values for the previous (always hidden) layer in the network.
+     * Calculates a component of the error gradient values for the previous (always hidden) layer in the network.
      * This method is typically used in the backpropagation algorithm to propagate
-     * the gradient errors backward through the network.
-     * The derivative function of the previous layer is used.
+     * the gradient errors backward through the network. It computes a weighted sum
+     * of the current layer's gradients and each neuron's weights.
+     *
+     * Note: This method does not apply the derivative of the previous layer's activation
+     * function to the calculated sum. The caller is responsible for applying this derivative
+     * to obtain the final gradient errors for the previous layer.
+     *
+     * The gradient values can be obtained by applying the derivative on the outputs of the layer,
+     * then multiplying these values with the weighted sum values obtained from this method.
      *
      * @param w A vector of error gradients for the current layer.
      * @param acc A previous layer in the neural network.
-     * @return A vector of gradient errors for the previous layer.
+     * @return A vector representing a weighted sum of the current layer's gradients and neuron weights.
      */
     [[nodiscard]] vd_t backPropagate(const vd_t &w, const HiddenLayer &acc) const;
 };

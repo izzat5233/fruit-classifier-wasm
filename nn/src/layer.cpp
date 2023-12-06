@@ -36,22 +36,18 @@ vd_t Layer::process(const vd_t &inputs) const {
 }
 
 vd_t Layer::backPropagate(const vd_t &gradients, const HiddenLayer &previous) const {
-    auto n = gradients.size();
     auto m = previous.size();
-    ASSERT(n == size())
+    ASSERT(gradients.size() == size())
     ASSERT(m == (*this)[0].size())
 
     vd_t e(m);
-    auto j = gradients.begin();
-    for (auto i = begin(); i != end(); ++i, ++j) {
-        auto &neuron = *i;
-        auto s = *j;
-        std::transform(e.begin(), e.end(), neuron.begin(), e.begin(), [s](auto acc, auto w) {
-            return acc + w * s;
-        });
+    for (std::size_t i = 0; i < m; ++i) {
+        auto gra = gradients.begin();
+        for (auto neo = begin(); neo != end(); ++neo, ++gra) {
+            e[i] += (*neo)[i] * (*gra);
+        }
     }
 
-    std::transform(e.begin(), e.end(), e.begin(), previous.function.der);
     return e;
 }
 
