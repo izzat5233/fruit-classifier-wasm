@@ -3,21 +3,14 @@ project(fruit_classifier_wasm)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_definitions(-DDEBUG)
+# Add nn directory to the build
+add_subdirectory(nn)
 
-add_executable(fruit_classifier_wasm
-        main.cpp
-        util/debug.h
-        nn/hidden_layer.h
-        src/neuron.cpp
-        src/layer.cpp
-        nn/nn.h
-        nn/output_layer.h
-        nn/neuron.h
-        nn/layer.h
-        src/act.cpp
-        src/make.cpp
-        nn/network.h
-        src/network.cpp
-        src/util.cpp
-)
+# Add test directory to the build
+add_subdirectory(test)
+
+# Assuming GoogleTest is downloaded and placed in the 'lib/googletest' directory
+add_subdirectory(lib/googletest)
+
+# Enable testing with GoogleTest
+enable_testing()

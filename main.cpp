@@ -1,7 +1,8 @@
-#include "util/debug.h"
-#include "nn/network.h"
+#include <network.h>
 #include <chrono>
 #include <iostream>
+
+using std::cout;
 
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
@@ -13,13 +14,21 @@ int main() {
             {{1, 0}, {0, 1}},
             {{1, 1}, {1, 0}}
     };
-    network.train(data, 10000, 0.1);
 
-    std::cout << "Training Done.\n";
+    network.train(data, 100000, 0.9);
+    cout << "Training Done.\n";
+
     for (const auto &p: data) {
-        PRINT_ITER("Input: ", p.first)
+        cout << "Inputs: ";
+        for (auto i: p.first) { cout << i << ' '; }
+        cout << '\n';
+
+        // Predict the output
         auto res = network.predict(p.first);
-        PRINT_ITER("Output: ", res)
+
+        cout << "Outputs: ";
+        for (auto i: res) { cout << i << ' '; }
+        cout << '\n';
     }
 
     auto stop = std::chrono::high_resolution_clock::now();

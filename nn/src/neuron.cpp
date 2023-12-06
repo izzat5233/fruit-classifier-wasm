@@ -2,8 +2,8 @@
 // Created by Izzat on 11/24/2023.
 //
 
-#include "../nn/neuron.h"
-#include "../util/debug.h"
+#include "neuron.h"
+#include "../../util/debug.h"
 
 #include <algorithm>
 #include <numeric>
@@ -13,6 +13,10 @@ using namespace nn;
 Neuron::Neuron(vd_t weights, double threshold)
         : vd_t(std::move(weights)), bias(threshold) {
     PRINT("Neuron created with " << size() << " weights and bias " << bias)
+}
+
+double Neuron::getBias() const {
+    return bias;
 }
 
 void Neuron::adjust(const vd_t &weightDeltas, double biasDelta) {

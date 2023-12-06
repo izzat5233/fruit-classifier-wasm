@@ -4,8 +4,8 @@
 
 #include <numeric>
 #include <algorithm>
-#include "../nn/network.h"
-#include "../util/debug.h"
+#include "network.h"
+#include "../../util/debug.h"
 
 using namespace nn;
 

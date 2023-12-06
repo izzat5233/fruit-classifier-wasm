@@ -2,11 +2,11 @@
 // Created by Izzat on 11/26/2023.
 //
 
-#include "../nn/nn.h"
-#include "../nn/neuron.h"
-#include "../nn/layer.h"
-#include "../nn/network.h"
-#include "../util/debug.h"
+#include "nn.h"
+#include "neuron.h"
+#include "layer.h"
+#include "network.h"
+#include "../../util/debug.h"
 
 #include <random>
 

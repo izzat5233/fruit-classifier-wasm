@@ -23,6 +23,13 @@ public:
     explicit Neuron(vd_t weights, double threshold);
 
     /**
+     * Getter for the bias of the neuron.
+     *
+     * @return The current bias of the neuron.
+     */
+    [[nodiscard]] double getBias() const;
+
+    /**
      * Adjusts the weights and bias of the neuron.
      *
      * @param weightDeltas Vector of changes to be applied to each weight.
@@ -45,6 +52,7 @@ public:
 
     /**
      * Calculates the weighted sum of inputs and the bias.
+     * The bias is added (not subtracted) from the weighted sum.
      *
      * @param inputs Vector of input values.
      * @return The weighted sum.

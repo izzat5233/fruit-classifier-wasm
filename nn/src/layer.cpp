@@ -2,10 +2,10 @@
 // Created by Izzat on 11/24/2023.
 //
 
-#include "../nn/layer.h"
-#include "../nn/hidden_layer.h"
-#include "../nn/output_layer.h"
-#include "../util/debug.h"
+#include "layer.h"
+#include "hidden_layer.h"
+#include "output_layer.h"
+#include "../../util/debug.h"
 
 #include <algorithm>
 

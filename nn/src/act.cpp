@@ -2,8 +2,8 @@
 // Created by Izzat on 11/26/2023.
 //
 
-#include "../nn/nn.h"
-#include "../util/debug.h"
+#include "nn.h"
+#include "../../util/debug.h"
 
 #include <valarray>
 #include <numeric>
