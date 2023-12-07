@@ -25,8 +25,8 @@ namespace nn::act {
     };
 
     Function relu{
-            [](double x) -> double { return x >= 0 ? x : 0; },
-            [](double y) -> double { return y >= 0 ? 1 : 0; }
+            [](double x) -> double { return x > 0 ? x : 0; },
+            [](double y) -> double { return y > 0 ? 1 : 0; }
     };
 
     Function sigmoid{
@@ -35,7 +35,7 @@ namespace nn::act {
     };
 
     Function tanh{
-            [](double x) -> double { return 2 / (1 + std::exp(-2 * x)) - 1; },
+            [](double x) -> double { return std::tanh(x); },
             [](double y) -> double { return 1 - y * y; }
     };
 
