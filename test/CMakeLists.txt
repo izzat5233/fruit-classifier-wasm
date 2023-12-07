@@ -5,7 +5,8 @@ file(GLOB_RECURSE TEST_SOURCES "*.cpp")
 add_executable(test_nn ${TEST_SOURCES}
         layer_test.cpp
         constants.h
-        act_test.cpp)
+        act_test.cpp
+        util_test.cpp)
 
 # Link the GoogleTest libraries and the neural network library
 target_link_libraries(test_nn gtest gtest_main nn_lib)
