@@ -4,7 +4,6 @@
 
 #include "nn.h"
 #include "neuron.h"
-#include "layer.h"
 #include "network.h"
 #include "../../util/debug.h"
 
@@ -24,7 +23,7 @@ Neuron make::neuron(const ui_t &numInputs, double lowBound, double highBound) {
     return Neuron(weights, dist(gen));
 }
 
-Layer make::layer(const ui_t &numInputs, const ui_t &numNeurons, double rangeFactor) {
+vn_t make::layer(const ui_t &numInputs, const ui_t &numNeurons, double rangeFactor) {
     ASSERT(rangeFactor > 0)
     auto lowBound = -numNeurons / rangeFactor;
     auto highBound = numNeurons / rangeFactor;
@@ -35,7 +34,7 @@ Layer make::layer(const ui_t &numInputs, const ui_t &numNeurons, double rangeFac
         neurons.push_back(make::neuron(numInputs, lowBound, highBound));
     }
 
-    return Layer(neurons);
+    return neurons;
 }
 
 Network make::network(const vi_t &dimensions, const vf_t &functions, double alpha) {

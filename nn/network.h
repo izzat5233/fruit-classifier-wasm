@@ -18,14 +18,25 @@ private:
     vvd_t y_cash;
     vvd_t e_cash;
 
+public:
+    /**
+     * Constructs a neural network with a given set of layers and a learning rate.
+     *
+     * @param layers Vector of hidden layers that make up the network.
+     * @param outputLayer The OutputLayer of the network.
+     * @param alpha Learning rate used in training.
+     */
+    explicit Network(vl_t layers, OutputLayer outputLayer, double alpha);
+
     /**
      * Forward-propagates the inputs vector through the network.
      * Uses the activation function for each layer to activate the outputs.
      * Cashes all outputs on the way.
      *
      * @param input Vector of input values.
+     * @return The calculated output values.
      */
-    void forwardPropagate(const vd_t &input);
+    vd_t forwardPropagate(const vd_t &input);
 
     /**
      * Backward-propagates the inputs vector through the network.
@@ -45,16 +56,6 @@ private:
      * @param output Vector of desired output values.
      */
     void propagate(const vd_t &input, const vd_t &output);
-
-public:
-    /**
-     * Constructs a neural network with a given set of layers and a learning rate.
-     *
-     * @param layers Vector of hidden layers that make up the network.
-     * @param outputLayer The OutputLayer of the network.
-     * @param alpha Learning rate used in training.
-     */
-    explicit Network(vl_t layers, OutputLayer outputLayer, double alpha);
 
     /**
      * Trains the neural network on a given input-output pair.

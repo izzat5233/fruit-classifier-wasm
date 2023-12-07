@@ -12,18 +12,13 @@ public:
     /**
      * Constructor for the OutputLayer class that initializes the layer with a given core layer.
      *
-     * @param layer A core layer which is a collection of neurons.
+     * @param neurons The neurons of the layer.
      */
-    explicit OutputLayer(Layer layer);
+    explicit OutputLayer(vn_t neurons);
 
-    /**
-     * Processes the inputs through the layer by activating each neuron.
-     * Uses Softmax activation function.
-     *
-     * @param inputs A vector of input values to the layer.
-     * @return A vector of output values from each neuron.
-     */
-    [[nodiscard]] vd_t activate(const vd_t &inputs) const;
+    [[nodiscard]] vd_t activate(const vd_t &inputs) const override;
+
+    [[nodiscard]] vd_t calculateGradients(const vd_t &intermediateGradients) const override;
 };
 
 #endif //FRUIT_CLASSIFIER_WASM_OUTPUT_LAYER_H

@@ -21,19 +21,14 @@ public:
      * Constructor for the HiddenLayer class that initializes the layer with a given core layer
      * and an activation function.
      *
-     * @param layer A core layer which is a collection of neurons.
+     * @param neurons The neurons of the layer.
      * @param function An activation function to be used for the neurons.
      */
-    explicit HiddenLayer(Layer layer, Function function);
+    explicit HiddenLayer(vn_t neurons, Function function);
 
-    /**
-     * Processes the inputs through the layer by activating each neuron.
-     * Activation function is applied to every output.
-     *
-     * @param inputs A vector of input values to the layer.
-     * @return A vector of output values from each neuron.
-     */
-    [[nodiscard]] vd_t activate(const vd_t &inputs) const;
+    [[nodiscard]] vd_t activate(const vd_t &inputs) const override;
+
+    [[nodiscard]] vd_t calculateGradients(const vd_t &intermediateGradients) const override;
 };
 
 #endif //FRUIT_CLASSIFIER_WASM_HIDDEN_LAYER_H

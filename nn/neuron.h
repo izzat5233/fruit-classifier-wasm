@@ -23,6 +23,12 @@ public:
     explicit Neuron(vd_t weights, double threshold);
 
     /**
+     * Two neurons are equal if all their weights are equal
+     * and they have the same bias.
+     */
+    bool operator==(const Neuron& other) const;
+
+    /**
      * Getter for the bias of the neuron.
      *
      * @return The current bias of the neuron.

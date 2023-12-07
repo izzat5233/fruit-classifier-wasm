@@ -69,12 +69,12 @@ namespace nn {
          * The activation function.
          * A function from x to y.
          */
-        const fdd_t &fun;
+        fdd_t fun;
         /**
          * The derivative of the activation function.
          * A function from y to y'.
          */
-        const fdd_t &der;
+        fdd_t der;
     };
 
     /*
@@ -108,7 +108,7 @@ namespace nn {
          * @param actual Actual output values
          * @return The Sum Square Error
          */
-        double sse(const vd_t& desired, const vd_t& actual);
+        double sse(const vd_t &desired, const vd_t &actual);
 
         /**
          * Calculates the Mean Square Error.
@@ -116,7 +116,7 @@ namespace nn {
          * @param actual Actual output values
          * @return The Mean Square Error
          */
-        double mse(const vd_t& desired, const vd_t& actual);
+        double mse(const vd_t &desired, const vd_t &actual);
     }
 
     /**
@@ -136,7 +136,7 @@ namespace nn {
         Neuron neuron(const ui_t &numInputs, double lowBound, double highBound);
 
         /**
-         * Creates a Layer with the specified options
+         * Creates a vector of neurons with the specified options
          * which can be used to create a HiddenLayer or an OutputLayer.
          * Neurons weights and bias are given random values in the range:
          * [-numNeurons / rangeFactor, +numNeurons / rangeFactor].
@@ -145,9 +145,9 @@ namespace nn {
          * @param numInputs Number of inputs for the neurons.
          * @param numNeurons Number of neurons for the layer.
          * @param rangeFactor Random values range factor. Default is 2.4.
-         * @return A Layer object configured as per the provided options.
+         * @return A vector of properly configured neurons.
          */
-        Layer layer(const ui_t &numInputs, const ui_t &numNeurons, double rangeFactor = 2.4);
+        vn_t layer(const ui_t &numInputs, const ui_t &numNeurons, double rangeFactor = 2.4);
 
         /**
          * Creates a Network with the specified options.

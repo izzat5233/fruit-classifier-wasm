@@ -15,6 +15,11 @@ Neuron::Neuron(vd_t weights, double threshold)
     PRINT("Neuron created with " << size() << " weights and bias " << bias)
 }
 
+bool Neuron::operator==(const Neuron &other) const {
+    return bias == other.bias &&
+           static_cast<const vd_t &>(*this) == static_cast<const vd_t &>(other);
+}
+
 double Neuron::getBias() const {
     return bias;
 }

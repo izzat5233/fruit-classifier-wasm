@@ -22,13 +22,13 @@ Network::Network(vl_t layers, OutputLayer outputLayer, double alpha)
     PRINT("Network created with " << size << " layers and alpha " << alpha)
 }
 
-void Network::forwardPropagate(const vd_t &input) {
+vd_t Network::forwardPropagate(const vd_t &input) {
     auto it = y_cash.begin();
     auto acc = std::accumulate(layers.begin(), layers.end(), input, [&it](const auto &acc, const auto &i) {
         (*it) = i.activate(acc);
         return *(it++);
     });
-    (*it) = outputLayer.activate(acc);
+    return (*it) = outputLayer.activate(acc);
 }
 
 void Network::backwardPropagate(const vd_t &output) {
@@ -37,13 +37,13 @@ void Network::backwardPropagate(const vd_t &output) {
     std::transform(output.begin(), output.end(), y_cash[size - 1].begin(), e_cash[size - 1].begin(), std::minus<>());
 
     // First hidden layer
-    e_cash[size - 2] = outputLayer.backPropagate(e_cash[size - 1], layers[size - 2]);
+    e_cash[size - 2] = outputLayer.propagateErrorBackward(e_cash[size - 1]);
     if (size <= 2) { return; }
 
     // Rest of layers
     for (std::size_t j = 0; j < size - 2; ++j) {
         auto i = size - 3 - j;
-        e_cash[i] = layers[i + 1].backPropagate(e_cash[i + 1], layers[i]);
+        e_cash[i] = layers[i + 1].propagateErrorBackward(e_cash[i + 1]);
     }
 }
 
