@@ -33,11 +33,11 @@ TEST_F(NeuronTest, AdjustWeightsManually) {
 
 TEST_F(NeuronTest, AdjustWeightsWithGradient) {
     neuron.adjust({0.2, 0.1, -0.5}, 0.5, 0.1);
-    auto factor = 0.5 * 0.1;
+    auto factor = -1 * 0.5 * 0.1;
     EXPECT_NEAR(neuron[0], n0[0] + 0.2 * factor, epsilon);
     EXPECT_NEAR(neuron[1], n0[1] + 0.1 * factor, epsilon);
     EXPECT_NEAR(neuron[2], n0[2] + -0.5 * factor, epsilon);
-    EXPECT_NEAR(neuron.getBias(), n0.getBias() + -1 * factor, epsilon);
+    EXPECT_NEAR(neuron.getBias(), n0.getBias() + factor, epsilon);
 }
 
 TEST_F(NeuronTest, AdjustWeightsWithZeroGradient) {
