@@ -35,9 +35,9 @@ void Neuron::adjust(const vd_t &weightDeltas, double biasDelta) {
 void Neuron::adjust(const vd_t &inputs, double gradient, double alpha) {
     vd_t deltas(inputs.size());
     std::transform(inputs.begin(), inputs.end(), deltas.begin(), [alpha, gradient](auto y) {
-        return alpha * y * gradient;
+        return -1 * alpha * y * gradient;
     });
-    auto biasDelta = alpha * -1 * gradient;
+    auto biasDelta = -1 * alpha * gradient;
     adjust(deltas, biasDelta);
 }
 
