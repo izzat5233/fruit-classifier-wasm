@@ -7,7 +7,7 @@ using std::cout;
 int main() {
     auto start = std::chrono::high_resolution_clock::now();
 
-    auto network = nn::make::network({2, 2, 2}, nn::act::tanh, 0.01);
+    auto network = nn::make::network({2, 2, 2}, nn::act::relu, 0.01);
     nn::vpvd_t data = {
             {{0, 0}, {1, 0}},
             {{0, 1}, {0, 1}},
@@ -15,7 +15,7 @@ int main() {
             {{1, 1}, {1, 0}}
     };
 
-    network.train(data, 10000, 0.2);
+    network.train(data, 10000, 0.1);
     cout << "Training Done.\n";
 
     for (const auto &p: data) {
