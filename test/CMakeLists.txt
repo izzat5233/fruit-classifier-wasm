@@ -6,6 +6,8 @@ add_executable(test_nn ${TEST_SOURCES}
         layer_test.cpp
         act_test.cpp
         util_test.cpp
+        network_test.cpp
+        globals.h
 )
 
 # Link the GoogleTest libraries and the neural network library

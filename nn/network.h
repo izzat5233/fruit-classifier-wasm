@@ -11,27 +11,58 @@
 
 class nn::Network {
 private:
+    const std::size_t size;
     vl_t layers;
     OutputLayer outputLayer;
     double alpha;
-    std::size_t size;
-    vvd_t y_cash;
-    vvd_t e_cash;
 
 public:
     /**
-     * Constructs a neural network with a given set of layers and a learning rate.
+     * Constructs a neural network with a given set of layers and learning rate.
+     * The algorithm works well if the last layer is OutputLayer.
+     * But no errors occur with another layer.
      *
-     * @param layers Vector of hidden layers that make up the network.
+     * @param hiddenLayers Vector of hidden layers that make up the network.
      * @param outputLayer The OutputLayer of the network.
      * @param alpha Learning rate used in training.
      */
-    explicit Network(vl_t layers, OutputLayer outputLayer, double alpha);
+    explicit Network(vl_t hiddenLayers, OutputLayer outputLayer, double alpha);
+
+    /**
+     * Provides access to a specific layer in the network.
+     *
+     * @param index The index of the layer to access.
+     * @return A reference to the requested layer.
+     */
+    Layer &get(std::size_t index);
+
+    /**
+     * Provides access to a specific layer in the network.
+     *
+     * @param index The index of the layer to access.
+     * @return A const reference to the requested layer.
+     */
+    [[nodiscard]] const Layer &get(std::size_t index) const;
+
+    /**
+     * Provides access to a specific layer in the network in reversed order.
+     *
+     * @param index The reverse index of the layer to access.
+     * @return A reference to the requested layer.
+     */
+    Layer &rget(std::size_t index);
+
+    /**
+     * Provides access to a specific layer in the network in reversed order.
+     *
+     * @param index The reverse index of the layer to access.
+     * @return A const reference to the requested layer.
+     */
+    [[nodiscard]] const Layer &rget(std::size_t index) const;
 
     /**
      * Forward-propagates the inputs vector through the network.
-     * Uses the activation function for each layer to activate the outputs.
-     * Cashes all outputs on the way.
+     * All layers are activated and all their outputs are cashed.
      *
      * @param input Vector of input values.
      * @return The calculated output values.
@@ -40,22 +71,20 @@ public:
 
     /**
      * Backward-propagates the inputs vector through the network.
-     * Uses the derivative function for each layer to perform gradient descent.
-     * The given desired outputs must be one-hot coded for the algorithm to work.
-     * Cashes all errors on the way back.
+     * The given desired outputs must be one-hot coded for the algorithm to work well.
      *
-     * @param output Vector of desired output values.
+     * @param desired Vector of desired output values.
      */
-    void backwardPropagate(const vd_t &output);
+    void backwardPropagate(const vd_t &desired);
 
     /**
      * Performs full forward & backward propagation given the input-output pair.
      * Cashes all outputs and errors.
      *
      * @param input Vector of input values.
-     * @param output Vector of desired output values.
+     * @param desired Vector of desired output values.
      */
-    void propagate(const vd_t &input, const vd_t &output);
+    void propagate(const vd_t &input, const vd_t &desired);
 
     /**
      * Trains the neural network on a given input-output pair.

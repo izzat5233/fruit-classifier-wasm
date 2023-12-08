@@ -12,12 +12,13 @@
 
 using namespace nn;
 
-Layer::Layer(vn_t neurons) : vn_t(std::move(neurons)), cash(this->size()) {
+Layer::Layer(vn_t neurons)
+        : vn_t(std::move(neurons)), output_cash(size()), gradient_cash(size()) {
     ASSERT([this] {
         auto n = (*this)[0].size();
         return std::all_of(begin(), end(), [n](auto &i) { return i.size() == n; });
     }())
-    PRINT("Layer created with " << this->size() << " neurons")
+    PRINT("Layer created with " << size() << " neurons")
 }
 
 HiddenLayer::HiddenLayer(vn_t neurons, Function function) : Layer(std::move(neurons)), function(function) {
@@ -26,6 +27,14 @@ HiddenLayer::HiddenLayer(vn_t neurons, Function function) : Layer(std::move(neur
 
 OutputLayer::OutputLayer(vn_t neurons) : Layer(std::move(neurons)) {
     PRINT("And its an output layer")
+}
+
+const vd_t &Layer::getOutputCash() const {
+    return output_cash;
+}
+
+const vd_t &Layer::getGradientCash() const {
+    return gradient_cash;
 }
 
 vd_t Layer::process(const vd_t &inputs) const {
@@ -37,7 +46,7 @@ vd_t Layer::process(const vd_t &inputs) const {
 }
 
 vd_t Layer::activateAndCache(const vd_t &inputs) {
-    return cash = activate(inputs);
+    return output_cash = activate(inputs);
 }
 
 vd_t HiddenLayer::activate(const vd_t &inputs) const {
@@ -62,15 +71,15 @@ vd_t Layer::propagateErrorBackward(const vd_t &gradients) const {
     return e;
 }
 
-vd_t Layer::calculateGradients(const Layer &l1, const Layer &l2, const vd_t &l2Gradients) {
-    return l1.calculateGradients(l2.propagateErrorBackward(l2Gradients));
+vd_t Layer::calculateGradientsAndCash(const vd_t &intermediateGradients) {
+    return gradient_cash = calculateGradients(intermediateGradients);
 }
 
 vd_t HiddenLayer::calculateGradients(const vd_t &intermediateGradients) const {
     ASSERT(size() == intermediateGradients.size())
     vd_t gradients(size());
     for (std::size_t i = 0; i < size(); ++i) {
-        gradients[i] = intermediateGradients[i] * function.der(cash[i]);
+        gradients[i] = intermediateGradients[i] * function.der(output_cash[i]);
     }
     return gradients;
 }
@@ -79,7 +88,7 @@ vd_t OutputLayer::calculateGradients(const vd_t &intermediateGradients) const {
     ASSERT(size() == intermediateGradients.size())
     vd_t gradients(size());
     for (std::size_t i = 0; i < size(); ++i) {
-        gradients[i] = cash[i] - intermediateGradients[i];
+        gradients[i] = output_cash[i] - intermediateGradients[i];
     }
     return gradients;
 }

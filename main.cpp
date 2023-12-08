@@ -15,7 +15,7 @@ int main() {
             {{1, 1}, {1, 0}}
     };
 
-    network.train(data, 100000, 0.9);
+    network.train(data, 10000, 0.1);
     cout << "Training Done.\n";
 
     for (const auto &p: data) {

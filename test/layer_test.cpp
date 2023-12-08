@@ -7,10 +7,10 @@
 #include <hidden_layer.h>
 #include <output_layer.h>
 
+#include "globals.h"
+
 class LayerTest : public ::testing::Test {
 protected:
-    const double epsilon;
-
     const nn::Neuron nl1, nl2;
     const nn::HiddenLayer l0;
 
@@ -26,8 +26,6 @@ protected:
     nn::OutputLayer outputLayer;
 
     LayerTest() :
-            epsilon(1e-9),
-
             nl1({0.1, 0.2}, -0.1),
             nl2({-0.2, 0.1}, 0.2),
             l0({nl1, nl2}, {}),
@@ -53,14 +51,10 @@ TEST_F(LayerTest, Constructors) {
 }
 
 TEST_F(LayerTest, ProcessInputs) {
-    nn::vd_t inputs = {0.5, -0.5};
-    nn::vd_t expected_outputs = {-0.15, 0.05};
-    nn::vd_t actual_outputs = layer.process(inputs);
-
-    EXPECT_EQ(expected_outputs.size(), actual_outputs.size());
-    for (std::size_t i = 0; i < expected_outputs.size(); ++i) {
-        EXPECT_NEAR(actual_outputs[i], expected_outputs[i], epsilon);
-    }
+    nn::vd_t input = {0.5, -0.5};
+    nn::vd_t expected = {-0.15, 0.05};
+    nn::vd_t actual = layer.process(input);
+    EXPECT_ALL_NEAR(expected, actual, EPSILON)
 }
 
 TEST_F(LayerTest, PreProcessGradients) {
@@ -70,33 +64,21 @@ TEST_F(LayerTest, PreProcessGradients) {
             gradients[0] * nl1[1] + gradients[1] * nl2[1],
     };
     nn::vd_t actual = layer.propagateErrorBackward(gradients);
-
-    EXPECT_EQ(expected.size(), actual.size());
-    for (std::size_t i = 0; i < expected.size(); ++i) {
-        EXPECT_NEAR(actual[i], expected[i], epsilon);
-    }
+    EXPECT_ALL_NEAR(expected, actual, EPSILON)
 }
 
 TEST_F(LayerTest, ActivateHiddenLayer) {
     nn::vd_t input = {3, -2, 0.8};
     nn::vd_t expected = {fh.fun(nh1.process(input)), fh.fun(nh2.process(input))};
     nn::vd_t actual = hiddenLayer.activate(input);
-
-    EXPECT_EQ(expected.size(), actual.size());
-    for (std::size_t i = 0; i < expected.size(); ++i) {
-        EXPECT_NEAR(expected[i], actual[i], epsilon);
-    }
+    EXPECT_ALL_NEAR(expected, actual, EPSILON)
 }
 
 TEST_F(LayerTest, ActivateOutputLayer) {
     nn::vd_t input = {0.2, -0.1};
     nn::vd_t expected = nn::act::softmax({no1.process(input), no2.process(input), no3.process(input)});
     nn::vd_t actual = outputLayer.activate(input);
-
-    EXPECT_EQ(expected.size(), actual.size());
-    for (std::size_t i = 0; i < expected.size(); ++i) {
-        EXPECT_NEAR(expected[i], actual[i], epsilon);
-    }
+    EXPECT_ALL_NEAR(expected, actual, EPSILON)
 }
 
 TEST_F(LayerTest, CalculateGradientsForHiddenLayer) {
@@ -107,11 +89,7 @@ TEST_F(LayerTest, CalculateGradientsForHiddenLayer) {
             preGradients[1] * fh.der(output[1])
     };
     nn::vd_t actual = hiddenLayer.calculateGradients(preGradients);
-
-    EXPECT_EQ(expected.size(), actual.size());
-    for (std::size_t i = 0; i < expected.size(); ++i) {
-        EXPECT_NEAR(expected[i], actual[i], epsilon);
-    }
+    EXPECT_ALL_NEAR(expected, actual, EPSILON)
 }
 
 TEST_F(LayerTest, CalculateGradientsForOutputLayer) {
@@ -123,9 +101,5 @@ TEST_F(LayerTest, CalculateGradientsForOutputLayer) {
             output[2] - desired[2]
     };
     nn::vd_t actual = outputLayer.calculateGradients(desired);
-
-    EXPECT_EQ(expected.size(), actual.size());
-    for (std::size_t i = 0; i < expected.size(); ++i) {
-        EXPECT_NEAR(expected[i], actual[i], epsilon);
-    }
+    EXPECT_ALL_NEAR(expected, actual, EPSILON)
 }

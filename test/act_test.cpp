@@ -5,7 +5,9 @@
 #include <gtest/gtest.h>
 #include <nn.h>
 
-constexpr auto epsilon = 1e-10;
+#define EPSILON 1e-10
+
+#include "globals.h"
 
 TEST(ActTest, ReluFunction) {
     auto f = nn::act::relu.fun;
@@ -27,47 +29,44 @@ TEST(ActTest, ReluDerivative) {
 
 TEST(ActTest, SigmoidFunction) {
     auto f = nn::act::sigmoid.fun;
-    EXPECT_NEAR(f(-1), 0.26894142137, epsilon);
-    EXPECT_NEAR(f(-0.001), 0.49975000002083, epsilon);
-    EXPECT_NEAR(f(0), 0.5, epsilon);
-    EXPECT_NEAR(f(0.001), 0.50024999997917, epsilon);
-    EXPECT_NEAR(f(1), 0.73105857863, epsilon);
+    EXPECT_NEAR(f(-1), 0.26894142137, EPSILON);
+    EXPECT_NEAR(f(-0.001), 0.49975000002083, EPSILON);
+    EXPECT_NEAR(f(0), 0.5, EPSILON);
+    EXPECT_NEAR(f(0.001), 0.50024999997917, EPSILON);
+    EXPECT_NEAR(f(1), 0.73105857863, EPSILON);
 }
 
 TEST(ActTest, SigmoidDerivative) {
     auto [f, f1] = nn::act::sigmoid;
-    EXPECT_NEAR(f1(f(-1)), 0.19661193324, epsilon);
-    EXPECT_NEAR(f1(f(-0.001)), 0.2499999375, epsilon);
-    EXPECT_NEAR(f1(f(0)), 0.25, epsilon);
-    EXPECT_NEAR(f1(f(0.001)), 0.2499999375, epsilon);
-    EXPECT_NEAR(f1(f(1)), 0.19661193324, epsilon);
+    EXPECT_NEAR(f1(f(-1)), 0.19661193324, EPSILON);
+    EXPECT_NEAR(f1(f(-0.001)), 0.2499999375, EPSILON);
+    EXPECT_NEAR(f1(f(0)), 0.25, EPSILON);
+    EXPECT_NEAR(f1(f(0.001)), 0.2499999375, EPSILON);
+    EXPECT_NEAR(f1(f(1)), 0.19661193324, EPSILON);
 }
 
 TEST(ActTest, TanhFunction) {
     auto f = nn::act::tanh.fun;
-    EXPECT_NEAR(f(-1), -0.7615941559, epsilon);
-    EXPECT_NEAR(f(-0.001), -0.0009999996, epsilon);
-    EXPECT_NEAR(f(0), 0, epsilon);
-    EXPECT_NEAR(f(0.001), 0.0009999996, epsilon);
-    EXPECT_NEAR(f(1), 0.7615941559, epsilon);
+    EXPECT_NEAR(f(-1), -0.7615941559, EPSILON);
+    EXPECT_NEAR(f(-0.001), -0.0009999996, EPSILON);
+    EXPECT_NEAR(f(0), 0, EPSILON);
+    EXPECT_NEAR(f(0.001), 0.0009999996, EPSILON);
+    EXPECT_NEAR(f(1), 0.7615941559, EPSILON);
 }
 
 TEST(ActTest, TanhDerivative) {
     auto [f, f1] = nn::act::tanh;
-    EXPECT_NEAR(f1(f(-1)), 0.4199743416, epsilon);
-    EXPECT_NEAR(f1(f(-0.001)), 0.9999990000, epsilon);
-    EXPECT_NEAR(f1(f(0)), 1, epsilon);
-    EXPECT_NEAR(f1(f(0.001)), 0.9999990000, epsilon);
-    EXPECT_NEAR(f1(f(1)), 0.4199743416, epsilon);
+    EXPECT_NEAR(f1(f(-1)), 0.4199743416, EPSILON);
+    EXPECT_NEAR(f1(f(-0.001)), 0.9999990000, EPSILON);
+    EXPECT_NEAR(f1(f(0)), 1, EPSILON);
+    EXPECT_NEAR(f1(f(0.001)), 0.9999990000, EPSILON);
+    EXPECT_NEAR(f1(f(1)), 0.4199743416, EPSILON);
 }
 
 TEST(ActTest, Softmax) {
     auto test = [](const nn::vd_t &input, const nn::vd_t &expected) {
         auto actual = nn::act::softmax(input);
-        EXPECT_EQ(actual.size(), expected.size());
-        for (std::size_t i = 0; i < input.size(); ++i) {
-            EXPECT_NEAR(actual[i], expected[i], epsilon);
-        }
+        EXPECT_ALL_NEAR(actual, expected, EPSILON)
     };
     test({-0.5}, {1});
     test({1, 3, 2}, {0.0900305732, 0.6652409558, 0.2447284711});

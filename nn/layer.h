@@ -10,7 +10,8 @@
 
 class nn::Layer : public vn_t {
 protected:
-    vd_t cash;
+    vd_t output_cash;
+    vd_t gradient_cash;
 
     friend class Network;
 
@@ -21,6 +22,16 @@ public:
      * @param n A vector of Neuron objects.
      */
     explicit Layer(vn_t n);
+
+    /**
+     * @return The latest cashed output result.
+     */
+    [[nodiscard]] const vd_t &getOutputCash() const;
+
+    /**
+     * @return The latest cashed gradient result.
+     */
+    [[nodiscard]] const vd_t &getGradientCash() const;
 
     /**
      * Processes the inputs through the each neuron of the layer.
@@ -86,29 +97,36 @@ public:
      * Note: this method uses the outputs cashed by the latest `activate` method call.
      *
      * @param intermediateGradients A vector of gradients obtained from the `propagateErrorBackward` method of the
-     * next layer. These gradients are pre-derivative and need to be processed further.
+     * next layer. These gradients are pre-derivative and need to be processed further. In the case of the output layer
+     * these are the `target` or `desired` values.
      * @return A vector of final gradients for the current layer after applying the derivative of
      * the activation function.
      */
     [[nodiscard]] virtual vd_t calculateGradients(const vd_t &intermediateGradients) const = 0;
 
     /**
-     * Static utility method for calculating gradients based on two consecutive layers and
-     * the gradients of the latter layer. It uses the `propagateErrorBackward` method of the first layer (`l1`)
-     * and the `calculateGradients` method of the second layer (`l2`) to compute the gradients.
+     * Calculates the gradients for the layer based on the intermediate gradients and caches them.
+     * This method is an extension of the `calculateGradients` abstract method, with the additional
+     * functionality of caching the computed gradients.
      *
-     * This method is particularly useful in chaining gradient computations across layers during
-     * the backpropagation phase of a neural network. By utilizing the weighted sum from `propagateErrorBackward`
-     * and the gradient calculation logic in `calculateGradients`, it effectively bridges the gradient
-     * computation between two layers.
+     * This method takes the intermediate gradients, which are the outputs of the `propagateErrorBackward`
+     * method from the next layer in the network, and applies the derivative of the activation function
+     * to these intermediate gradients. This process produces the final gradients for the current layer,
+     * which are then cached for use in subsequent weight update steps.
      *
+     * The caching of gradients is crucial for the efficiency of the backpropagation algorithm,
+     * particularly in cases where gradient values need to be accessed multiple times during
+     * the weight update phase.
      *
-     * @param l1 The first layer (usually closer to the input).
-     * @param l2 The second layer (usually closer to the output).
-     * @param l2Gradients Gradients calculated for the second layer (`l2`).
-     * @return A vector of gradients for the first layer (`l1`), ready for backpropagation.
+     * Note: This method uses the outputs cached by the latest `activate` or `activateAndCache` method call.
+     *
+     * @param intermediateGradients A vector of gradients obtained from the `propagateErrorBackward` method of the
+     * next layer. These gradients are pre-derivative and need to be processed to obtain the final gradients.
+     * In the case of the output layer these are the `target` or `desired` values.
+     * @return A vector of final gradients for the current layer after applying the derivative of
+     * the activation function. These gradients are also cached within the layer.
      */
-    [[nodiscard]] static vd_t calculateGradients(const Layer &l1, const Layer &l2, const vd_t &l2Gradients);
+    vd_t calculateGradientsAndCash(const vd_t &intermediateGradients);
 };
 
 #endif //FRUIT_CLASSIFIER_WASM_LAYER_H
