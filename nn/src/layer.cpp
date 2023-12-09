@@ -58,15 +58,17 @@ vd_t HiddenLayer::activate(const vd_t &inputs) const {
 }
 
 vd_t OutputLayer::activate(const vd_t &inputs) const {
-    return act::softmax(Layer::process(inputs));
+    vd_t res = Layer::process(inputs);
+    if (size() == 1) { return {act::sigmoid.fun(res[0])}; }
+    return act::softmax(res);
 }
 
-vd_t Layer::propagateErrorBackward(const vd_t &gradients) const {
+vd_t Layer::propagateErrorBackward() const {
     ASSERT(gradients.size() == size())
 
     vd_t e((*this)[0].size());
     for (std::size_t i = 0; i < e.size(); ++i) {
-        auto g = gradients.begin();
+        auto g = gradient_cash.begin();
         for (auto n = begin(); n != end(); ++n, ++g) { e[i] += (*n)[i] * (*g); }
     }
     return e;

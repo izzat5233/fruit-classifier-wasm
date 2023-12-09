@@ -55,7 +55,8 @@ vd_t Network::forwardPropagate(const vd_t &input) {
 void Network::backwardPropagate(const vd_t &desired) {
     auto res = desired;
     for (std::size_t i = 0; i < size; ++i) {
-        res = rget(i).propagateErrorBackward(rget(i).calculateGradientsAndCash(res));
+        rget(i).calculateGradientsAndCash(res);
+        res = rget(i).propagateErrorBackward();
     }
 }
 
@@ -68,15 +69,15 @@ void Network::propagate(const vd_t &input, const vd_t &desired) {
 
 double Network::train(const vd_t &input, const vd_t &output) {
     propagate(input, output);
-    double sse = loss::sse(output, rget(0).output_cash);
+    double sse = loss::sse(output, rget(0).getOutputCash());
     PRINT("Propagation error: " << sse)
 
     for (std::size_t i = 0; i < size; ++i) {
         auto &layer = get(i);
         for (std::size_t j = 0; j < layer.size(); ++j) {
             auto &neuron = layer[j];
-            auto &y = (i > 0 ? get(i - 1).output_cash : input);
-            auto e = layer.gradient_cash[j];
+            auto &y = (i > 0 ? get(i - 1).getOutputCash() : input);
+            auto e = layer.getGradientCash()[j];
             neuron.adjust(y, e, alpha);
         }
     }

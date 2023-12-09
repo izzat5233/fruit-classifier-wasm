@@ -58,12 +58,12 @@ TEST_F(LayerTest, ProcessInputs) {
 }
 
 TEST_F(LayerTest, PreProcessGradients) {
-    nn::vd_t gradients = {0.4, -0.3};
+    nn::vd_t gradients = layer.calculateGradients({0.4, -0.3});
     nn::vd_t expected = {
             gradients[0] * nl1[0] + gradients[1] * nl2[0],
             gradients[0] * nl1[1] + gradients[1] * nl2[1],
     };
-    nn::vd_t actual = layer.propagateErrorBackward(gradients);
+    nn::vd_t actual = layer.propagateErrorBackward();
     EXPECT_ALL_NEAR(expected, actual, EPSILON)
 }
 

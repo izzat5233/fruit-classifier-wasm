@@ -11,8 +11,6 @@ class nn::Neuron : public vd_t {
 private:
     double bias;
 
-    friend class Layer;
-
 public:
     /**
      * Constructor for the Neuron class.

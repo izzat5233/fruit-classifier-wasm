@@ -13,8 +13,6 @@ protected:
     vd_t output_cash;
     vd_t gradient_cash;
 
-    friend class Network;
-
 public:
     /**
      * Constructor for the Layer class that initializes the layer with a given set of neurons.
@@ -63,27 +61,6 @@ public:
     vd_t activateAndCache(const vd_t &inputs);
 
     /**
-     * Propagates the error backward from the current layer to the previous layer in the network.
-     * This method computes the preliminary component of the gradients for the previous layer
-     * by calculating the weighted sum of the current layer's gradients and each neuron's weights.
-     *
-     * This computation is a fundamental part of the backpropagation algorithm and is used for
-     * adjusting the weights in the network. It effectively distributes the error from the current
-     * layer back to the previous layer, taking into account the contribution of each neuron's weights
-     * to the overall error.
-     *
-     * Note: This method only computes the weighted sum of gradients and does not apply the derivative
-     * of the activation function. The computed values are intermediate gradients, and the derivative
-     * of the previous layer's activation function should be applied externally to obtain the final gradients.
-     *
-     * @param gradients A vector of error gradients from the current layer. These gradients are typically
-     * the differences between the predicted output and the actual output of the network.
-     * @return A vector representing the preliminary gradients for the previous layer, calculated as a
-     * weighted sum of the current layer's gradients and neuron weights.
-     */
-    [[nodiscard]] vd_t propagateErrorBackward(const vd_t &gradients) const;
-
-    /**
      * Abstract method for calculating the gradients for the layer. This method is designed to be
      * overridden in derived classes. It takes the intermediate gradients, which are the outputs of
      * the `propagateErrorBackward` method from the next layer in the network, and applies the derivative of the
@@ -127,6 +104,27 @@ public:
      * the activation function. These gradients are also cached within the layer.
      */
     vd_t calculateGradientsAndCash(const vd_t &intermediateGradients);
+
+    /**
+     * Propagates the error backward from the current layer to the previous layer in the network.
+     * This method computes the preliminary component of the gradients for the previous layer
+     * by calculating the weighted sum of the current layer's gradients and each neuron's weights.
+     *
+     * It uses the cashed gradients calculated by `calculateGradients` method.
+     *
+     * This computation is a fundamental part of the backpropagation algorithm and is used for
+     * adjusting the weights in the network. It effectively distributes the error from the current
+     * layer back to the previous layer, taking into account the contribution of each neuron's weights
+     * to the overall error.
+     *
+     * Note: This method only computes the weighted sum of gradients and does not apply the derivative
+     * of the activation function. The computed values are intermediate gradients, and the derivative
+     * of the previous layer's activation function should be applied externally to obtain the final gradients.
+     *
+     * @return A vector representing the preliminary gradients for the previous layer, calculated as a
+     * weighted sum of the current layer's gradients and neuron weights.
+     */
+    [[nodiscard]] vd_t propagateErrorBackward() const;
 };
 
 #endif //FRUIT_CLASSIFIER_WASM_LAYER_H
