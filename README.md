@@ -32,6 +32,8 @@ different types of fruits. This library forms the core part of the larger Fruit 
 - **Activation Functions**: Defined in the ```act``` namespace with built-in functions for use in network layers.
   Includes a special softmax function for output layers.
 
+- **Loss Functions**: Defined in the ```loss``` namespace with built-in functions for use in network layers.
+
 - **Factory Functions**:
   Located in the ```make``` namespace, these functions allow for the creation of Neurons, Layers, and Networks with
   specific configurations.
@@ -47,7 +49,7 @@ different types of fruits. This library forms the core part of the larger Fruit 
 - Example
 
 ```c++
-#include "nn/network.h"
+#include <network.h>
 
 int main() {
     // Create a neural network with specific dimensions and activation functions
@@ -56,13 +58,23 @@ int main() {
     // First hidden layer uses ReLU activation function, second one uses Sigmoid.
     nn::Network network = nn::make::network({3, 6, 4, 2}, {nn::act::relu, nn::act::sigmoid}, 0.01);
 
+    // Define the data. Typically, a vector of decimals vectors.
+    nn::vpvd_t data = {       // This is an XOR dataset
+            {{0, 0}, {1, 0}}, // for 0 xor 0 we expect a 0
+            {{0, 1}, {0, 1}}, // for 0 xor 1 we expect a 1
+            {{1, 0}, {0, 1}}, // for 1 xor 0 we expect a 1
+            {{1, 1}, {1, 0}}  // for 1 xor 1 we expect a 0
+    };
+    
     // Train the network with your data...
-    // For input {1, 2, 3} we expect an output {1, 0}
-    network.train({1, 2, 3}, {1, 0});
+    // Keep training until it reaches 10000 epochs
+    // or a maximum sum square error 0.1
+    network.train(data, 10000, 0.1);
 
     // Now use it to predict outputs...
     // vd_t is a vector of double values.
-    nn::vd_t output = network.predict({2, 3, 1});
+    // example result {0.129248 0.870752}
+    nn::vd_t output = network.predict({0, 1});
     
     return 0;
 }
