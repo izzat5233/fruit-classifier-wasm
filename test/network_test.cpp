@@ -11,7 +11,7 @@ class NetworkTest : public ::testing::Test {
 protected:
     const double alpha;
     const nn::Neuron n11, n12, n21, n22, n23, n31, n32;
-    const nn::Function f1, f2;
+    const nn::act::Function f1, f2;
     const nn::HiddenLayer l1, l2;
     const nn::OutputLayer l3;
 

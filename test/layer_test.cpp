@@ -15,7 +15,7 @@ protected:
     const nn::HiddenLayer l0;
 
     const nn::Neuron nh1, nh2;
-    const nn::Function fh;
+    const nn::act::Function fh;
     const nn::HiddenLayer h0;
 
     const nn::Neuron no1, no2, no3;
