@@ -3,33 +3,23 @@
 //
 
 #include "neuron.h"
-#include "../../util/debug.h"
 
 #include <algorithm>
 #include <numeric>
+#include <cassert>
 
 using namespace nn;
 
-Neuron::Neuron(vd_t weights, double threshold)
-        : vd_t(std::move(weights)), bias(threshold) {
-    PRINT("Neuron created with " << size() << " weights and bias " << bias)
-}
-
-bool Neuron::operator==(const Neuron &other) const {
-    return bias == other.bias &&
-           static_cast<const vd_t &>(*this) == static_cast<const vd_t &>(other);
-}
+Neuron::Neuron(vd_t weights, double threshold) : vd_t(std::move(weights)), bias(threshold) {}
 
 double Neuron::getBias() const {
     return bias;
 }
 
 void Neuron::adjust(const vd_t &weightDeltas, double biasDelta) {
-    ASSERT(size() == weightDeltas.size())
+    assert(size() == weightDeltas.size());
     std::transform(begin(), end(), weightDeltas.begin(), begin(), std::plus<>());
     bias += biasDelta;
-    PRINT_ITER("Neuron adjusted weights to: ", *this)
-    PRINT("Neuron adjusted bias to: " << bias)
 }
 
 void Neuron::adjust(const vd_t &inputs, double gradient, double alpha) {
@@ -43,6 +33,6 @@ void Neuron::adjust(const vd_t &inputs, double gradient, double alpha) {
 }
 
 double Neuron::process(const vd_t &inputs) const {
-    ASSERT(size() == inputs.size())
+    assert(size() == inputs.size());
     return std::inner_product(begin(), end(), inputs.begin(), 0.0) + bias;
 }

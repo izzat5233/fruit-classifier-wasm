@@ -33,6 +33,7 @@ namespace nn {
     /**
      * Represents the output layer of the neural network. A collection of neurons that
      * processes inputs and produces outputs. Uses Softmax as an activation function.
+     * In case of 1-neuron size layer (Binary Classification) it uses Sigmoid activation function.
      */
     class OutputLayer;
 

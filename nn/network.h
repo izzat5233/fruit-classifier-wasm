@@ -78,15 +78,6 @@ public:
     void backwardPropagate(const vd_t &desired);
 
     /**
-     * Performs full forward & backward propagation given the input-output pair.
-     * Cashes all outputs and errors.
-     *
-     * @param input Vector of input values.
-     * @param desired Vector of desired output values.
-     */
-    void propagate(const vd_t &input, const vd_t &desired);
-
-    /**
      * Trains the neural network on a given input-output pair.
      * Calculates SSE during propagation and returns it.
      *

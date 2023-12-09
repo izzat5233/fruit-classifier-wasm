@@ -3,21 +3,21 @@
 //
 
 #include <algorithm>
+#include <cassert>
 #include "network.h"
-#include "../../util/debug.h"
 
 using namespace nn;
 
 Network::Network(vl_t layers, OutputLayer outputLayer, double alpha)
         : size(layers.size() + 1), layers(std::move(layers)), outputLayer(std::move(outputLayer)), alpha(alpha) {
-    ASSERT(!this->layers.empty())
-    ASSERT([this] {
-        for (auto i = std::next(this->layers.begin()); i != this->layers.end(); ++i) {
-            if ((*i)[0].size() != std::prev(i)->size()) { return false; }
+    assert(!this->layers.empty());
+    assert([this] {
+        auto i = this->layers.cbegin();
+        for (i = std::next(i); i != this->layers.cend(); i = std::next(i)) {
+            if (i->cbegin()->size() != std::prev(i)->size()) { return false; }
         }
-        return this->outputLayer[0].size() == this->layers.rbegin()->size();
-    }())
-    PRINT("Network created with " << size << " layers and alpha " << alpha)
+        return this->outputLayer.cbegin()->size() == this->layers.crbegin()->size();
+    }());
 }
 
 Layer &Network::get(std::size_t index) {
@@ -60,17 +60,9 @@ void Network::backwardPropagate(const vd_t &desired) {
     }
 }
 
-void Network::propagate(const vd_t &input, const vd_t &desired) {
-    forwardPropagate(input);
-    PRINT("Forward propagation done")
-    backwardPropagate(desired);
-    PRINT("Backward propagation done")
-}
-
 double Network::train(const vd_t &input, const vd_t &output) {
-    propagate(input, output);
-    double sse = loss::sse(output, rget(0).getOutputCash());
-    PRINT("Propagation error: " << sse)
+    vd_t res = forwardPropagate(input);
+    backwardPropagate(output);
 
     for (std::size_t i = 0; i < size; ++i) {
         auto &layer = get(i);
@@ -82,12 +74,11 @@ double Network::train(const vd_t &input, const vd_t &output) {
         }
     }
 
-    return sse;
+    return loss::sse(output, res);
 }
 
 void Network::train(const vpvd_t &data, std::size_t epochsLimit, double errorThreshold) {
     for (std::size_t i = 0; i < epochsLimit; ++i) {
-        PRINT("Epoch: " << i + 1)
         double worstError = errorThreshold - 1;
         for (const auto &p: data) {
             worstError = std::max(worstError, train(p.first, p.second));

@@ -5,9 +5,9 @@
 #include "nn.h"
 #include "neuron.h"
 #include "network.h"
-#include "../../util/debug.h"
 
 #include <random>
+#include <cassert>
 
 using namespace nn;
 
@@ -19,12 +19,11 @@ Neuron make::neuron(const ui_t &numInputs, double lowBound, double highBound) {
     vd_t weights(numInputs);
     for (auto &i: weights) { i = dist(gen); }
 
-    PRINT_ITER("Random weights:", weights)
     return Neuron(weights, dist(gen));
 }
 
 vn_t make::layer(const ui_t &numInputs, const ui_t &numNeurons, double rangeFactor) {
-    ASSERT(rangeFactor > 0)
+    assert(rangeFactor > 0);
     auto lowBound = -numNeurons / rangeFactor;
     auto highBound = numNeurons / rangeFactor;
 
@@ -39,7 +38,7 @@ vn_t make::layer(const ui_t &numInputs, const ui_t &numNeurons, double rangeFact
 
 Network make::network(const vi_t &dimensions, const vf_t &functions, double alpha) {
     auto n = static_cast<ui_t>(dimensions.size());
-    ASSERT(n == dimensions.size())
+    assert(n == dimensions.size());
 
     vl_t layers;
     for (ui_t i = 1; i < n - 1; ++i) {

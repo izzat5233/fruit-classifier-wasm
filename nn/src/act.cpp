@@ -3,7 +3,6 @@
 //
 
 #include "nn.h"
-#include "../../util/debug.h"
 
 #include <valarray>
 #include <numeric>
@@ -43,7 +42,6 @@ namespace nn::act {
         auto sum = std::accumulate(x.begin(), x.end(), 0.0, [](auto t, auto i) { return t + std::exp(i); });
         vd_t outputs(x);
         std::transform(outputs.begin(), outputs.end(), outputs.begin(), [sum](auto i) { return std::exp(i) / sum; });
-        PRINT_ITER("Softmax activated outputs:", outputs)
         return outputs;
     }
 }

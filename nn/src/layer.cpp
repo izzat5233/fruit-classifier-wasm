@@ -5,30 +5,18 @@
 #include "layer.h"
 #include "hidden_layer.h"
 #include "output_layer.h"
-#include "../../util/debug.h"
 
 #include <algorithm>
 #include <utility>
+#include <cassert>
 
 using namespace nn;
 
-Layer::Layer(vn_t neurons)
-        : vn_t(std::move(neurons)), output_cash(size()), gradient_cash(size()) {
-    ASSERT([this] {
-        auto n = (*this)[0].size();
-        return std::all_of(begin(), end(), [n](auto &i) { return i.size() == n; });
-    }())
-    PRINT("Layer created with " << size() << " neurons")
-}
+Layer::Layer(vn_t neurons) : vn_t(std::move(neurons)), output_cash(size()), gradient_cash(size()) {}
 
-HiddenLayer::HiddenLayer(vn_t neurons, act::Function function)
-        : Layer(std::move(neurons)), function(function) {
-    PRINT("And its a hidden layer")
-}
+HiddenLayer::HiddenLayer(vn_t neurons, act::Function function) : Layer(std::move(neurons)), function(function) {}
 
-OutputLayer::OutputLayer(vn_t neurons) : Layer(std::move(neurons)) {
-    PRINT("And its an output layer")
-}
+OutputLayer::OutputLayer(vn_t neurons) : Layer(std::move(neurons)) {}
 
 const vd_t &Layer::getOutputCash() const {
     return output_cash;
@@ -39,11 +27,9 @@ const vd_t &Layer::getGradientCash() const {
 }
 
 vd_t Layer::process(const vd_t &inputs) const {
-    vd_t outputs(size());
-    std::transform(begin(), end(), outputs.begin(), [&inputs](auto &n) { return n.process(inputs); });
-    PRINT_ITER("Layer processed inputs:", inputs)
-    PRINT_ITER("To raw outputs:", outputs)
-    return outputs;
+    vd_t res(size());
+    std::transform(begin(), end(), res.begin(), [&inputs](auto &n) { return n.process(inputs); });
+    return res;
 }
 
 vd_t Layer::activateAndCache(const vd_t &inputs) {
@@ -51,10 +37,9 @@ vd_t Layer::activateAndCache(const vd_t &inputs) {
 }
 
 vd_t HiddenLayer::activate(const vd_t &inputs) const {
-    vd_t output = Layer::process(inputs);
-    std::transform(output.begin(), output.end(), output.begin(), this->function.fun);
-    PRINT_ITER("Then to activated outputs:", outputs)
-    return output;
+    vd_t res = Layer::process(inputs);
+    std::transform(res.begin(), res.end(), res.begin(), this->function.fun);
+    return res;
 }
 
 vd_t OutputLayer::activate(const vd_t &inputs) const {
@@ -64,9 +49,7 @@ vd_t OutputLayer::activate(const vd_t &inputs) const {
 }
 
 vd_t Layer::propagateErrorBackward() const {
-    ASSERT(gradients.size() == size())
-
-    vd_t e((*this)[0].size());
+    vd_t e(begin()->size());
     for (std::size_t i = 0; i < e.size(); ++i) {
         auto g = gradient_cash.begin();
         for (auto n = begin(); n != end(); ++n, ++g) { e[i] += (*n)[i] * (*g); }
@@ -79,7 +62,7 @@ vd_t Layer::calculateGradientsAndCash(const vd_t &intermediateGradients) {
 }
 
 vd_t HiddenLayer::calculateGradients(const vd_t &intermediateGradients) const {
-    ASSERT(size() == intermediateGradients.size())
+    assert(size() == intermediateGradients.size());
     vd_t gradients(size());
     for (std::size_t i = 0; i < size(); ++i) {
         gradients[i] = intermediateGradients[i] * function.der(output_cash[i]);
@@ -88,7 +71,7 @@ vd_t HiddenLayer::calculateGradients(const vd_t &intermediateGradients) const {
 }
 
 vd_t OutputLayer::calculateGradients(const vd_t &intermediateGradients) const {
-    ASSERT(size() == intermediateGradients.size())
+    assert(size() == intermediateGradients.size());
     vd_t gradients(size());
     for (std::size_t i = 0; i < size(); ++i) {
         gradients[i] = output_cash[i] - intermediateGradients[i];
