@@ -36,7 +36,7 @@ protected:
 
 TEST_F(NetworkTest, ForwardPropagation) {
     nn::vd_t input = {1, 0};
-    std::vector<nn::vd_t> expected = {
+    nn::vvd_t expected = {
             {0.5,            0.5},
             {-0.4011342849,  0.0249947929, 0.0996679946},
             {0.316920916177, 0.683079083822}
@@ -47,7 +47,7 @@ TEST_F(NetworkTest, ForwardPropagation) {
     }
 }
 
-TEST_F(NetworkTest, BackwardPropagation) {
+TEST_F(NetworkTest, BackwardPropagationDoesntBreak) {
     nn::vd_t input = {1, 0};
     network.forwardPropagate(input);
     nn::vd_t desired = {0, 1};

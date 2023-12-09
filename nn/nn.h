@@ -42,12 +42,17 @@ namespace nn {
      */
     class Network;
 
-    /**
-     * Base struct for activation functions in a neural network.
-     * This struct defines the interface for activation functions and their derivatives,
-     * allowing for polymorphic use of different activation functions within the network.
+    /*
+     * Activation Functions Namespace
      */
-    struct Function;
+    namespace act {
+        /**
+         * Base struct for activation functions in a neural network.
+         * This struct defines the interface for activation functions and their derivatives,
+         * allowing for polymorphic use of different activation functions within the network.
+         */
+        struct Function;
+    }
 
     /**
      * Different types used frequently in nn namespace
@@ -58,29 +63,26 @@ namespace nn {
         using vd_t = std::vector<double>;
         using vn_t = std::vector<Neuron>;
         using vl_t = std::vector<HiddenLayer>;
-        using vf_t = std::vector<Function>;
+        using vf_t = std::vector<act::Function>;
         using fdd_t = double (*)(double);
         using vvd_t = std::vector<std::vector<double>>;
         using vpvd_t = std::vector<std::pair<vd_t, vd_t>>;
     }
 
-    struct Function {
-        /**
-         * The activation function.
-         * A function from x to y.
-         */
-        fdd_t fun;
-        /**
-         * The derivative of the activation function.
-         * A function from y to y'.
-         */
-        fdd_t der;
-    };
-
-    /*
-     * Activation Functions Namespace
-     */
     namespace act {
+        struct Function {
+            /**
+             * The activation function.
+             * A function from x to y.
+             */
+            fdd_t fun;
+            /**
+             * The derivative of the activation function.
+             * A function from y to y'.
+             */
+            fdd_t der;
+        };
+
         extern Function step;
         extern Function sign;
         extern Function linear;
@@ -99,9 +101,9 @@ namespace nn {
     }
 
     /**
-     * Utility Functions Namespace
+     * Loss Functions Namespace
      */
-    namespace util {
+    namespace loss {
         /**
          * Calculates the Sum Square Error.
          * @param desired Desired output values
@@ -176,7 +178,7 @@ namespace nn {
          * @param alpha Initial learning rate used for the neural network.
          * @return A Network object configured as per the provided options.
          */
-        Network network(const vi_t &dimensions, const Function &function, double alpha);
+        Network network(const vi_t &dimensions, const act::Function &function, double alpha);
     }
 }
 

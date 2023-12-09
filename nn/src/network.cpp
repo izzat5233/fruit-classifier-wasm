@@ -68,7 +68,7 @@ void Network::propagate(const vd_t &input, const vd_t &desired) {
 
 double Network::train(const vd_t &input, const vd_t &output) {
     propagate(input, output);
-    double sse = util::sse(output, rget(0).output_cash);
+    double sse = loss::sse(output, rget(0).output_cash);
     PRINT("Propagation error: " << sse)
 
     for (std::size_t i = 0; i < size; ++i) {

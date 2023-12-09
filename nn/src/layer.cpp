@@ -21,7 +21,8 @@ Layer::Layer(vn_t neurons)
     PRINT("Layer created with " << size() << " neurons")
 }
 
-HiddenLayer::HiddenLayer(vn_t neurons, Function function) : Layer(std::move(neurons)), function(function) {
+HiddenLayer::HiddenLayer(vn_t neurons, act::Function function)
+        : Layer(std::move(neurons)), function(function) {
     PRINT("And its a hidden layer")
 }
 

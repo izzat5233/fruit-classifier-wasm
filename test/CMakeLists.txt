@@ -5,7 +5,7 @@ file(GLOB_RECURSE TEST_SOURCES "*.cpp")
 add_executable(test_nn ${TEST_SOURCES}
         layer_test.cpp
         act_test.cpp
-        util_test.cpp
+        loss_test.cpp
         network_test.cpp
         globals.h
 )

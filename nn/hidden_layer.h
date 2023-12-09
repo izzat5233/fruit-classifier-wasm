@@ -12,7 +12,7 @@
 
 class nn::HiddenLayer : public nn::Layer {
 private:
-    Function function;
+    act::Function function;
 
     friend class Layer;
 
@@ -24,7 +24,7 @@ public:
      * @param neurons The neurons of the layer.
      * @param function An activation function to be used for the neurons.
      */
-    explicit HiddenLayer(vn_t neurons, Function function);
+    explicit HiddenLayer(vn_t neurons, act::Function function);
 
     [[nodiscard]] vd_t activate(const vd_t &inputs) const override;
 

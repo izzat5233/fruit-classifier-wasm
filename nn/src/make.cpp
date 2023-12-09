@@ -50,6 +50,6 @@ Network make::network(const vi_t &dimensions, const vf_t &functions, double alph
     return Network(layers, outputLayer, alpha);
 }
 
-Network make::network(const vi_t &dimensions, const Function &function, double alpha) {
+Network make::network(const vi_t &dimensions, const act::Function &function, double alpha) {
     return make::network(dimensions, vf_t(dimensions.size() - 2, function), alpha);
 }
