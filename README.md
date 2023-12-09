@@ -53,10 +53,10 @@ different types of fruits. This library forms the core part of the larger Fruit 
 
 int main() {
     // Create a neural network with specific dimensions and activation functions
-    // The following network has 3 inputs and 2 hidden layers with [6, 4] neurons respectively,
-    // and output layer with 2 neurons. With initial learning rate 0.01.
+    // The following network has 2 inputs and a hidden layers with 2 neurons,
+    // and output layer with 2 neurons. With an initial learning rate of 0.01.
     // First hidden layer uses ReLU activation function, second one uses Sigmoid.
-    nn::Network network = nn::make::network({3, 6, 4, 2}, {nn::act::relu, nn::act::sigmoid}, 0.01);
+    nn::Network network = nn::make::network({2, 2, 2}, {nn::act::relu, nn::act::sigmoid}, 0.01);
 
     // Define the data. Typically, a vector of decimals vectors.
     nn::vpvd_t data = {       // This is an XOR dataset
