@@ -29,6 +29,14 @@ public:
     explicit Network(vl_t hiddenLayers, OutputLayer outputLayer, double alpha);
 
     /**
+     * Changes the learning rate of the network.
+     * Typically used for adaptive learning.
+     *
+     * @param learningRate The new learning rate.
+     */
+    void setAlpha(double learningRate);
+
+    /**
      * Provides access to a specific layer in the network.
      *
      * @param index The index of the layer to access.
@@ -79,24 +87,27 @@ public:
 
     /**
      * Trains the neural network on a given input-output pair.
-     * Calculates SSE during propagation and returns it.
+     * A call to this method represents a single iteration on the data.
+     *
+     * Returns the propagated (predicted) outputs. Its the responsibility of the caller
+     * to decide what to do with the result and how to continue.
      *
      * @param input Vector of given input values
      * @param output Vector of expected output values
-     * @return The SSE calculated after forward propagation.
+     * @return The calculated output values.
      */
-    double train(const vd_t &input, const vd_t &output);
+    vd_t train(const vd_t &input, const vd_t &output);
 
     /**
-     * Trains the neural network on a given set of input-output pairs.
-     * Keeps training until either epochs limit is reached
-     * or the error value for all iterations is below the given threshold.
+     * Trains the neural network on the given set of input-output pairs.
+     * Uses the given lossFunction to calculate the worst error result of all iterations.
+     * A call to this method represents a single epoch (full iteration on all data pairs).
      *
      * @param data Vector of input-output pairs for training.
-     * @param epochsLimit A limit to how many epochs the training is allowed to continue.
-     * @param errorThreshold A threshold all iteration is below the training stops.
+     * @param lossFunction The loss function used to calculate the errors.
+     * @return The worst error result of all iterations, calculated by the lossFunction.
      */
-    void train(const vpvd_t &data, std::size_t epochsLimit, double errorThreshold);
+    double train(const vpvd_t &data, loss::function_t lossFunction);
 
     /**
      * Makes predictions based on input data.

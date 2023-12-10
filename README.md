@@ -67,9 +67,13 @@ int main() {
     };
     
     // Train the network with your data...
-    // Keep training until it reaches 10000 epochs
+    // Keep training until it reaches 100 epochs
     // or a maximum sum square error 0.1
-    network.train(data, 10000, 0.1);
+    for (std::size_t i = 0; i < 100; ++i) {
+        auto error = network.train(data, nn::loss::sse);
+        if (error <= 0.1) { break; }
+    }
+    
 
     // Now use it to predict outputs...
     // vd_t is a vector of double values.

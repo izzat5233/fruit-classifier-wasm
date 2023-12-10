@@ -57,6 +57,7 @@ TEST_F(NetworkTest, BackwardPropagationDoesntBreak) {
 TEST_F(NetworkTest, SimpleTrainingTest) {
     nn::vd_t input = {1, 0};
     nn::vd_t output = {0, 1};
-    double error = network.train(input, output);
-    EXPECT_NEAR(error, 0.2008777342, EPSILON);
+    nn::vd_t expected = {0.316920916177, 0.683079083822};
+    nn::vd_t actual = network.train(input, output);
+    EXPECT_ALL_NEAR(actual, expected, EPSILON);
 }

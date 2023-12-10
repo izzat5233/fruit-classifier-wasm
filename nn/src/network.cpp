@@ -20,6 +20,10 @@ Network::Network(vl_t layers, OutputLayer outputLayer, double alpha)
     }());
 }
 
+void Network::setAlpha(double learningRate) {
+    this->alpha = learningRate;
+}
+
 Layer &Network::get(std::size_t index) {
     if (index == layers.size()) { return outputLayer; }
     return layers[index];
@@ -60,7 +64,7 @@ void Network::backwardPropagate(const vd_t &desired) {
     }
 }
 
-double Network::train(const vd_t &input, const vd_t &output) {
+vd_t Network::train(const vd_t &input, const vd_t &output) {
     vd_t res = forwardPropagate(input);
     backwardPropagate(output);
 
@@ -74,15 +78,15 @@ double Network::train(const vd_t &input, const vd_t &output) {
         }
     }
 
-    return loss::sse(output, res);
+    return res;
 }
 
-void Network::train(const vpvd_t &data, std::size_t epochsLimit, double errorThreshold) {
-    for (std::size_t i = 0; i < epochsLimit; ++i) {
-        double worstError = errorThreshold - 1;
-        for (const auto &p: data) {
-            worstError = std::max(worstError, train(p.first, p.second));
-        }
-        if (worstError < errorThreshold) { break; }
+double Network::train(const vpvd_t &data, loss::function_t lossFunction) {
+    double worst = -1;
+    for (const auto &[input, output]: data) {
+        vd_t res = train(input, output);
+        double error = lossFunction(output, res);
+        worst = std::max(worst, error);
     }
+    return worst;
 }

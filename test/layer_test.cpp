@@ -28,7 +28,7 @@ protected:
     LayerTest() :
             nl1({0.1, 0.2}, -0.1),
             nl2({-0.2, 0.1}, 0.2),
-            l0({nl1, nl2}, {}),
+            l0({nl1, nl2}, nn::act::linear),
 
             nh1({-0.5, 0.2, 0.1}, 0.3),
             nh2({0.05, 0.3, -0.05}, -0.2),
@@ -46,6 +46,7 @@ protected:
 };
 
 TEST_F(LayerTest, Constructors) {
+    EXPECT_EQ(layer, l0);
     EXPECT_EQ(hiddenLayer, h0);
     EXPECT_EQ(outputLayer, o0);
 }
@@ -58,7 +59,8 @@ TEST_F(LayerTest, ProcessInputs) {
 }
 
 TEST_F(LayerTest, PreProcessGradients) {
-    nn::vd_t gradients = layer.calculateGradients({0.4, -0.3});
+    layer.activateAndCache({0.5, -0.5});
+    nn::vd_t gradients = layer.calculateGradientsAndCash({0.4, -0.3});
     nn::vd_t expected = {
             gradients[0] * nl1[0] + gradients[1] * nl2[0],
             gradients[0] * nl1[1] + gradients[1] * nl2[1],

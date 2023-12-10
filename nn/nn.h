@@ -106,6 +106,11 @@ namespace nn {
      */
     namespace loss {
         /**
+         * The general type for a loss function.
+         */
+        using function_t = double (*)(const vd_t &, const vd_t &);
+
+        /**
          * Calculates the Sum Square Error.
          * @param desired Desired output values
          * @param actual Actual output values
