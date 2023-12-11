@@ -83,6 +83,10 @@ jobs:
           cd web
           hugo --minify --baseURL "${{ secrets.PRODUCTION_URL }}"
 
+      - name: Copy WASM files to public directory
+        run: |
+          cp -R static/wasm public/wasm
+
       - name: List Hugo Build Output
         run: ls -l ./web/public
 
