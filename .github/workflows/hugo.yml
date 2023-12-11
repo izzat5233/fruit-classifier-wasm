@@ -80,16 +80,12 @@ jobs:
           hugo --minify --baseURL "${{ secrets.PRODUCTION_URL }}"
 
       - name: List Hugo Build Output
-        run: ls -l web/public
-
-      - name: Copy WASM files to public directory
-        run: |
-          cp -R web/static/wasm web/public/wasm
+        run: ls -l ./public
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
         with:
-          path: ./web/public
+          path: ./public
 
   deploy:
     environment:
