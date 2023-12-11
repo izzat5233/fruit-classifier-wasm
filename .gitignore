@@ -1,3 +1,6 @@
+# Wasm files build directory
+/web/static/wasm
+
 # Project exclude paths
 /cmake-build-debug/### C++ template
 # Prerequisites
