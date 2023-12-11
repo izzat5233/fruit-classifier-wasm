@@ -8,15 +8,21 @@ if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
     set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/web/static/wasm)
 endif ()
 
-# Add nn directory to the build
-add_subdirectory(nn)
-
 # Add test directory to the build only for Debug configuration
 if (CMAKE_BUILD_TYPE MATCHES Debug)
+    include(FetchContent)
+    FetchContent_Declare(
+            googletest
+            GIT_REPOSITORY https://github.com/google/googletest.git
+            GIT_TAG release-1.10.0
+    )
+    FetchContent_MakeAvailable(googletest)
     add_subdirectory(test)
-    add_subdirectory(lib/googletest)
     enable_testing()
 endif ()
+
+# Add nn directory to the build
+add_subdirectory(nn)
 
 # Add an executable for the main.cpp
 add_executable(main_executable main.cpp)
