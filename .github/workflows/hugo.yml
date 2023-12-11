@@ -54,6 +54,9 @@ jobs:
       - name: Build Project
         run: cmake --build build/release
 
+      - name: List WASM Directory
+        run: ls -l web/static/wasm
+
       - name: Install Hugo CLI
         run: |
           wget -O ${{ runner.temp }}/hugo.deb https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_extended_${HUGO_VERSION}_linux-amd64.deb \
@@ -83,6 +86,9 @@ jobs:
           hugo \
             --minify \
             --baseURL "${{ secrets.PRODUCTION_URL }}"
+
+      - name: List Hugo Build Output
+        run: ls -l web/public
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2

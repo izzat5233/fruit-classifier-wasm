@@ -35,8 +35,8 @@ else ()
     # Link the executable to the necessary libraries
     target_link_libraries(main_executable nn_lib)
 
-    # Set different output names for different configurations
-    set_target_properties(main_executable PROPERTIES OUTPUT_NAME "wasm" DEBUG_POSTFIX "_debug")
+    # Set output name
+    set_target_properties(main_executable PROPERTIES OUTPUT_NAME "wasm")
 
     # Release flags
     target_link_options(main_executable PRIVATE "SHELL:-s NO_EXIT_RUNTIME=1")
