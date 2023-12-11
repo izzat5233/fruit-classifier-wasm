@@ -1,23 +1,11 @@
-baseURL = 'https://example.org/'
+baseURL = 'localhost:1313'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = 'Frusim'
 
-[[menus.main]]
-name = 'Home'
-pageRef = '/'
-weight = 10
-
-[[menus.main]]
-name = 'Posts'
-pageRef = '/posts'
-weight = 20
-
-[[menus.main]]
-name = 'Tags'
-pageRef = '/tags'
-weight = 30
+[params]
+    Description = 'Fruit Classifier Neural Network in Web Assembly'
 
 [module]
-[module.hugoVersion]
-extended = false
-min = "0.116.0"
+    [module.hugoVersion]
+    extended = false
+    min = "0.116.0"
