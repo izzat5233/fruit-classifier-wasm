@@ -83,7 +83,7 @@ jobs:
           HUGO_ENV: production
         run: |
           cd web
-          hugo --baseURL "${{ secrets.PRODUCTION_URL }}"
+          hugo --forceSyncStatic --verbose --ignoreCache --baseURL "${{ secrets.PRODUCTION_URL }}"
 
       - name: List Hugo Build Output
         run: ls -l web/public
