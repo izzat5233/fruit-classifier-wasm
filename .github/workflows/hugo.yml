@@ -2,7 +2,7 @@ name: Build, Test, and Deploy
 
 on:
   push:
-    branches: ["master"]
+    branches: [ "master" ]
   workflow_dispatch:
 
 permissions:
@@ -52,8 +52,14 @@ jobs:
       - name: Build Project
         run: cmake --build build/release
 
-      - name: Build Hugo site with overridden baseURL
-        run: hugo --baseURL ${{ secrets.PRODUCTION_URL }}
+      - name: Install Hugo
+        run: |
+          HUGO_VERSION="0.116.0"
+          wget -q -O hugo.deb https://github.com/gohugoio/hugo/releases/download/v0.116.0/hugo_0.116.0_linux-amd64.deb
+          sudo dpkg -i hugo.deb
+          
+          - name: Build Hugo site with overridden baseURL
+            run: hugo --baseURL ${{ secrets.PRODUCTION_URL }}
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
