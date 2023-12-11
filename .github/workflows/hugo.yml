@@ -55,7 +55,7 @@ jobs:
         run: cmake --build build/release
 
       - name: List WASM Directory
-        run: ls -l web/static/wasm
+        run: ls -l web/static/assets/wasm
 
       - name: Install Hugo CLI
         run: |
