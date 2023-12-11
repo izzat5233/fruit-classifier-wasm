@@ -1,7 +1,7 @@
-# Fruit Classifier Neural Network in WASM (FCNN)
+# Fruism | Fruit Classifier Neural Network in WASM
 
-The FCNN is a lightweight, flexible neural network library written in C++, designed for the specific task of classifying
-different types of fruits. This library forms the core part of the larger Fruit Classifier project.
+The Fruism is a lightweight, flexible neural network library written in C++, designed for the specific task of
+classifying different types of fruits. This library forms the core part of the larger Fruit Classifier project.
 
 ## Features:
 
@@ -83,3 +83,41 @@ int main() {
     return 0;
 }
 ```
+
+## Development
+
+To get started with development:
+
+1. **Emscripten Installation**: Make sure Emscripten is installed and properly configured on your system. Follow the
+   installation guide on the official [Emscripten website](https://emscripten.org/docs/getting_started/downloads.html).
+
+2. **Configure Build Profiles**:
+    - **Release Profile**: For building the final WebAssembly version of the project, use the Release profile. This
+      includes Emscripten's toolchain for WebAssembly compilation. Compiled wasm files will be located
+      at `/web/static/wasm`
+      afterward to be used by hugo server.
+        ```sh
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=path/to/emscripten/cmake/Modules/Platform/Emscripten.cmake -B build/release -S .
+        ```
+    - **Debug Profile**: For development and testing, use the Debug profile. This profile is configured to run all the
+      tests in the `test` directory.
+        ```sh
+        cmake -DCMAKE_BUILD_TYPE=Debug -B build/debug -S .
+        ```
+
+3. **Build the Project**:
+    - Navigate to the appropriate build directory (`build/debug` or `build/release`) and build the project:
+        ```sh
+        cmake --build .
+        ```
+
+4. **Run Tests** (Debug profile only):
+    - In the Debug profile, execute the tests to ensure everything is functioning correctly:
+        ```sh
+        ctest
+        ```
+
+5. **Web Integration** (Release profile only):
+    - For the Release profile, include the generated JavaScript and WebAssembly files in your web project. Use the
+      Emscripten Module API for interaction with the compiled code.
+    - All wasm files are generated at `/web/static/wasm`. `web/static` directory is served 'as is' by hugo server.

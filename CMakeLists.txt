@@ -3,17 +3,18 @@ project(fruit_classifier_wasm)
 
 set(CMAKE_CXX_STANDARD 17)
 
+# Wasm files directory
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/web/static/wasm)
+
 # Add nn directory to the build
 add_subdirectory(nn)
 
-# Add test directory to the build
-add_subdirectory(test)
-
-# Assuming GoogleTest is downloaded and placed in the 'lib/googletest' directory
-add_subdirectory(lib/googletest)
-
-# Enable testing with GoogleTest
-enable_testing()
+# Add test directory to the build only for Debug configuration
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    add_subdirectory(test)
+    add_subdirectory(lib/googletest)
+    enable_testing()
+endif ()
 
 # Add an executable for the main.cpp
 add_executable(main_executable main.cpp)
@@ -23,3 +24,17 @@ target_include_directories(main_executable PUBLIC ${PROJECT_SOURCE_DIR}/nn)
 
 # Link the executable to the necessary libraries
 target_link_libraries(main_executable nn_lib)
+
+# Set different output names for different configurations
+set_target_properties(main_executable PROPERTIES OUTPUT_NAME "wasm" DEBUG_POSTFIX "_debug")
+
+# Set compiler options and definitions based on the build type
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    # Debugging flags
+    target_compile_definitions(main_executable PRIVATE DEBUG=1)
+    target_link_options(main_executable PRIVATE "SHELL:-s ASSERTIONS=1")
+else ()
+    # Release flags
+    target_link_options(main_executable PRIVATE "SHELL:-s NO_EXIT_RUNTIME=1")
+    target_link_options(main_executable PRIVATE "SHELL:-s EXPORTED_RUNTIME_METHODS=['ccall']")
+endif ()

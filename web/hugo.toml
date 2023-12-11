@@ -1,0 +1,11 @@
+baseURL = 'localhost:1313'
+languageCode = 'en-us'
+title = 'Frusim'
+
+[params]
+    Description = 'Fruit Classifier Neural Network in Web Assembly'
+
+[module]
+    [module.hugoVersion]
+    extended = false
+    min = "0.116.0"
