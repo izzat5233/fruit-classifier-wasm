@@ -68,8 +68,6 @@ jobs:
 
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Setup Pages
         id: pages
@@ -82,13 +80,13 @@ jobs:
         run: |
           cd web
           hugo --minify --baseURL "${{ secrets.PRODUCTION_URL }}"
-
-      - name: Copy WASM files to public directory
-        run: |
-          cp -R static/wasm public/wasm
+          cd ..
 
       - name: List Hugo Build Output
-        run: ls -l ./web/public
+        run: |
+          ls -l ./web
+          ls -l ./web/static
+          ls -l ./web/public
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
