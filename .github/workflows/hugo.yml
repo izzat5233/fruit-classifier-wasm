@@ -40,7 +40,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.121.1
+      HUGO_VERSION: 0.120.4
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -77,10 +77,14 @@ jobs:
           HUGO_ENV: production
         run: |
           cd web
-          hugo --forceSyncStatic --verbose --ignoreCache --baseURL "${{ secrets.PRODUCTION_URL }}"
+          hugo --minify --baseURL "${{ secrets.PRODUCTION_URL }}"
 
       - name: List Hugo Build Output
         run: ls -l web/public
+
+      - name: Copy WASM files to public directory
+        run: |
+          cp -R web/static/wasm web/public/wasm
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
