@@ -40,7 +40,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.120.4
+      HUGO_VERSION: 0.116.0
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,7 +55,7 @@ jobs:
         run: cmake --build build/release
 
       - name: List WASM Directory
-        run: ls -l web/static/assets/wasm
+        run: ls -l web/static/wasm
 
       - name: Install Hugo CLI
         run: |

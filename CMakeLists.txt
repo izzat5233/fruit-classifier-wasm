@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 if (NOT CMAKE_BUILD_TYPE MATCHES Debug)
     # Wasm files directory
-    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/web/static/assets/wasm)
+    set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/web/static/wasm)
 endif ()
 
 # Add nn directory to the build
