@@ -91,7 +91,11 @@ To get started with development:
 1. **Emscripten Installation**: Make sure Emscripten is installed and properly configured on your system. Follow the
    installation guide on the official [Emscripten website](https://emscripten.org/docs/getting_started/downloads.html).
 
-2. **Configure Build Profiles**:
+2. **GoogleTest Installation**: GoogleTest library should be located at `lib/googletest`.
+   It can be installed using different methods typically by downloading the source, by using git, etc. For detailed
+   instructions, visit the official [GoogleTest GitHub repository](https://github.com/google/googletest).
+
+3. **Configure Build Profiles**:
     - **Release Profile**: For building the final WebAssembly version of the project, use the Release profile. This
       includes Emscripten's toolchain for WebAssembly compilation. Compiled wasm files will be located
       at `/web/static/wasm`
@@ -105,19 +109,19 @@ To get started with development:
         cmake -DCMAKE_BUILD_TYPE=Debug -B build/debug -S .
         ```
 
-3. **Build the Project**:
+4. **Build the Project**:
     - Navigate to the appropriate build directory (`build/debug` or `build/release`) and build the project:
         ```sh
         cmake --build .
         ```
 
-4. **Run Tests** (Debug profile only):
+5. **Run Tests** (Debug profile only):
     - In the Debug profile, execute the tests to ensure everything is functioning correctly:
         ```sh
         ctest
         ```
 
-5. **Web Integration** (Release profile only):
+6. **Web Integration** (Release profile only):
     - For the Release profile, include the generated JavaScript and WebAssembly files in your web project. Use the
       Emscripten Module API for interaction with the compiled code.
     - All wasm files are generated at `/web/static/wasm`. `web/static` directory is served 'as is' by hugo server.
