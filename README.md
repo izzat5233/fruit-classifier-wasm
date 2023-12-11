@@ -94,7 +94,7 @@ To get started with development:
 2. **Configure Build Profiles**:
     - **Release Profile**: For building the final WebAssembly version of the project, use the Release profile. This
       includes Emscripten's toolchain for WebAssembly compilation. Compiled wasm files will be located
-      at `/web/static/wasm`
+      at `/web/static/assets/wasm`
       afterward to be used by hugo server.
         ```sh
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=path/to/emscripten/cmake/Modules/Platform/Emscripten.cmake -B build/release -S .
@@ -120,4 +120,4 @@ To get started with development:
 5. **Web Integration** (Release profile only):
     - For the Release profile, include the generated JavaScript and WebAssembly files in your web project. Use the
       Emscripten Module API for interaction with the compiled code.
-    - All wasm files are generated at `/web/static/wasm`. `web/static` directory is served 'as is' by hugo server.
+    - All wasm files are generated at `/web/static/wasm`. `web/static` directory is served as-is by hugo server.
