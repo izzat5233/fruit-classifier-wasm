@@ -7,5 +7,5 @@ title = 'Frusim'
 
 [module]
     [module.hugoVersion]
-    extended = true
+    extended = false
     min = "0.120.4"
