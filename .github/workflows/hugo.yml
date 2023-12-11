@@ -1,0 +1,61 @@
+name: Build, Test, and Deploy
+
+on:
+  push:
+    branches: ["master"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v9
+
+      - name: Configure CMake Project (Debug)
+        run: cmake -B build/debug -DCMAKE_BUILD_TYPE=Debug
+
+      - name: Build and Run Tests
+        run: |
+          cmake --build build/debug
+          ctest --test-dir build/debug
+
+  build-and-deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Emscripten
+        uses: mymindstorm/setup-emsdk@v9
+
+      - name: Configure CMake Project (Release)
+        run: cmake -B build/release -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=${{ env.EMSDK }}/upstream/emscripten/cmake/Modules/Platform/Emscripten.cmake
+
+      - name: Build Project
+        run: cmake --build build/release
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: ./web
+
+      - name: Deploy to GitHub Pages
+        uses: actions/deploy-pages@v3
