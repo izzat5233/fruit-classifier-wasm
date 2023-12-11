@@ -82,7 +82,7 @@ jobs:
           cd web
           hugo \
             --minify \
-            --baseURL "${{ secrets.PRODUCTION_URL }}/"
+            --baseURL "${{ steps.deployment.outputs.page_url }}/"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v2
