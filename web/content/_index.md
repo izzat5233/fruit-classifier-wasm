@@ -6,4 +6,8 @@ draft = false
 
 # Set up The Neural Network
 
+---
+
 {{< include-html "snippet.html" >}}
+
+---

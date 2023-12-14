@@ -1,0 +1,202 @@
+<div class="accordion">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#panelsStayOpen-collapseOne" aria-expanded="true"
+                    aria-controls="panelsStayOpen-collapseOne">
+                Structure Controls
+            </button>
+        </h2>
+        <div id="panelsStayOpen-collapseOne" class="accordion-collapse collapse show">
+            <div class="accordion-body">
+                <div class="container p-4 flex-column gap-4">
+                    <div class="row row-cols-1 row-cols-lg-3 gx-4">
+                        <div class="col">
+                            <label for="inputLayerHeight" class="form-label">Input Layer Height</label>
+                            <input type="range" class="form-range" min="1" max="10" step="1" id="inputLayerHeight"
+                                   value="5">
+                            <p class="fs-3 text-center" id="inputLayerHeightValue"></p>
+                        </div>
+                        <div class="col">
+                            <label for="hiddenLayersCount" class="form-label">Hidden Layers Count</label>
+                            <input type="range" class="form-range" min="1" max="10" step="1" id="hiddenLayersCount"
+                                   value="5">
+                            <p class="fs-3 text-center" id="hiddenLayersCountValue"></p>
+                        </div>
+                        <div class="col">
+                            <label for="outputLayerHeight" class="form-label">Output Layer Height</label>
+                            <input type="range" class="form-range" min="1" max="10" step="1" id="outputLayerHeight"
+                                   value="5">
+                            <p class="fs-3 text-center" id="outputLayerHeightValue"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#panelsStayOpen-collapseTwo" aria-expanded="false"
+                    aria-controls="panelsStayOpen-collapseTwo">
+                Hidden Layers Size
+            </button>
+        </h2>
+        <div id="panelsStayOpen-collapseTwo" class="accordion-collapse collapse">
+            <div class="accordion-body">
+                <div id="hiddenLayersContainer"></div>
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#panelsStayOpen-collapseThree" aria-expanded="false"
+                    aria-controls="panelsStayOpen-collapseThree">
+                Advanced Controls
+            </button>
+        </h2>
+        <div id="panelsStayOpen-collapseThree" class="accordion-collapse collapse">
+            <div class="accordion-body">
+            </div>
+        </div>
+    </div>
+</div>
+<div id="visualizer"></div>
+<script type="module">
+    import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+
+    function drawNetwork(dimensions) {
+        const svgWidth = d3.select("#visualizer").node().getBoundingClientRect().width;
+        const radius = 20;
+        const svgHeight = (2 * radius) * (2 * Math.max(...dimensions));
+
+        function layerYShift(nodesInLayer) {
+            return (svgHeight - (nodesInLayer * 4 * radius)) / 2;
+        }
+
+        function layerXShift(layerIndex) {
+            return (svgWidth / dimensions.length) * (layerIndex + 0.5) - radius;
+        }
+
+        function circleYShift(nodeIndex) {
+            return radius * 2 * (2 * nodeIndex + 1);
+        }
+
+        // Create the SVG
+        let svg = d3.select("#visualizer").select("svg");
+        if (svg.empty()) svg = d3.select("#visualizer").append("svg");
+        svg.attr("width", svgWidth).attr("height", svgHeight);
+
+        const layerData = dimensions.map((n, i) => ({
+            index: i,
+            nodes: d3.range(n).map(j => ({layerIndex: i, nodeIndex: j}))
+        }));
+
+        // Create the layers
+        const layers = svg.selectAll(".layer")
+            .data(layerData)
+            .join("g")
+            .attr("class", "layer")
+            .attr("transform", (d, i) =>
+                `translate(${layerXShift(i)}, ${layerYShift(d.nodes.length)})`);
+
+        // Draw the nodes
+        layers.selectAll(".node")
+            .data(d => d.nodes)
+            .join("circle")
+            .attr("class", "node")
+            .attr("cx", radius * 2)
+            .attr("cy", d => circleYShift(d.nodeIndex))
+            .transition()
+            .attr("r", radius);
+
+        // Preparing data for lines
+        const lineData = [];
+        dimensions.forEach((numNodes, layerIndex) => {
+            if (layerIndex === 0) return;
+
+            const prevLayerNodes = layerData[layerIndex - 1].nodes;
+            layerData[layerIndex].nodes.forEach((node, nodeIndex) => {
+                prevLayerNodes.forEach((prevNode, prevNodeIndex) => {
+                    lineData.push({
+                        x1: layerXShift(layerIndex - 1) + radius * 2,
+                        y1: layerYShift(prevLayerNodes.length) + circleYShift(prevNodeIndex),
+                        x2: layerXShift(layerIndex) + radius * 2,
+                        y2: layerYShift(numNodes) + circleYShift(nodeIndex)
+                    });
+                });
+            });
+        });
+
+        // Drawing lines
+        svg.selectAll(".line")
+            .data(lineData)
+            .join("line")
+            .attr("class", "line")
+            .attr("x1", d => d.x1)
+            .attr("y1", d => d.y1)
+            .attr("x2", d => d.x2)
+            .attr("y2", d => d.y2)
+            .attr("stroke", "black")
+            .transition()
+            .attr("stroke-width", 2)
+    }
+
+    document.getElementById('inputLayerHeight').oninput = function () {
+        document.getElementById('inputLayerHeightValue').textContent = this.value;
+        onAnyInput();
+    };
+    document.getElementById('hiddenLayersCount').oninput = function () {
+        document.getElementById('hiddenLayersCountValue').textContent = this.value;
+        updateHiddenLayersInput();
+        onAnyInput();
+    };
+    document.getElementById('outputLayerHeight').oninput = function () {
+        document.getElementById('outputLayerHeightValue').textContent = this.value
+        onAnyInput();
+    };
+
+    function updateHiddenLayersInput() {
+        const hiddenLayersCount = parseInt(document.getElementById('hiddenLayersCount').value);
+        const hiddenLayersContainer = document.getElementById('hiddenLayersContainer');
+
+        // Clear existing inputs
+        hiddenLayersContainer.innerHTML = '';
+
+        // Create new inputs
+        for (let i = 0; i < hiddenLayersCount; i++) {
+            const input = document.createElement('input');
+            input.type = 'range';
+            input.min = '1';
+            input.max = '10';
+            input.value = '4';
+            input.className = 'form-range hidden-layer-input';
+            input.oninput = function () {
+                document.getElementById('hiddenLayerValue' + i).textContent = this.value;
+                onAnyInput();
+            };
+            hiddenLayersContainer.appendChild(input);
+
+            const valueDisplay = document.createElement('p');
+            valueDisplay.id = 'hiddenLayerValue' + i;
+            valueDisplay.className = 'fs-3 text-center';
+            valueDisplay.textContent = '4';
+            hiddenLayersContainer.appendChild(valueDisplay);
+        }
+    }
+
+    function onAnyInput() {
+        const inputLayerHeight = document.getElementById('inputLayerHeight').value
+        const outputLayerHeight = document.getElementById('outputLayerHeight').value
+        let dimensions = [inputLayerHeight]
+        document.querySelectorAll('.hidden-layer-input').forEach(e => dimensions.push(e.value));
+        dimensions.push(outputLayerHeight)
+        drawNetwork(dimensions)
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        updateHiddenLayersInput()
+        onAnyInput()
+    });
+</script>
