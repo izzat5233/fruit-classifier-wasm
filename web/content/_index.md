@@ -8,6 +8,6 @@ draft = false
 
 ---
 
-{{< include-html "snippet.html" >}}
+{{< include-html "visualizer.html" >}}
 
 ---
