@@ -27,7 +27,10 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_subdirectory(test)
 else ()
     # Add an executable for the main.cpp
-    add_executable(main_executable main.cpp)
+    add_executable(main_executable wasm/main.cpp
+            wasm/emscripten_browser_file.h
+            wasm/io_interface.h
+            wasm/network_interface.h)
 
     # Include directories for nn library
     target_include_directories(main_executable PUBLIC ${PROJECT_SOURCE_DIR}/nn)
@@ -39,6 +42,9 @@ else ()
     set_target_properties(main_executable PROPERTIES OUTPUT_NAME "main")
 
     # Release flags
+    target_link_options(main_executable PRIVATE "SHELL:--bind")
     target_link_options(main_executable PRIVATE "SHELL:-s NO_EXIT_RUNTIME=1")
-    target_link_options(main_executable PRIVATE "SHELL:-s EXPORTED_RUNTIME_METHODS=['ccall']")
+    target_link_options(main_executable PRIVATE "SHELL:-s EXPORTED_RUNTIME_METHODS=['ccall','cwrap']")
+    target_link_options(main_executable PRIVATE "SHELL:-s EXPORTED_FUNCTIONS=[_main,_malloc,_free]")
+    target_link_options(main_executable PRIVATE "SHELL:-s ALLOW_MEMORY_GROWTH=1")
 endif ()
