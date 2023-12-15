@@ -6,8 +6,12 @@ draft = false
 
 # Set up The Neural Network
 
+{{< include-html "visualizer.html" >}}
+
 ---
 
-{{< include-html "visualizer.html" >}}
+# It's Super Fast, Give it a try!
+
+{{< include-html "controls.html" >}}
 
 ---

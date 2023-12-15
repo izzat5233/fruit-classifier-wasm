@@ -29,7 +29,7 @@ else ()
     # Add an executable for the main.cpp
     add_executable(main_executable wasm/main.cpp
             wasm/emscripten_browser_file.h
-            wasm/io_interface.h
+            wasm/io_utility.h
             wasm/network_interface.h)
 
     # Include directories for nn library
