@@ -18,6 +18,8 @@
                     </div>
                     <p class="btn btn-primary" id="prepareTrainingDataButton"
                        onclick="network.prepareTrainingData()">Load</p>
+                    <p class="btn btn-danger" id="clearTrainingDataButton"
+                       onclick="onClearTrainingData()">Clear</p>
                 </div>
                 <div class="col">
                     <h5>Testing Data</h5>
@@ -29,6 +31,8 @@
                     </div>
                     <p class="btn btn-primary" id="prepareTestingDataButton"
                        onclick="network.prepareTestingData()">Load</p>
+                    <p class="btn btn-danger" id="clearTestingDataButton"
+                       onclick="onClearTestingData()">Clear</p>
                 </div>
             </div>
         </div>
@@ -83,11 +87,30 @@
 
     function onTrainingDataPrepared(dataSize) {
         showSimpleToast("<h5>Loaded " + dataSize + " Valid Rows</h5>");
-        document.getElementById('prepareTrainingDataButton').classList.add('active');
     }
 
     function onTestingDataPrepared(dataSize) {
         showSimpleToast("<h5>Loaded " + dataSize + " Valid Rows</h5>");
-        document.getElementById('prepareTestingDataButton').classList.add('active');
+    }
+
+    function onClearFileData(input, output) {
+        input.removeAttribute('data-size');
+        input.classList.remove('active');
+        input.innerHTML = "Browse Input File";
+        output.removeAttribute('data-size');
+        output.classList.remove('active');
+        output.innerHTML = "Browse Output File";
+    }
+
+    function onClearTrainingData() {
+        const input = document.getElementById('inputTrainingDataButton');
+        const output = document.getElementById('outputTrainingDataButton');
+        onClearFileData(input, output);
+    }
+
+    function onClearTestingData() {
+        const input = document.getElementById('inputTestingDataButton');
+        const output = document.getElementById('outputTestingDataButton');
+        onClearFileData(input, output);
     }
 </script>
