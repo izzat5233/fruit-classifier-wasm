@@ -54,6 +54,8 @@ void processCsvData(UPLOAD_HANDLER_PARAMETERS) {
                 row.push_back(value);
             } catch (const std::invalid_argument &ia) {
                 EM_ASM_ARGS({ console.error("Invalid argument: " + $0) }, ia.what());
+                row.clear();
+                break;
             }
         }
 

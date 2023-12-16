@@ -20,16 +20,20 @@ private:
     double alpha = 0.1;
 
     CSVFile *inTrainFile = new CSVFile([this] {
-        EM_ASM_ARGS({ setInputTrainingFilename(UTF8ToString($0)) }, this->inTrainFile->getFilename().c_str());
+        EM_ASM_ARGS({ onInputTrainingFileSet(UTF8ToString($0), $1) },
+                    inTrainFile->getFilename().c_str(), inTrainFile->getData().size());
     });
     CSVFile *outTrainFile = new CSVFile([this] {
-        EM_ASM_ARGS({ setOutputTrainingFilename($0) }, this->outTrainFile->getFilename().c_str());
+        EM_ASM_ARGS({ onOutputTrainingFileSet(UTF8ToString($0), $1) },
+                    outTrainFile->getFilename().c_str(), outTrainFile->getData().size());
     });
     CSVFile *inTestFile = new CSVFile([this] {
-        EM_ASM_ARGS({ setInputTestingFilename($0) }, this->inTestFile->getFilename().c_str());
+        EM_ASM_ARGS({ onInputTestingFileSet(UTF8ToString($0), $1) },
+                    inTestFile->getFilename().c_str(), inTestFile->getData().size());
     });
     CSVFile *outTestFile = new CSVFile([this] {
-        EM_ASM_ARGS({ setOutputTestingFilename($0) }, this->outTestFile->getFilename().c_str());
+        EM_ASM_ARGS({ onOutputTestingFileSet(UTF8ToString($0), $1) },
+                    outTestFile->getFilename().c_str(), outTestFile->getData().size());
     });
 
     std::optional<nn::vpvd_t> trainingData;
@@ -103,10 +107,12 @@ public:
 
     void prepareTrainingData() {
         trainingData.emplace(concatenateData(inTrainFile->getData(), outTrainFile->getData()));
+        EM_ASM_ARGS({ onTrainingDataPrepared($0) }, trainingData->size());
     }
 
     void prepareTestingData() {
         testingData.emplace(concatenateData(inTestFile->getData(), outTestFile->getData()));
+        EM_ASM_ARGS({ onTestingDataPrepared($0) }, testingData->size());
     }
 
     nn::vd_t trainFor(std::size_t epochs) {

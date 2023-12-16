@@ -1,6 +1,6 @@
 function drawNetwork(dimensions) {
     const svgWidth = d3.select("#visualizer").node().getBoundingClientRect().width;
-    const radius = 20;
+    const radius = (window.innerWidth / 100) + (5000 / window.innerWidth);
     const svgHeight = (2 * radius) * (2 * Math.max(...dimensions));
 
     function layerYShift(nodesInLayer) {
@@ -8,7 +8,7 @@ function drawNetwork(dimensions) {
     }
 
     function layerXShift(layerIndex) {
-        return (svgWidth / dimensions.length) * (layerIndex + 0.5) - radius;
+        return (svgWidth / dimensions.length) * (layerIndex + 0.5) - 2 * radius;
     }
 
     function circleYShift(nodeIndex) {

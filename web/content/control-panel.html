@@ -1,12 +1,93 @@
-<div class="container">
-    <div class="row gy-8">
-        <div class="row gy-4">
-            <h3>Training Data</h3>
-            <input class="form-control" type="file" id="trainingFileInput">
+<div id="controlAccordion" class="accordion py-4">
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#controlCollapseOne" aria-expanded="false" aria-controls="controlCollapseOne">
+                Load Your Data
+            </button>
+        </h2>
+        <div id="controlCollapseOne" class="accordion-collapse collapse show" data-bs-parent="#controlAccordion">
+            <div class="accordion-body row gy-4">
+                <div class="col">
+                    <h5>Training Data</h5>
+                    <div class="btn-group">
+                        <p class="btn btn-light" id="inputTrainingDataButton"
+                           onclick="network.promptInputTrainingData()">Browse Input File</p>
+                        <p class="btn btn-light" id="outputTrainingDataButton"
+                           onclick="network.promptOutputTrainingData()">Browse Output File</p>
+                    </div>
+                    <p class="btn btn-primary" id="prepareTrainingDataButton"
+                       onclick="network.prepareTrainingData()">Load</p>
+                </div>
+                <div class="col">
+                    <h5>Testing Data</h5>
+                    <div class="btn-group">
+                        <p class="btn btn-light" id="inputTestingDataButton"
+                           onclick="network.promptInputTestingData()">Browse Input File</p>
+                        <p class="btn btn-light" id="outputTestingDataButton"
+                           onclick="network.promptOutputTestingData()">Browse Output File</p>
+                    </div>
+                    <p class="btn btn-primary" id="prepareTestingDataButton"
+                       onclick="network.prepareTestingData()">Load</p>
+                </div>
+            </div>
         </div>
-        <div class="row gy-4">
-            <h3>Testing Data</h3>
-            <input class="form-control" type="file" id="testingFileInput">
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#controlCollapseTwo" aria-expanded="false" aria-controls="controlCollapseTwo">
+                2
+            </button>
+        </h2>
+        <div id="controlCollapseTwo" class="accordion-collapse collapse" data-bs-parent="#controlAccordion">
+            <div class="accordion-body row gy-4">
+            </div>
+        </div>
+    </div>
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#controlCollapseThree" aria-expanded="false" aria-controls="controlCollapseThree">
+                3
+            </button>
+        </h2>
+        <div id="controlCollapseThree" class="accordion-collapse collapse" data-bs-parent="#controlAccordion">
+            <div class="accordion-body row gy-4">
+            </div>
         </div>
     </div>
 </div>
+<script>
+    function onDataFileSet(element, filename, dataSize) {
+        element.setAttribute('data-size', dataSize);
+        element.innerHTML = filename + "<br>" + "Valid Rows: " + Number(dataSize);
+        element.classList.add('active');
+    }
+
+    function onInputTrainingFileSet(filename, dataSize) {
+        onDataFileSet(document.getElementById('inputTrainingDataButton'), filename, dataSize);
+    }
+
+    function onOutputTrainingFileSet(filename, dataSize) {
+        onDataFileSet(document.getElementById('outputTrainingDataButton'), filename, dataSize);
+    }
+
+    function onInputTestingFileSet(filename, dataSize) {
+        onDataFileSet(document.getElementById('inputTestingDataButton'), filename, dataSize);
+    }
+
+    function onOutputTestingFileSet(filename, dataSize) {
+        onDataFileSet(document.getElementById('outputTestingDataButton'), filename, dataSize);
+    }
+
+    function onTrainingDataPrepared(dataSize) {
+        showSimpleToast("<h5>Loaded " + dataSize + " Valid Rows</h5>");
+        document.getElementById('prepareTrainingDataButton').classList.add('active');
+    }
+
+    function onTestingDataPrepared(dataSize) {
+        showSimpleToast("<h5>Loaded " + dataSize + " Valid Rows</h5>");
+        document.getElementById('prepareTestingDataButton').classList.add('active');
+    }
+</script>
