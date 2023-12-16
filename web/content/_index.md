@@ -6,12 +6,14 @@ draft = false
 
 # Set up The Neural Network
 
+{{< include-script "wasm/main.js" >}}
+
 {{< include-html "visualizer.html" >}}
 
 ---
 
 # It's Super Fast, Give it a try!
 
-{{< include-html "controls.html" >}}
+{{< include-html "control-panel.html" >}}
 
 ---
