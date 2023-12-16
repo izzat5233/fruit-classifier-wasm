@@ -15,9 +15,9 @@
 class NetworkController {
 private:
     nn::vi_t dimensions;
-    nn::act::Function actFunction{};
-    nn::loss::function_t lossFunction{};
-    double alpha{};
+    nn::act::Function actFunction = nn::act::relu;
+    nn::loss::function_t lossFunction = nn::loss::sse;
+    double alpha = 0.1;
 
     nn::vvd_t *inputTrainingData = new nn::vvd_t();
     nn::vvd_t *outputTrainingData = new nn::vvd_t();
@@ -79,22 +79,18 @@ public:
 
     void promptInputTrainingData() {
         emscripten_browser_file::upload(".csv,.txt", processCsvData, inputTrainingData);
-        if (inputTrainingData->size() == outputTrainingData->size()) { prepareTrainingData(); }
     }
 
     void promptOutputTrainingData() {
         emscripten_browser_file::upload(".csv,.txt", processCsvData, outputTrainingData);
-        if (inputTrainingData->size() == outputTrainingData->size()) { prepareTrainingData(); }
     }
 
     void promptInputTestingData() {
         emscripten_browser_file::upload(".csv,.txt", processCsvData, inputTestingData);
-        if (inputTestingData->size() == outputTestingData->size()) { prepareTestingData(); }
     }
 
     void promptOutputTestingData() {
         emscripten_browser_file::upload(".csv,.txt", processCsvData, outputTestingData);
-        if (inputTestingData->size() == outputTestingData->size()) { prepareTestingData(); }
     }
 
     void prepareTrainingData() {
@@ -124,19 +120,20 @@ public:
 
     [[nodiscard]] nn::vvd_t predictTestingOutputs() const {
         nn::vvd_t res;
-        for (auto &in: *inputTestingData) {
+        for (const auto &in: *inputTestingData) {
             res.push_back(network->predict(in));
         }
         return res;
     }
 
     [[nodiscard]] double testingDataError() const {
-        double error = LONG_MAX;
+        double avgError = 0;
         nn::vvd_t output = predictTestingOutputs();
         for (std::size_t i = 0; i < output.size(); ++i) {
-            error = std::min(error, lossFunction(output[i], (*outputTestingData)[i]));
+            double error = lossFunction(output[i], (*testingData)[i].second);
+            avgError += error / output.size();
         }
-        return error;
+        return avgError;
     }
 };
 
@@ -146,8 +143,7 @@ EMSCRIPTEN_BINDINGS(my_module) {
     register_vector<int>("VecInt");
     register_vector<nn::ui_t>("VecUInt");
     register_vector<double>("VecNum");
-    register_vector<nn::vvd_t>("VecVecNum");
-
+    register_vector<nn::vd_t>("VecVecNum");
 
     class_<NetworkController>("Network")
             .constructor<>()

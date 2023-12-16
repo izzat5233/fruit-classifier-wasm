@@ -82,11 +82,11 @@ vd_t Network::train(const vd_t &input, const vd_t &output) {
 }
 
 double Network::train(const vpvd_t &data, loss::function_t lossFunction) {
-    double worst = -1;
+    double avg = 0;
     for (const auto &[input, output]: data) {
         vd_t res = train(input, output);
         double error = lossFunction(output, res);
-        worst = std::max(worst, error);
+        avg += error / data.size();
     }
-    return worst;
+    return avg;
 }

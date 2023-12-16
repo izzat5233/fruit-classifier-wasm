@@ -100,12 +100,12 @@ public:
 
     /**
      * Trains the neural network on the given set of input-output pairs.
-     * Uses the given lossFunction to calculate the worst error result of all iterations.
+     * Uses the given lossFunction to calculate the average error result of all iterations.
      * A call to this method represents a single epoch (full iteration on all data pairs).
      *
      * @param data Vector of input-output pairs for training.
      * @param lossFunction The loss function used to calculate the errors.
-     * @return The worst error result of all iterations, calculated by the lossFunction.
+     * @return The average error result of all iterations, calculated by the lossFunction.
      */
     double train(const vpvd_t &data, loss::function_t lossFunction);
 

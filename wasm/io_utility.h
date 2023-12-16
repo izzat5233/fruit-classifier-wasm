@@ -20,22 +20,20 @@ void processCsvData(UPLOAD_HANDLER_PARAMETERS) {
     std::string line;
 
     while (std::getline(ss, line)) {
-        std::vector<double> row;
+        nn::vd_t row;
         std::stringstream lineStream(line);
         std::string cell;
 
-        bool add = true;
         while (std::getline(lineStream, cell, ',')) {
             try {
                 double value = std::stod(cell);
                 row.push_back(value);
             } catch (const std::invalid_argument &ia) {
                 EM_ASM_ARGS({ console.error("Invalid argument: " + $0) }, ia.what());
-                add = false;
             }
         }
 
-        if (add && !row.empty()) {
+        if (!row.empty()) {
             data->push_back(row);
         }
     }
