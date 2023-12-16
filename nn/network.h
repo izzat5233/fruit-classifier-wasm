@@ -12,6 +12,8 @@
 class nn::Network {
 private:
     const std::size_t size;
+
+private:
     vl_t layers;
     OutputLayer outputLayer;
     double alpha;
@@ -35,6 +37,11 @@ public:
      * @param learningRate The new learning rate.
      */
     void setAlpha(double learningRate);
+
+    /**
+     * @return The number of layers in the network, including the output layer.
+     */
+    [[nodiscard]] const size_t getSize() const;
 
     /**
      * Provides access to a specific layer in the network.

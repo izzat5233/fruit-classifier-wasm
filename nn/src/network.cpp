@@ -24,6 +24,10 @@ void Network::setAlpha(double learningRate) {
     this->alpha = learningRate;
 }
 
+const size_t Network::getSize() const {
+    return size;
+}
+
 Layer &Network::get(std::size_t index) {
     if (index == layers.size()) { return outputLayer; }
     return layers[index];

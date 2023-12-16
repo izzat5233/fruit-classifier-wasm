@@ -19,10 +19,18 @@ private:
     nn::loss::function_t lossFunction = nn::loss::sse;
     double alpha = 0.1;
 
-    nn::vvd_t *inputTrainingData = new nn::vvd_t();
-    nn::vvd_t *outputTrainingData = new nn::vvd_t();
-    nn::vvd_t *inputTestingData = new nn::vvd_t();
-    nn::vvd_t *outputTestingData = new nn::vvd_t();
+    CSVFile *inTrainFile = new CSVFile([this] {
+        EM_ASM_ARGS({ setInputTrainingFilename(UTF8ToString($0)) }, this->inTrainFile->getFilename().c_str());
+    });
+    CSVFile *outTrainFile = new CSVFile([this] {
+        EM_ASM_ARGS({ setOutputTrainingFilename($0) }, this->outTrainFile->getFilename().c_str());
+    });
+    CSVFile *inTestFile = new CSVFile([this] {
+        EM_ASM_ARGS({ setInputTestingFilename($0) }, this->inTestFile->getFilename().c_str());
+    });
+    CSVFile *outTestFile = new CSVFile([this] {
+        EM_ASM_ARGS({ setOutputTestingFilename($0) }, this->outTestFile->getFilename().c_str());
+    });
 
     std::optional<nn::vpvd_t> trainingData;
     std::optional<nn::vpvd_t> testingData;
@@ -38,10 +46,10 @@ private:
 
 public:
     ~NetworkController() {
-        delete inputTrainingData;
-        delete outputTrainingData;
-        delete inputTestingData;
-        delete outputTestingData;
+        delete inTrainFile;
+        delete outTrainFile;
+        delete inTestFile;
+        delete outTestFile;
     }
 
     void setDimensions(const nn::vi_t &networkDimensions) {
@@ -78,27 +86,27 @@ public:
     }
 
     void promptInputTrainingData() {
-        emscripten_browser_file::upload(".csv,.txt", processCsvData, inputTrainingData);
+        emscripten_browser_file::upload(".csv,.txt", processCsvData, inTrainFile);
     }
 
     void promptOutputTrainingData() {
-        emscripten_browser_file::upload(".csv,.txt", processCsvData, outputTrainingData);
+        emscripten_browser_file::upload(".csv,.txt", processCsvData, outTrainFile);
     }
 
     void promptInputTestingData() {
-        emscripten_browser_file::upload(".csv,.txt", processCsvData, inputTestingData);
+        emscripten_browser_file::upload(".csv,.txt", processCsvData, inTestFile);
     }
 
     void promptOutputTestingData() {
-        emscripten_browser_file::upload(".csv,.txt", processCsvData, outputTestingData);
+        emscripten_browser_file::upload(".csv,.txt", processCsvData, outTestFile);
     }
 
     void prepareTrainingData() {
-        trainingData.emplace(concatenateData(*inputTrainingData, *outputTrainingData));
+        trainingData.emplace(concatenateData(inTrainFile->getData(), outTrainFile->getData()));
     }
 
     void prepareTestingData() {
-        testingData.emplace(concatenateData(*inputTestingData, *outputTestingData));
+        testingData.emplace(concatenateData(inTestFile->getData(), outTestFile->getData()));
     }
 
     nn::vd_t trainFor(std::size_t epochs) {
@@ -120,7 +128,7 @@ public:
 
     [[nodiscard]] nn::vvd_t predictTestingOutputs() const {
         nn::vvd_t res;
-        for (const auto &in: *inputTestingData) {
+        for (const auto &in: inTestFile->getData()) {
             res.push_back(network->predict(in));
         }
         return res;
@@ -129,11 +137,31 @@ public:
     [[nodiscard]] double testingDataError() const {
         double avgError = 0;
         nn::vvd_t output = predictTestingOutputs();
+        const nn::vvd_t &actual = outTestFile->getData();
         for (std::size_t i = 0; i < output.size(); ++i) {
-            double error = lossFunction(output[i], (*testingData)[i].second);
+            double error = lossFunction(output[i], actual[i]);
             avgError += error / output.size();
         }
         return avgError;
+    }
+
+    [[nodiscard]] std::vector<nn::vvd_t> getWeights() const {
+        std::vector<nn::vvd_t> weights;
+        weights.reserve(network->getSize());
+        for (std::size_t i = 0; i < weights.size(); ++i) {
+            nn::vvd_t layerWeights;
+            layerWeights.reserve(network->get(i).size());
+            for (auto &neuron: network->get(i)) {
+                nn::vd_t neuronWeights;
+                neuronWeights.reserve(neuron.size());
+                for (auto &weight: neuron) {
+                    neuronWeights.push_back(weight);
+                }
+                layerWeights.push_back(neuronWeights);
+            }
+            weights.push_back(layerWeights);
+        }
+        return weights;
     }
 };
 
@@ -142,8 +170,10 @@ EMSCRIPTEN_BINDINGS(my_module) {
 
     register_vector<int>("VecInt");
     register_vector<nn::ui_t>("VecUInt");
+
     register_vector<double>("VecNum");
     register_vector<nn::vd_t>("VecVecNum");
+    register_vector<nn::vvd_t>("VecVecVecNum");
 
     class_<NetworkController>("Network")
             .constructor<>()
@@ -161,7 +191,8 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("trainFor", &NetworkController::trainFor)
             .function("trainAndTestFor", &NetworkController::trainAndTestFor)
             .function("predictTestingOutputs", &NetworkController::predictTestingOutputs)
-            .function("testingDataError", &NetworkController::testingDataError);
+            .function("testingDataError", &NetworkController::testingDataError)
+            .function("getWeights", &NetworkController::getWeights);
 }
 
 #endif //FRUIT_CLASSIFIER_WASM_NETWORK_INTERFACE_H
