@@ -148,7 +148,7 @@ public:
     [[nodiscard]] std::vector<nn::vvd_t> getWeights() const {
         std::vector<nn::vvd_t> weights;
         weights.reserve(network->getSize());
-        for (std::size_t i = 0; i < weights.size(); ++i) {
+        for (std::size_t i = 0; i < network->getSize(); ++i) {
             nn::vvd_t layerWeights;
             layerWeights.reserve(network->get(i).size());
             for (auto &neuron: network->get(i)) {

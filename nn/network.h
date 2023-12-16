@@ -12,8 +12,6 @@
 class nn::Network {
 private:
     const std::size_t size;
-
-private:
     vl_t layers;
     OutputLayer outputLayer;
     double alpha;
