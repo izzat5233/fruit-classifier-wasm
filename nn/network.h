@@ -41,7 +41,7 @@ public:
     /**
      * @return The number of layers in the network, including the output layer.
      */
-    [[nodiscard]] const size_t getSize() const;
+    [[nodiscard]] std::size_t getSize() const;
 
     /**
      * Provides access to a specific layer in the network.

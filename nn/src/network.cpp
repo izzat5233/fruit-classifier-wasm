@@ -24,7 +24,7 @@ void Network::setAlpha(double learningRate) {
     this->alpha = learningRate;
 }
 
-const size_t Network::getSize() const {
+std::size_t Network::getSize() const {
     return size;
 }
 
