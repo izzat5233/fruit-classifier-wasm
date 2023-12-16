@@ -14,7 +14,7 @@
 
 class NetworkController {
 private:
-    nn::vi_t dimensions;
+    nn::vi_t dimensions = {2, 3, 2};
     nn::act::Function actFunction = nn::act::relu;
     nn::loss::function_t lossFunction = nn::loss::sse;
     double alpha = 0.1;
@@ -49,6 +49,10 @@ private:
     }
 
 public:
+    NetworkController() {
+        build();
+    }
+
     ~NetworkController() {
         delete inTrainFile;
         delete outTrainFile;

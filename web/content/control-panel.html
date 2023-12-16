@@ -1,116 +1,206 @@
-<div id="controlAccordion" class="accordion py-4">
+<div id="controlAccordion" class="accordion py-5">
     <div class="accordion-item">
         <h2 class="accordion-header">
-            <button class="accordion-button" type="button" data-bs-toggle="collapse"
+            <button class="accordion-button lead fs-4" type="button" data-bs-toggle="collapse"
                     data-bs-target="#controlCollapseOne" aria-expanded="false" aria-controls="controlCollapseOne">
                 Load Your Data
             </button>
         </h2>
         <div id="controlCollapseOne" class="accordion-collapse collapse show" data-bs-parent="#controlAccordion">
-            <div class="accordion-body row gy-4">
-                <div class="col">
-                    <h5>Training Data</h5>
-                    <div class="btn-group">
-                        <p class="btn btn-light" id="inputTrainingDataButton"
-                           onclick="network.promptInputTrainingData()">Browse Input File</p>
-                        <p class="btn btn-light" id="outputTrainingDataButton"
-                           onclick="network.promptOutputTrainingData()">Browse Output File</p>
+            <div class="accordion-body py-5">
+                <div class="row">
+                    <div class="col">
+                        <h5>Training Data</h5>
+                        <div class="btn-group">
+                            <p class="btn btn-light" id="inputTrainingDataButton"
+                               onclick="network.promptInputTrainingData()">Browse Input File</p>
+                            <p class="btn btn-light" id="outputTrainingDataButton"
+                               onclick="network.promptOutputTrainingData()">Browse Output File</p>
+                        </div>
+                        <div class="d-inline-block">
+                            <p class="btn btn-primary" id="prepareTrainingDataButton"
+                               onclick="network.prepareTrainingData()">Load</p>
+                            <p class="btn btn-danger" id="clearTrainingDataButton"
+                               onclick="onClearTrainingData()">Clear</p>
+                        </div>
                     </div>
-                    <p class="btn btn-primary" id="prepareTrainingDataButton"
-                       onclick="network.prepareTrainingData()">Load</p>
-                    <p class="btn btn-danger" id="clearTrainingDataButton"
-                       onclick="onClearTrainingData()">Clear</p>
-                </div>
-                <div class="col">
-                    <h5>Testing Data</h5>
-                    <div class="btn-group">
-                        <p class="btn btn-light" id="inputTestingDataButton"
-                           onclick="network.promptInputTestingData()">Browse Input File</p>
-                        <p class="btn btn-light" id="outputTestingDataButton"
-                           onclick="network.promptOutputTestingData()">Browse Output File</p>
+                    <div class="col">
+                        <h5>Testing Data</h5>
+                        <div class="btn-group">
+                            <p class="btn btn-light" id="inputTestingDataButton"
+                               onclick="network.promptInputTestingData()">Browse Input File</p>
+                            <p class="btn btn-light" id="outputTestingDataButton"
+                               onclick="network.promptOutputTestingData()">Browse Output File</p>
+                        </div>
+                        <div class="d-inline-block">
+                            <p class="btn btn-primary" id="prepareTestingDataButton"
+                               onclick="network.prepareTestingData()">Load</p>
+                            <p class="btn btn-danger" id="clearTestingDataButton"
+                               onclick="onClearTestingData()">Clear</p>
+                        </div>
                     </div>
-                    <p class="btn btn-primary" id="prepareTestingDataButton"
-                       onclick="network.prepareTestingData()">Load</p>
-                    <p class="btn btn-danger" id="clearTestingDataButton"
-                       onclick="onClearTestingData()">Clear</p>
                 </div>
+                <script>
+                    function onDataFileSet(element, filename, dataSize) {
+                        element.setAttribute('data-size', dataSize);
+                        element.innerHTML = filename + "<br>" + "Valid Rows: " + Number(dataSize);
+                        element.classList.add('active');
+                    }
+
+                    function onInputTrainingFileSet(filename, dataSize) {
+                        onDataFileSet(document.getElementById('inputTrainingDataButton'), filename, dataSize);
+                    }
+
+                    function onOutputTrainingFileSet(filename, dataSize) {
+                        onDataFileSet(document.getElementById('outputTrainingDataButton'), filename, dataSize);
+                    }
+
+                    function onInputTestingFileSet(filename, dataSize) {
+                        onDataFileSet(document.getElementById('inputTestingDataButton'), filename, dataSize);
+                    }
+
+                    function onOutputTestingFileSet(filename, dataSize) {
+                        onDataFileSet(document.getElementById('outputTestingDataButton'), filename, dataSize);
+                    }
+
+                    function onTrainingDataPrepared(dataSize) {
+                        showSimpleToast("<h5>Loaded " + dataSize + " Valid Rows</h5>");
+                    }
+
+                    function onTestingDataPrepared(dataSize) {
+                        showSimpleToast("<h5>Loaded " + dataSize + " Valid Rows</h5>");
+                    }
+
+                    function onClearFileData(input, output) {
+                        input.removeAttribute('data-size');
+                        input.classList.remove('active');
+                        input.innerHTML = "Browse Input File";
+                        output.removeAttribute('data-size');
+                        output.classList.remove('active');
+                        output.innerHTML = "Browse Output File";
+                    }
+
+                    function onClearTrainingData() {
+                        const input = document.getElementById('inputTrainingDataButton');
+                        const output = document.getElementById('outputTrainingDataButton');
+                        onClearFileData(input, output);
+                    }
+
+                    function onClearTestingData() {
+                        const input = document.getElementById('inputTestingDataButton');
+                        const output = document.getElementById('outputTestingDataButton');
+                        onClearFileData(input, output);
+                    }
+                </script>
             </div>
         </div>
     </div>
     <div class="accordion-item">
         <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+            <button class="accordion-button collapsed lead fs-4" type="button" data-bs-toggle="collapse"
                     data-bs-target="#controlCollapseTwo" aria-expanded="false" aria-controls="controlCollapseTwo">
-                2
+                Train It
             </button>
         </h2>
         <div id="controlCollapseTwo" class="accordion-collapse collapse" data-bs-parent="#controlAccordion">
-            <div class="accordion-body row gy-4">
+            <div class="accordion-body py-5">
+                <div class="row justify-content-center">
+                    <div class="col">
+                        <h5 class="py-4">Epochs:</h5>
+                        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio1"
+                                   autocomplete="off" value="1" checked>
+                            <label class="btn btn-light fs-5" for="epochsRadio1">1</label>
+                            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio5"
+                                   autocomplete="off" value="5">
+                            <label class="btn btn-light fs-5" for="epochsRadio5">5</label>
+                            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio10"
+                                   autocomplete="off" value="10">
+                            <label class="btn btn-light fs-5" for="epochsRadio10">10</label>
+                            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio50"
+                                   autocomplete="off" value="50">
+                            <label class="btn btn-light fs-5" for="epochsRadio50">50</label>
+                            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio100"
+                                   autocomplete="off" value="100">
+                            <label class="btn btn-light fs-5" for="epochsRadio100">100</label>
+                            <button type="button" title="start" id="startTrainingButton" onclick="startTraining()"
+                                    class="btn btn-lg btn-success bi bi-play-fill fs-5"></button>
+                        </div>
+                        <div>
+                            <h5 class="py-4">Options:</h5>
+                            <div class="px-2">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="useTestDataCheck">
+                                    <label class="form-check-label" for="useTestDataCheck">
+                                        Use Testing Data
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="my-4">
+                        <div>
+                            <button type="button" title="start" id="refreshWeightsButton" onclick="network.build()"
+                                    class="btn btn-lg btn-danger bi bi-arrow-clockwise fs-5"> Randomize Weights
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <h5 class="py-4">Training Errors:</h5>
+                        <div id="trainingLogger"></div>
+                    </div>
+                    <div class="col">
+                        <h5 class="py-4">Testing Errors:</h5>
+                        <div id="testingLogger"></div>
+                    </div>
+                </div>
+                <script>
+                    function startTraining() {
+                        const trainLogger = document.getElementById('trainingLogger');
+                        const testLogger = document.getElementById('testingLogger');
+                        trainLogger.innerHTML = "";
+                        testLogger.innerHTML = "";
+
+                        const epochs = getSelectedEpochValue();
+                        let res;
+                        if (document.getElementById('useTestDataCheck').checked) {
+                            res = network.trainAndTestFor(epochs);
+                            for (let i = 0; i < res.size(); ++i) {
+                                trainLogger.innerHTML += "<p>" + res.get(i).get(0) + "</p>";
+                                testLogger.innerHTML += "<p>" + res.get(i).get(1) + "</p>";
+                            }
+                        } else {
+                            res = network.trainFor(epochs);
+                            for (let i = 0; i < res.size(); ++i) {
+                                trainLogger.innerHTML += "<p>" + res.get(i) + "</p>";
+                            }
+                        }
+                    }
+
+                    function getSelectedEpochValue() {
+                        const radioButtons = document.querySelectorAll('input[name="epochsRadio"]');
+                        for (const radioButton of radioButtons) {
+                            if (radioButton.checked) {
+                                return Number(radioButton.value);
+                            }
+                        }
+                    }
+                </script>
             </div>
         </div>
     </div>
     <div class="accordion-item">
         <h2 class="accordion-header">
-            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+            <button class="accordion-button collapsed lead fs-4" type="button" data-bs-toggle="collapse"
                     data-bs-target="#controlCollapseThree" aria-expanded="false" aria-controls="controlCollapseThree">
-                3
+                Test It
             </button>
         </h2>
         <div id="controlCollapseThree" class="accordion-collapse collapse" data-bs-parent="#controlAccordion">
-            <div class="accordion-body row gy-4">
+            <div class="accordion-body">
+                <div class="row gy-4">
+
+                </div>
             </div>
         </div>
     </div>
 </div>
-<script>
-    function onDataFileSet(element, filename, dataSize) {
-        element.setAttribute('data-size', dataSize);
-        element.innerHTML = filename + "<br>" + "Valid Rows: " + Number(dataSize);
-        element.classList.add('active');
-    }
-
-    function onInputTrainingFileSet(filename, dataSize) {
-        onDataFileSet(document.getElementById('inputTrainingDataButton'), filename, dataSize);
-    }
-
-    function onOutputTrainingFileSet(filename, dataSize) {
-        onDataFileSet(document.getElementById('outputTrainingDataButton'), filename, dataSize);
-    }
-
-    function onInputTestingFileSet(filename, dataSize) {
-        onDataFileSet(document.getElementById('inputTestingDataButton'), filename, dataSize);
-    }
-
-    function onOutputTestingFileSet(filename, dataSize) {
-        onDataFileSet(document.getElementById('outputTestingDataButton'), filename, dataSize);
-    }
-
-    function onTrainingDataPrepared(dataSize) {
-        showSimpleToast("<h5>Loaded " + dataSize + " Valid Rows</h5>");
-    }
-
-    function onTestingDataPrepared(dataSize) {
-        showSimpleToast("<h5>Loaded " + dataSize + " Valid Rows</h5>");
-    }
-
-    function onClearFileData(input, output) {
-        input.removeAttribute('data-size');
-        input.classList.remove('active');
-        input.innerHTML = "Browse Input File";
-        output.removeAttribute('data-size');
-        output.classList.remove('active');
-        output.innerHTML = "Browse Output File";
-    }
-
-    function onClearTrainingData() {
-        const input = document.getElementById('inputTrainingDataButton');
-        const output = document.getElementById('outputTrainingDataButton');
-        onClearFileData(input, output);
-    }
-
-    function onClearTestingData() {
-        const input = document.getElementById('inputTestingDataButton');
-        const output = document.getElementById('outputTestingDataButton');
-        onClearFileData(input, output);
-    }
-</script>
