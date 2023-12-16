@@ -86,11 +86,10 @@ vd_t Network::train(const vd_t &input, const vd_t &output) {
 }
 
 double Network::train(const vpvd_t &data, loss::function_t lossFunction) {
-    double avg = 0;
+    double sum = 0;
     for (const auto &[input, output]: data) {
         vd_t res = train(input, output);
-        double error = lossFunction(output, res);
-        avg += error / data.size();
+        sum += lossFunction(output, res);
     }
-    return avg;
+    return sum / data.size();
 }

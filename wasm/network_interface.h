@@ -145,14 +145,13 @@ public:
     }
 
     [[nodiscard]] double testingDataError() const {
-        double avgError = 0;
+        double sum = 0;
         nn::vvd_t output = predictTestingOutputs();
         const nn::vvd_t &actual = outTestFile->getData();
         for (std::size_t i = 0; i < output.size(); ++i) {
-            double error = lossFunction(output[i], actual[i]);
-            avgError += error / output.size();
+            sum += lossFunction(output[i], actual[i]);
         }
-        return avgError;
+        return sum / output.size();;
     }
 
     [[nodiscard]] std::vector<nn::vvd_t> getWeights() const {
