@@ -30,7 +30,7 @@ void Module::NormalizedData::set(const vvd_t &data) {
     minMax.reserve(data.size());
     for (const vd_t &line: data) {
         double minVal = *std::min_element(line.begin(), line.end());
-        double maxVal = *std::min_element(line.begin(), line.end());
+        double maxVal = *std::max_element(line.begin(), line.end());
         normalized.push_back(process::minmax(line));
         minMax.emplace_back(minVal, maxVal);
     }
@@ -44,7 +44,7 @@ vvd_t Module::NormalizedData::get(const vvd_t &processed) const {
     vvd_t original;
     original.reserve(processed.size());
     for (std::size_t i = 0; i < processed.size(); ++i) {
-        original.push_back(process::inverse_minmax(processed[i], minMax[i].first, minMax[i].second));
+        original.push_back(process::inverseMinmax(processed[i], minMax[i].first, minMax[i].second));
     }
     return original;
 }

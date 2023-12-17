@@ -8,9 +8,10 @@
 using namespace nn;
 
 vd_t process::minmax(const vd_t &data) {
+    if (data.size() == 1) { return {data[0]}; } // turn off for single outputs
     double minVal = *std::min_element(data.begin(), data.end());
     double maxVal = *std::max_element(data.begin(), data.end());
-    if (minVal == maxVal) { return {(data.size(), 0.5)}; }
+    if (minVal == maxVal) { return vd_t(data.size(), 0.5); }
 
     vd_t normalized(data.size());
     std::transform(data.begin(), data.end(), normalized.begin(), [minVal, maxVal](double x) {
@@ -19,8 +20,8 @@ vd_t process::minmax(const vd_t &data) {
     return normalized;
 }
 
-vd_t process::inverse_minmax(const vd_t &data, double originalMin, double originalMax) {
-    if (originalMin == originalMax) { return {(data.size(), originalMin)}; }
+vd_t process::inverseMinmax(const vd_t &data, double originalMin, double originalMax) {
+    if (data.size() == 1) { return {data[0]}; } // turn off for single outputs
     vd_t denormalized(data.size());
     std::transform(data.begin(), data.end(), denormalized.begin(), [originalMin, originalMax](double x) {
         return x * (originalMax - originalMin) + originalMin;

@@ -179,7 +179,7 @@ namespace nn {
          * @param originalMax The original maximum value of the data before normalization
          * @return Denormalized data vector
          */
-        vd_t inverse_minmax(const vd_t &data, double originalMin, double originalMax);
+        vd_t inverseMinmax(const vd_t &data, double originalMin, double originalMax);
     }
 
     /**
