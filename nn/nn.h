@@ -43,6 +43,13 @@ namespace nn {
      */
     class Network;
 
+    /**
+     * The Module class encapsulates a neural network and
+     * manages its training, testing, and regularization processes.
+     * It also manages normalizing and de-normalizing with minmax function.
+     */
+    class Module;
+
     /*
      * Activation Functions Namespace
      */
@@ -66,6 +73,7 @@ namespace nn {
         using vl_t = std::vector<HiddenLayer>;
         using vf_t = std::vector<act::Function>;
         using fdd_t = double (*)(double);
+        using vpd_t = std::vector<std::pair<double, double>>;
         using vvd_t = std::vector<std::vector<double>>;
         using vpvd_t = std::vector<std::pair<vd_t, vd_t>>;
     }
@@ -128,6 +136,53 @@ namespace nn {
     }
 
     /**
+     * Data Processing Namespace.
+     * Contains Regularization & Normalization functions.
+     */
+    namespace process {
+        /**
+         * The general type for regularization functions.
+         */
+        using regularizer_t = double (*)(const vd_t &, double);
+
+        /**
+         * L1 Regularization.
+         * Applies L1 regularization technique.
+         * @param weights Vector of network weights
+         * @param lambda Regularization coefficient
+         * @return The L1 regularization term
+         */
+        double l1(const vd_t &weights, double lambda);
+
+        /**
+         * L2 Regularization.
+         * Applies L2 regularization technique.
+         * @param weights Vector of network weights
+         * @param lambda Regularization coefficient
+         * @return The L2 regularization term
+         */
+        double l2(const vd_t &weights, double lambda);
+
+        /**
+         * Min-Max Normalization.
+         * Normalizes the data using Min-Max scaling.
+         * @param data Vector of data points
+         * @return Normalized data vector
+         */
+        vd_t minmax(const vd_t &data);
+
+        /**
+         * Inverse Min-Max Normalization (De-normalization).
+         * Reverts the normalized data back to its original scale.
+         * @param data Vector of normalized data points
+         * @param originalMin The original minimum value of the data before normalization
+         * @param originalMax The original maximum value of the data before normalization
+         * @return Denormalized data vector
+         */
+        vd_t inverse_minmax(const vd_t &data, double originalMin, double originalMax);
+    }
+
+    /**
      * The Factory Namespace
      */
     namespace make {
@@ -167,10 +222,11 @@ namespace nn {
          * Last value represents the number of neurons for the output layer.
          * @param functions Activation functions used for each hidden layer in the neural network.
          * For N dimensions there should be N - 2 functions.
+         * @param loss Loss function used for backward propagation and error calculation.
          * @param alpha Initial learning rate used for the neural network.
          * @return A Network object configured as per the provided options.
          */
-        Network network(const vi_t &dimensions, const vf_t &functions, double alpha);
+        Network network(const vi_t &dimensions, const vf_t &functions, loss::function_t loss, double alpha);
 
         /**
          * Creates a Network with the specified options.
@@ -181,10 +237,11 @@ namespace nn {
          * Mid values represents the number of neurons for each hidden layer.
          * Last value represents the number of neurons for the output layer.
          * @param function Activation function used for all hidden layers in the network.
+         * @param loss Loss function used for backward propagation and error calculation.
          * @param alpha Initial learning rate used for the neural network.
          * @return A Network object configured as per the provided options.
          */
-        Network network(const vi_t &dimensions, const act::Function &function, double alpha);
+        Network network(const vi_t &dimensions, const act::Function &functions, loss::function_t loss, double alpha);
     }
 }
 

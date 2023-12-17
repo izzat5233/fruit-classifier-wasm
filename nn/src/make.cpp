@@ -36,7 +36,7 @@ vn_t make::layer(const ui_t &numInputs, const ui_t &numNeurons, double rangeFact
     return neurons;
 }
 
-Network make::network(const vi_t &dimensions, const vf_t &functions, double alpha) {
+Network make::network(const vi_t &dimensions, const vf_t &functions, loss::function_t loss, double alpha) {
     auto n = static_cast<ui_t>(dimensions.size());
     assert(n == dimensions.size());
 
@@ -46,9 +46,9 @@ Network make::network(const vi_t &dimensions, const vf_t &functions, double alph
     }
 
     OutputLayer outputLayer(make::layer(dimensions[n - 2], dimensions[n - 1]));
-    return Network(layers, outputLayer, alpha);
+    return Network(layers, outputLayer, loss, alpha);
 }
 
-Network make::network(const vi_t &dimensions, const act::Function &function, double alpha) {
-    return make::network(dimensions, vf_t(dimensions.size() - 2, function), alpha);
+Network make::network(const vi_t &dimensions, const act::Function &function, loss::function_t loss, double alpha) {
+    return make::network(dimensions, vf_t(dimensions.size() - 2, function), loss, alpha);
 }

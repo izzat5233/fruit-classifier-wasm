@@ -14,19 +14,21 @@ private:
     const std::size_t size;
     vl_t layers;
     OutputLayer outputLayer;
+    loss::function_t lossFunction;
     double alpha;
 
 public:
     /**
-     * Constructs a neural network with a given set of layers and learning rate.
+     * Constructs a neural network with a given set of layers, loss function, and learning rate.
      * The algorithm works well if the last layer is OutputLayer.
      * But no errors occur with another layer.
      *
      * @param hiddenLayers Vector of hidden layers that make up the network.
      * @param outputLayer The OutputLayer of the network.
+     * @param lossFunction The loss function used in backpropagation
      * @param alpha Learning rate used in training.
      */
-    explicit Network(vl_t hiddenLayers, OutputLayer outputLayer, double alpha);
+    explicit Network(vl_t hiddenLayers, OutputLayer outputLayer, loss::function_t lossFunction, double alpha);
 
     /**
      * Changes the learning rate of the network.
@@ -94,25 +96,21 @@ public:
      * Trains the neural network on a given input-output pair.
      * A call to this method represents a single iteration on the data.
      *
-     * Returns the propagated (predicted) outputs. Its the responsibility of the caller
-     * to decide what to do with the result and how to continue.
+     * @param input Vector of given input values
+     * @param output Vector of expected output values
+     * @return The outputs error calculated by the lossFunction.
+     */
+    double train(const vd_t &input, const vd_t &output);
+
+    /**
+     * Tests the neural network on a given input-output pair.
+     * A call to this method represents a single iteration on the data.
      *
      * @param input Vector of given input values
      * @param output Vector of expected output values
-     * @return The calculated output values.
+     * @return The outputs error calculated by the lossFunction.
      */
-    vd_t train(const vd_t &input, const vd_t &output);
-
-    /**
-     * Trains the neural network on the given set of input-output pairs.
-     * Uses the given lossFunction to calculate the average error result of all iterations.
-     * A call to this method represents a single epoch (full iteration on all data pairs).
-     *
-     * @param data Vector of input-output pairs for training.
-     * @param lossFunction The loss function used to calculate the errors.
-     * @return The average error result of all iterations, calculated by the lossFunction.
-     */
-    double train(const vpvd_t &data, loss::function_t lossFunction);
+    [[nodiscard]] double test(const vd_t &input, const vd_t &output) const;
 
     /**
      * Makes predictions based on input data.

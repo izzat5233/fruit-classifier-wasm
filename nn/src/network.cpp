@@ -8,8 +8,9 @@
 
 using namespace nn;
 
-Network::Network(vl_t layers, OutputLayer outputLayer, double alpha)
-        : size(layers.size() + 1), layers(std::move(layers)), outputLayer(std::move(outputLayer)), alpha(alpha) {
+Network::Network(vl_t layers, OutputLayer outputLayer, loss::function_t lossFunction, double alpha)
+        : size(layers.size() + 1), layers(std::move(layers)), outputLayer(std::move(outputLayer)),
+          lossFunction(lossFunction), alpha(alpha) {
     assert(!this->layers.empty());
     assert([this] {
         auto i = this->layers.cbegin();
@@ -68,7 +69,7 @@ void Network::backwardPropagate(const vd_t &desired) {
     }
 }
 
-vd_t Network::train(const vd_t &input, const vd_t &output) {
+double Network::train(const vd_t &input, const vd_t &output) {
     vd_t res = forwardPropagate(input);
     backwardPropagate(output);
 
@@ -82,14 +83,10 @@ vd_t Network::train(const vd_t &input, const vd_t &output) {
         }
     }
 
-    return res;
+    return lossFunction(res, output);
 }
 
-double Network::train(const vpvd_t &data, loss::function_t lossFunction) {
-    double sum = 0;
-    for (const auto &[input, output]: data) {
-        vd_t res = train(input, output);
-        sum += lossFunction(output, res);
-    }
-    return sum / data.size();
+double Network::test(const vd_t &input, const vd_t &output) const {
+    vd_t res = predict(input);
+    return lossFunction(res, output);
 }
