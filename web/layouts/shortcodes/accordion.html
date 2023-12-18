@@ -1,0 +1,22 @@
+{{ $accordionKey := .Get 0 }}
+{{ $accordionData := index .Page.Params.accordions $accordionKey }}
+<div id="accordion-{{ $accordionKey }}" class="accordion py-5">
+    {{ range $accordionData.items }}
+    <div class="accordion-item">
+        <h2 class="accordion-header">
+            <button class="accordion-button {{ if .expanded }}show{{ else }}collapsed{{ end }} lead fs-4" type="button"
+                    data-bs-toggle="collapse" data-bs-target="#{{ .collapseId }}" aria-expanded="{{ .expanded }}"
+                    aria-controls="{{ .collapseId }}">
+                {{ .title }}
+            </button>
+        </h2>
+        <div id="{{ .collapseId }}" class="accordion-collapse collapse {{ if .expanded }}show{{ end }}"
+             data-bs-parent="#accordion-{{ $accordionKey }}">
+            <div class="accordion-body py-5">
+                {{ $content := readFile (printf "content/%s" .file) | safeHTML }}
+                {{ $content }}
+            </div>
+        </div>
+    </div>
+    {{ end }}
+</div>

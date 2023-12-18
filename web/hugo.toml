@@ -5,6 +5,9 @@ title = 'Frusim'
 [params]
     Description = 'Fruit Classifier Neural Network in Web Assembly'
 
+[markup.goldmark.renderer]
+    unsafe = true
+
 [module]
     [module.hugoVersion]
     extended = false

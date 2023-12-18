@@ -1,0 +1,81 @@
+<div class="row justify-content-center">
+    <div class="col">
+        <h5 class="py-4">Epochs:</h5>
+        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio1"
+                   autocomplete="off" value="1" checked>
+            <label class="btn btn-light fs-5" for="epochsRadio1">1</label>
+            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio5"
+                   autocomplete="off" value="5">
+            <label class="btn btn-light fs-5" for="epochsRadio5">5</label>
+            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio10"
+                   autocomplete="off" value="10">
+            <label class="btn btn-light fs-5" for="epochsRadio10">10</label>
+            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio50"
+                   autocomplete="off" value="50">
+            <label class="btn btn-light fs-5" for="epochsRadio50">50</label>
+            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio100"
+                   autocomplete="off" value="100">
+            <label class="btn btn-light fs-5" for="epochsRadio100">100</label>
+            <button type="button" title="start" id="startTrainingButton" onclick="startTraining()"
+                    class="btn btn-lg btn-success bi bi-play-fill fs-5"></button>
+        </div>
+        <div>
+            <h5 class="py-4">Options:</h5>
+            <div class="px-2">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="useTestDataCheck">
+                    <label class="form-check-label" for="useTestDataCheck">
+                        Use Testing Data
+                    </label>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4">
+        <div>
+            <button type="button" title="start" id="refreshWeightsButton" onclick="network.build()"
+                    class="btn btn-lg btn-danger bi bi-arrow-clockwise fs-5"> Randomize Weights
+            </button>
+        </div>
+    </div>
+    <div class="col">
+        <h5 class="py-4">Training Errors:</h5>
+        <div id="trainingLogger"></div>
+    </div>
+    <div class="col">
+        <h5 class="py-4">Testing Errors:</h5>
+        <div id="testingLogger"></div>
+    </div>
+</div>
+<script>
+    function startTraining() {
+        const trainLogger = document.getElementById('trainingLogger');
+        const testLogger = document.getElementById('testingLogger');
+        trainLogger.innerHTML = "";
+        testLogger.innerHTML = "";
+
+        const epochs = getSelectedEpochValue();
+        let res;
+        if (document.getElementById('useTestDataCheck').checked) {
+            res = network.trainAndTestFor(epochs);
+            for (let i = 0; i < res.size(); ++i) {
+                trainLogger.innerHTML += "<p>" + res.get(i).get(0) + "</p>";
+                testLogger.innerHTML += "<p>" + res.get(i).get(1) + "</p>";
+            }
+        } else {
+            res = network.trainFor(epochs);
+            for (let i = 0; i < res.size(); ++i) {
+                trainLogger.innerHTML += "<p>" + res.get(i) + "</p>";
+            }
+        }
+    }
+
+    function getSelectedEpochValue() {
+        const radioButtons = document.querySelectorAll('input[name="epochsRadio"]');
+        for (const radioButton of radioButtons) {
+            if (radioButton.checked) {
+                return Number(radioButton.value);
+            }
+        }
+    }
+</script>
