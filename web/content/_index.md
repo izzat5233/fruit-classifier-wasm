@@ -36,15 +36,16 @@ expanded = false
 # Set up The Neural Network
 
 {{< include-script "wasm/main.js" >}}
-
 {{< accordion "setup" >}}
 
+{{< include-script "js/visualizer.js" >}}
 <div id="visualizer"></div>
 
 ---
 
 # It's Super Fast, Give it a try!
 
+{{< include-script "js/table.js" >}}
 {{< accordion "control" >}}
 
 ---

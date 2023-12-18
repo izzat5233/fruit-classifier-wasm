@@ -168,7 +168,7 @@ public:
     }
 
     nn::vvd_t getTrainOut() {
-        return module.getTrainInput();
+        return module.getTrainOutput();
     }
 
     nn::vvd_t getTrainOutPreview() {
@@ -181,7 +181,7 @@ public:
     }
 
     nn::vvd_t getTestIn() {
-        return module.getTrainInput();
+        return module.getTestInput();
     }
 
     nn::vvd_t getTestInPreview() {
@@ -194,7 +194,7 @@ public:
     }
 
     nn::vvd_t getTestOut() {
-        return module.getTrainInput();
+        return module.getTestOutput();
     }
 
     nn::vvd_t getTestOutPreview() {

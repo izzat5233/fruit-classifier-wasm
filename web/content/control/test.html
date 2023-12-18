@@ -1,0 +1,59 @@
+<div class="row justify-content-center">
+    <div class="col">
+        <div class="d-flex justify-content-center">
+            <div class="btn-group" role="group" aria-label="Get Outputs">
+                <button type="button" class="btn btn-lg btn-primary fs-5" onclick="getTestOutputs()">
+                    Get Test Outputs
+                </button>
+                <button type="button" class="btn btn-lg btn-outline-primary bi bi-download fs-5" disabled
+                        id="downloadOutputsButton" onclick="network.downloadPredictedOutputs()"> Download
+                </button>
+                <button type="button" class="btn btn-lg btn-outline-primary fs-5"
+                        id="clearOutputsButton" onclick="clearPredictedTable()">Clear
+                </button>
+            </div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="d-flex justify-content-center">
+            <button type="button" class="btn btn-lg btn-primary bi bi-download fs-5" id="downloadWeightsButton"
+                    onclick="network.downloadNetwork()"> Download Network Weights
+            </button>
+        </div>
+    </div>
+</div>
+<hr class="my-4">
+<div class="row justify-content-center">
+    <table class="col table table-bordered">
+        <thead id="predictedInThead"></thead>
+        <tbody id="predictedInTbody"></tbody>
+    </table>
+    <table class="col table table-bordered">
+        <thead id="predictedOutThead"></thead>
+        <tbody id="predictedOutTbody"></tbody>
+    </table>
+</div>
+<script>
+    function clearPredictedTable() {
+        document.getElementById('predictedInThead').innerHTML = "";
+        document.getElementById('predictedInTbody').innerHTML = "";
+        document.getElementById('predictedOutThead').innerHTML = "";
+        document.getElementById('predictedOutTbody').innerHTML = "";
+        document.getElementById("downloadOutputsButton").disabled = true;
+    }
+
+    function getTestOutputs() {
+        clearPredictedTable();
+        document.getElementById("downloadOutputsButton").disabled = false;
+
+        network.predictTestingOutputs();
+        let input = network.getTestIn();
+        setupTableHeader("#predictedInThead", input.get(0).size(), "Input");
+        fillNumTable("#predictedInTbody", input);
+
+        let output = network.getPredictedOutputs();
+        setupTableHeader("#predictedOutThead", output.get(0).size(), "Output");
+        fillNumTable("#predictedOutTbody", output, window.innerWidth > 400 ? 8 : 4);
+        showSimpleToast("<h5>Computed " + input.size() + " predictions</h5>");
+    }
+</script>
