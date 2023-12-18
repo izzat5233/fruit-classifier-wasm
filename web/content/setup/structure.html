@@ -17,12 +17,12 @@
         updateNetworkDimensions(structure);
     }
 </script>
-<div class="container flex-column gap-4" oninput="onStructureChange()">
+<div class="container flex-column gap-4">
     <div class="row row-cols-1 row-cols-lg-3 g-4">
         <div class="col">
             <label for="inputLayerHeight" class="form-label">Input Layer Height</label>
             <input type="range" class="form-range" min="1" max="10" step="1" id="inputLayerHeight"
-                   value="2" oninput="structure[0] = Number(value)">
+                   value="2" oninput="setStructureInput(Number(value))">
         </div>
         <div class="col">
             <label for="hiddenLayersCount" class="form-label">Hidden Layers Count</label>
@@ -32,7 +32,7 @@
         <div class="col">
             <label for="outputLayerHeight" class="form-label">Output Layer Height</label>
             <input type="range" class="form-range" min="1" max="10" step="1" id="outputLayerHeight"
-                   value="2" oninput="structure[structure.length - 1] = Number(value)">
+                   value="2" oninput="setStructureOutput(Number(value))">
         </div>
     </div>
     <hr>
@@ -43,6 +43,18 @@
         drawNetwork(structure);
         if (network) updateNetworkDimensions(structure);
         updateOutputFunctionLabel();
+    }
+
+    function setStructureInput(value) {
+        structure[0] = value;
+        document.getElementById('inputLayerHeight').value = value;
+        onStructureChange();
+    }
+
+    function setStructureOutput(value) {
+        structure[structure.length - 1] = value;
+        document.getElementById('outputLayerHeight').value = value;
+        onStructureChange();
     }
 
     function createHiddenLayerInput(index, value) {
@@ -78,6 +90,7 @@
         }
 
         structure.push(last);
+        onStructureChange();
     }
 
     function updateOutputFunctionLabel() {

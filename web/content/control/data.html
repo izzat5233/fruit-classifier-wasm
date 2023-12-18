@@ -122,12 +122,18 @@
         clearTrainPreviewTable()
 
         let input = network.getTrainInPreview();
-        const headers1 = appendTableHeaders("#trainPreviewThead", input.get(0).size(), "Input");
+        const inputSize = input.get(0).size();
+        setStructureInput(inputSize);
+
+        const headers1 = appendTableHeaders("#trainPreviewThead", inputSize, "Input");
         const cells1 = appendTableCells("#trainPreviewTbody", input);
         styleTableSelection(headers1, cells1, 'table-default');
 
         let output = network.getTrainOutPreview();
-        const headers2 = appendTableHeaders("#trainPreviewThead", output.get(0).size(), "Output");
+        const outputSize = output.get(0).size();
+        setStructureOutput(outputSize);
+
+        const headers2 = appendTableHeaders("#trainPreviewThead", outputSize, "Output");
         const cells2 = appendTableCells("#trainPreviewTbody", output);
         styleTableSelection(headers2, cells2, 'table-secondary');
 
