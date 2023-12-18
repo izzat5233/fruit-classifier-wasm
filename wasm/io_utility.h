@@ -92,16 +92,16 @@ std::string prepareCsvData(const nn::vvd_t &data) {
  * @param biases The biases of the neural network.
  * @return A string representation of the network data in JSON-like format.
  */
-std::string prepareNetworkData(const vvvd_t &weights, const vvd_t &biases) {
+std::string prepareNetworkData(const nn::vvvd_t &weights, const nn::vvd_t &biases) {
     std::ostringstream oss;
 
     oss << "{\n";
     oss << "  \"weights\": [\n";
-    for (size_t i = 0; i < weights.size(); ++i) {
+    for (std::size_t i = 0; i < weights.size(); ++i) {
         oss << "    [\n";
-        for (size_t j = 0; j < weights[i].size(); ++j) {
+        for (std::size_t j = 0; j < weights[i].size(); ++j) {
             oss << "      [";
-            for (size_t k = 0; k < weights[i][j].size(); ++k) {
+            for (std::size_t k = 0; k < weights[i][j].size(); ++k) {
                 oss << weights[i][j][k];
                 if (k < weights[i][j].size() - 1) oss << ", ";
             }
@@ -116,9 +116,9 @@ std::string prepareNetworkData(const vvvd_t &weights, const vvd_t &biases) {
     oss << "  ],\n";
 
     oss << "  \"biases\": [\n";
-    for (size_t i = 0; i < biases.size(); ++i) {
+    for (std::size_t i = 0; i < biases.size(); ++i) {
         oss << "    [";
-        for (size_t j = 0; j < biases[i].size(); ++j) {
+        for (std::size_t j = 0; j < biases[i].size(); ++j) {
             oss << biases[i][j];
             if (j < biases[i].size() - 1) oss << ", ";
         }
