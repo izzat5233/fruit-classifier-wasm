@@ -14,7 +14,7 @@
                onclick="onClearTrainingData()">Clear</p>
         </div>
         <div class="row justify-content-center">
-            <div class="col">
+            <div class="col table-responsive">
                 <table class="table table-bordered">
                     <thead id="trainPreviewThead"></thead>
                     <tbody id="trainPreviewTbody"></tbody>
@@ -37,7 +37,7 @@
                onclick="onClearTestingData()">Clear</p>
         </div>
         <div class="row justify-content-center">
-            <div class="col">
+            <div class="col table-responsive">
                 <table class="table table-bordered">
                     <thead id="testPreviewThead"></thead>
                     <tbody id="testPreviewTbody"></tbody>
@@ -122,12 +122,14 @@
         clearTrainPreviewTable()
 
         let input = network.getTrainInPreview();
-        setupTableHeader("#trainPreviewThead", input.get(0).size(), "Input");
-        fillNumTable("#trainPreviewTbody", input);
+        const headers1 = appendTableHeaders("#trainPreviewThead", input.get(0).size(), "Input");
+        const cells1 = appendTableCells("#trainPreviewTbody", input);
+        styleTableSelection(headers1, cells1, 'table-default');
 
         let output = network.getTrainOutPreview();
-        setupTableHeader("#trainPreviewThead", output.get(0).size(), "Output");
-        fillNumTable("#trainPreviewTbody", output);
+        const headers2 = appendTableHeaders("#trainPreviewThead", output.get(0).size(), "Output");
+        const cells2 = appendTableCells("#trainPreviewTbody", output);
+        styleTableSelection(headers2, cells2, 'table-secondary');
 
         return input.size();
     }
@@ -136,12 +138,14 @@
         clearTestPreviewTable()
 
         let input = network.getTestInPreview();
-        setupTableHeader("#testPreviewThead", input.get(0).size(), "Input");
-        fillNumTable("#testPreviewTbody", input);
+        const headers1 = appendTableHeaders("#testPreviewThead", input.get(0).size(), "Input");
+        const cells1 = appendTableCells("#testPreviewTbody", input);
+        styleTableSelection(headers1, cells1, 'table-default');
 
         let output = network.getTestOutPreview();
-        setupTableHeader("#testPreviewThead", output.get(0).size(), "Output");
-        fillNumTable("#testPreviewTbody", output);
+        const headers2 = appendTableHeaders("#testPreviewThead", output.get(0).size(), "Output");
+        const cells2 = appendTableCells("#testPreviewTbody", output);
+        styleTableSelection(headers2, cells2, 'table-secondary');
 
         return input.size();
     }

@@ -25,7 +25,7 @@
 <hr class="my-4">
 <div class="container">
     <div class="row justify-content-center">
-        <div class="col">
+        <div class="col table-responsive">
             <table class="table table-bordered">
                 <thead id="predictedThead"></thead>
                 <tbody id="predictedTbody"></tbody>
@@ -48,16 +48,19 @@
         const tbody = "#predictedTbody";
 
         let input = network.getTestIn();
-        setupTableHeader(thead, input.get(0).size(), "Input");
-        fillNumTable(tbody, input);
+        const headers1 = appendTableHeaders(thead, input.get(0).size(), "Input");
+        const cells1 = appendTableCells(tbody, input);
+        styleTableSelection(headers1, cells1, 'table-default');
 
         let output = network.getTestOut();
-        setupTableHeader(thead, output.get(0).size(), "Output");
-        fillNumTable(tbody, output);
+        const headers2 = appendTableHeaders(thead, output.get(0).size(), "Output");
+        const cells2 = appendTableCells(tbody, output);
+        styleTableSelection(headers2, cells2, 'table-secondary');
 
         let predicted = network.getPredictedOutputs();
-        setupTableHeader(thead, predicted.get(0).size(), "Predicted");
-        fillNumTable(tbody, predicted);
+        const headers3 = appendTableHeaders(thead, predicted.get(0).size(), "Predicted");
+        const cells3 = appendTableCells(tbody, predicted);
+        styleTableSelection(headers3, cells3, 'table-primary');
 
         showSimpleToast("<h5>Computed " + input.size() + " predictions</h5>");
     }
