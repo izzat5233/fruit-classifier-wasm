@@ -19,8 +19,36 @@ void Module::setNetwork(Network newNetwork) {
     this->network.emplace(std::move(newNetwork));
 }
 
-const std::optional<Network> &Module::getNetwork() const {
-    return network;
+vvvd_t Module::getWeights() const {
+    vvvd_t res;
+    for (std::size_t i = 0; i < network->getSize(); ++i) {
+        vvd_t weights;
+        for (const Neuron &neuron: network->get(i)) {
+            weights.push_back(neuron);
+        }
+        res.push_back(weights);
+    }
+    return res;
+}
+
+vvd_t Module::getBiases() const {
+    vvd_t res;
+    for (std::size_t i = 0; i < network->getSize(); ++i) {
+        vd_t biases;
+        for (const Neuron &neuron: network->get(i)) {
+            biases.push_back(neuron.getBias());
+        }
+        res.push_back(biases);
+    }
+    return res;
+}
+
+void Module::setLearningRate(double learningRate) {
+    this->alpha = learningRate;
+}
+
+double Module::getLearningRate() const {
+    return alpha;
 }
 
 void Module::NormalizedData::set(const vvd_t &data) {
@@ -92,7 +120,7 @@ double Module::train() {
 
     double sum = 0;
     for (std::size_t i = 0; i < inputs.size(); ++i) {
-        sum += network->train(inputs[i], outputs[i]);
+        sum += network->train(inputs[i], outputs[i], alpha);
     }
     return sum / (double) inputs.size();
 }
@@ -121,6 +149,15 @@ vd_t Module::test(std::size_t epochs) const {
     return errors;
 }
 
+vpd_t Module::trainAndTest(std::size_t epochs) {
+    vpd_t errors(epochs);
+    for (std::size_t i = 0; i < epochs; ++i) {
+        errors[i].first = train();
+        errors[i].second = test();
+    }
+    return errors;
+}
+
 vvd_t Module::predict() const {
     const vvd_t &normalized = testInput.use();
     vvd_t processed(normalized.size());
@@ -130,11 +167,13 @@ vvd_t Module::predict() const {
     return testInput.get(processed);
 }
 
-vpd_t Module::trainAndTest(std::size_t epochs) {
-    vpd_t errors(epochs);
-    for (std::size_t i = 0; i < epochs; ++i) {
-        errors[i].first = train();
-        errors[i].second = test();
+vvd_t Module::predict(const vvd_t &inputData) const {
+    NormalizedData data;
+    data.set(inputData);
+    const vvd_t &normalized = data.use();
+    vvd_t processed(normalized.size());
+    for (std::size_t i = 0; i < processed.size(); ++i) {
+        processed[i] = network->predict(normalized[i]);
     }
-    return errors;
+    return data.get(processed);
 }

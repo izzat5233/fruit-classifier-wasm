@@ -8,9 +8,9 @@
 
 using namespace nn;
 
-Network::Network(vl_t layers, OutputLayer outputLayer, loss::function_t lossFunction, double alpha)
-        : size(layers.size() + 1), layers(std::move(layers)), outputLayer(std::move(outputLayer)),
-          lossFunction(lossFunction), alpha(alpha) {
+Network::Network(vl_t layers, OutputLayer outputLayer, loss::function_t lossFunction)
+        : size(layers.size() + 1), layers(std::move(layers)),
+          outputLayer(std::move(outputLayer)), lossFunction(lossFunction) {
     assert(!this->layers.empty());
     assert([this] {
         auto i = this->layers.cbegin();
@@ -19,10 +19,6 @@ Network::Network(vl_t layers, OutputLayer outputLayer, loss::function_t lossFunc
         }
         return this->outputLayer.cbegin()->size() == this->layers.crbegin()->size();
     }());
-}
-
-void Network::setAlpha(double learningRate) {
-    this->alpha = learningRate;
 }
 
 std::size_t Network::getSize() const {
@@ -69,7 +65,7 @@ void Network::backwardPropagate(const vd_t &desired) {
     }
 }
 
-double Network::train(const vd_t &input, const vd_t &output) {
+double Network::train(const vd_t &input, const vd_t &output, double alpha) {
     vd_t res = forwardPropagate(input);
     backwardPropagate(output);
 

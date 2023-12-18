@@ -31,7 +31,7 @@ protected:
             l1({n11, n12}, f1),
             l2({n21, n22, n23}, f2),
             l3({n31, n32}),
-            network({l1, l2}, l3, nn::loss::sse, alpha) {}
+            network({l1, l2}, l3, nn::loss::sse) {}
 };
 
 TEST_F(NetworkTest, ForwardPropagation) {
@@ -58,6 +58,6 @@ TEST_F(NetworkTest, SimpleTrainingTest) {
     nn::vd_t input = {1, 0};
     nn::vd_t output = {0, 1};
     nn::vd_t expected = {0.316920916177, 0.683079083822};
-    double error = network.train(input, output);
+    double error = network.train(input, output, alpha);
     EXPECT_NEAR(error, nn::loss::sse(output, expected), EPSILON);
 }

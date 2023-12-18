@@ -14,11 +14,13 @@
 
 class NetworkController {
 private:
-    nn::Module module;
     nn::vi_t dimensions = {2, 3, 2};
     nn::act::Function actFunction = nn::act::relu;
     nn::loss::function_t lossFunction = nn::loss::sse;
     double alpha = 0.1;
+
+    nn::Module module;
+    nn::vvd_t predictedCash;
 
     CSVFile *inTrainFile = new CSVFile([this] {
         EM_ASM_ARGS({ onInputTrainingFileSet(UTF8ToString($0), $1) },
@@ -56,7 +58,8 @@ public:
     }
 
     void build() {
-        module.setNetwork(nn::make::network(dimensions, actFunction, lossFunction, alpha));
+        module.setNetwork(nn::make::network(dimensions, actFunction, lossFunction));
+        module.setLearningRate(alpha);
     }
 
     void setDimensions(const nn::vi_t &networkDimensions) {
@@ -66,7 +69,7 @@ public:
 
     void setLearningRate(double learningRate) {
         this->alpha = learningRate;
-        build();
+        module.setLearningRate(alpha);
     }
 
     void setActivationFunction(const std::string &function) {
@@ -125,8 +128,82 @@ public:
         return pairToVector(module.trainAndTest(epochs));
     }
 
-    [[nodiscard]] nn::vvd_t predictTestingOutputs() const {
-        return module.predict();
+    nn::vvd_t predictTestingOutputs() {
+        return predictedCash = module.predict();
+    }
+
+    nn::vvd_t getPredictedOutputs() {
+        return predictedCash;
+    }
+
+    void downloadPredictedOutputs() {
+        std::string data = prepareCsvData(predictedCash);
+        emscripten_browser_file::download("predicted.csv", "text/csv", data.c_str(), data.size());
+    }
+
+    nn::vvvd_t getWeights() {
+        return module.getWeights();
+    }
+
+    nn::vvd_t getBiases() {
+        return module.getBiases();
+    }
+
+    void downloadNetwork() {
+        std::string data = prepareNetworkData(getWeights(), getBiases());
+        emscripten_browser_file::download("network.json", "json", data.c_str(), data.size());
+    }
+
+    nn::vvd_t getTrainIn() {
+        return module.getTrainInput();
+    }
+
+    nn::vvd_t getTrainInPreview() {
+        return inTrainFile->getPreview();
+    }
+
+    void downloadTrainIn() {
+        std::string data = prepareCsvData(module.getTrainInput());
+        emscripten_browser_file::download("trainIn.csv", "text/csv", data.c_str(), data.size());
+    }
+
+    nn::vvd_t getTrainOut() {
+        return module.getTrainInput();
+    }
+
+    nn::vvd_t getTrainOutPreview() {
+        return outTrainFile->getPreview();
+    }
+
+    void downloadTrainOut() {
+        std::string data = prepareCsvData(module.getTrainOutput());
+        emscripten_browser_file::download("trainOut.csv", "text/csv", data.c_str(), data.size());
+    }
+
+    nn::vvd_t getTestIn() {
+        return module.getTrainInput();
+    }
+
+    nn::vvd_t getTestInPreview() {
+        return inTestFile->getPreview();
+    }
+
+    void downloadTestIn() {
+        std::string data = prepareCsvData(module.getTestInput());
+        emscripten_browser_file::download("testIn.csv", "text/csv", data.c_str(), data.size());
+    }
+
+    nn::vvd_t getTestOut() {
+        return module.getTrainInput();
+    }
+
+    nn::vvd_t getTestOutPreview() {
+        return outTestFile->getPreview();
+    }
+
+    void downloadTestOut() {
+        std::string data = prepareCsvData(module.getTestOutput());
+        emscripten_browser_file::download("testOut.csv", "text/csv", data.c_str(), data.size());
     }
 };
 
@@ -154,7 +231,24 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("prepareTestingData", &NetworkController::prepareTestingData)
             .function("trainFor", &NetworkController::trainFor)
             .function("trainAndTestFor", &NetworkController::trainAndTestFor)
-            .function("predictTestingOutputs", &NetworkController::predictTestingOutputs);
+            .function("predictTestingOutputs", &NetworkController::predictTestingOutputs)
+            .function("getPredictedOutputs", &NetworkController::getPredictedOutputs)
+            .function("getWeights", &NetworkController::getWeights)
+            .function("getBiases", &NetworkController::getBiases)
+            .function("downloadNetwork", &NetworkController::downloadNetwork)
+            .function("downloadPredictedOutputs", &NetworkController::downloadPredictedOutputs)
+            .function("getTrainIn", &NetworkController::getTrainIn)
+            .function("getTrainInPreview", &NetworkController::getTrainInPreview)
+            .function("downloadTrainIn", &NetworkController::downloadTrainIn)
+            .function("getTrainOut", &NetworkController::getTrainOut)
+            .function("getTrainOutPreview", &NetworkController::getTrainOutPreview)
+            .function("downloadTrainOut", &NetworkController::downloadTrainOut)
+            .function("getTestIn", &NetworkController::getTestIn)
+            .function("getTestInPreview", &NetworkController::getTestInPreview)
+            .function("downloadTestIn", &NetworkController::downloadTestIn)
+            .function("getTestOut", &NetworkController::getTestOut)
+            .function("getTestOutPreview", &NetworkController::getTestOutPreview)
+            .function("downloadTestOut", &NetworkController::downloadTestOut);
 }
 
 #endif //FRUIT_CLASSIFIER_WASM_NETWORK_INTERFACE_H

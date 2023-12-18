@@ -33,6 +33,13 @@ public:
     [[nodiscard]] const std::string &getFilename() const {
         return filename;
     }
+
+    [[nodiscard]] nn::vvd_t getPreview() const {
+        nn::vvd_t res;
+        std::size_t inc = std::max((std::size_t) 1, data.size() / 10);
+        for (std::size_t i = 0; i < data.size(); i += inc) { res.push_back(data[i]); }
+        return res;
+    }
 };
 
 void processCsvData(UPLOAD_HANDLER_PARAMETERS) {
@@ -65,6 +72,64 @@ void processCsvData(UPLOAD_HANDLER_PARAMETERS) {
     }
 
     file->onProcessDone();
+}
+
+std::string prepareCsvData(const nn::vvd_t &data) {
+    std::stringstream ss;
+    for (const auto &row: data) {
+        for (std::size_t i = 0; i < row.size(); ++i) {
+            ss << row[i];
+            if (i < row.size() - 1) { ss << ","; }
+        }
+        ss << "\n";
+    }
+    return ss.str();
+}
+
+/**
+ * Prepares the network's weights and biases data for download in a simple JSON-like format.
+ * @param weights The weights of the neural network.
+ * @param biases The biases of the neural network.
+ * @return A string representation of the network data in JSON-like format.
+ */
+std::string prepareNetworkData(const vvvd_t &weights, const vvd_t &biases) {
+    std::ostringstream oss;
+
+    oss << "{\n";
+    oss << "  \"weights\": [\n";
+    for (size_t i = 0; i < weights.size(); ++i) {
+        oss << "    [\n";
+        for (size_t j = 0; j < weights[i].size(); ++j) {
+            oss << "      [";
+            for (size_t k = 0; k < weights[i][j].size(); ++k) {
+                oss << weights[i][j][k];
+                if (k < weights[i][j].size() - 1) oss << ", ";
+            }
+            oss << "]";
+            if (j < weights[i].size() - 1) oss << ",";
+            oss << "\n";
+        }
+        oss << "    ]";
+        if (i < weights.size() - 1) oss << ",";
+        oss << "\n";
+    }
+    oss << "  ],\n";
+
+    oss << "  \"biases\": [\n";
+    for (size_t i = 0; i < biases.size(); ++i) {
+        oss << "    [";
+        for (size_t j = 0; j < biases[i].size(); ++j) {
+            oss << biases[i][j];
+            if (j < biases[i].size() - 1) oss << ", ";
+        }
+        oss << "]";
+        if (i < biases.size() - 1) oss << ",";
+        oss << "\n";
+    }
+    oss << "  ]\n";
+    oss << "}\n";
+
+    return oss.str();
 }
 
 #endif //FRUIT_CLASSIFIER_WASM_IO_UTILITY_H

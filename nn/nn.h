@@ -75,7 +75,7 @@ namespace nn {
         using fdd_t = double (*)(double);
         using vpd_t = std::vector<std::pair<double, double>>;
         using vvd_t = std::vector<std::vector<double>>;
-        using vpvd_t = std::vector<std::pair<vd_t, vd_t>>;
+        using vvvd_t = std::vector<vvd_t>;
     }
 
     namespace act {
@@ -222,11 +222,10 @@ namespace nn {
          * Last value represents the number of neurons for the output layer.
          * @param functions Activation functions used for each hidden layer in the neural network.
          * For N dimensions there should be N - 2 functions.
-         * @param loss Loss function used for backward propagation and error calculation.
-         * @param alpha Initial learning rate used for the neural network.
+         * @param lossFunction Loss function used for backward propagation and error calculation.
          * @return A Network object configured as per the provided options.
          */
-        Network network(const vi_t &dimensions, const vf_t &functions, loss::function_t loss, double alpha);
+        Network network(const vi_t &dimensions, const vf_t &functions, loss::function_t lossFunction);
 
         /**
          * Creates a Network with the specified options.
@@ -237,11 +236,10 @@ namespace nn {
          * Mid values represents the number of neurons for each hidden layer.
          * Last value represents the number of neurons for the output layer.
          * @param function Activation function used for all hidden layers in the network.
-         * @param loss Loss function used for backward propagation and error calculation.
-         * @param alpha Initial learning rate used for the neural network.
+         * @param lossFunction Loss function used for backward propagation and error calculation.
          * @return A Network object configured as per the provided options.
          */
-        Network network(const vi_t &dimensions, const act::Function &functions, loss::function_t loss, double alpha);
+        Network network(const vi_t &dimensions, const act::Function &functions, loss::function_t lossFunction);
     }
 }
 

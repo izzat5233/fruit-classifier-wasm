@@ -15,28 +15,18 @@ private:
     vl_t layers;
     OutputLayer outputLayer;
     loss::function_t lossFunction;
-    double alpha;
 
 public:
     /**
-     * Constructs a neural network with a given set of layers, loss function, and learning rate.
+     * Constructs a neural network with a given set of layers and loss function,.
      * The algorithm works well if the last layer is OutputLayer.
      * But no errors occur with another layer.
      *
      * @param hiddenLayers Vector of hidden layers that make up the network.
      * @param outputLayer The OutputLayer of the network.
      * @param lossFunction The loss function used in backpropagation
-     * @param alpha Learning rate used in training.
      */
-    explicit Network(vl_t hiddenLayers, OutputLayer outputLayer, loss::function_t lossFunction, double alpha);
-
-    /**
-     * Changes the learning rate of the network.
-     * Typically used for adaptive learning.
-     *
-     * @param learningRate The new learning rate.
-     */
-    void setAlpha(double learningRate);
+    explicit Network(vl_t hiddenLayers, OutputLayer outputLayer, loss::function_t lossFunction);
 
     /**
      * @return The number of layers in the network, including the output layer.
@@ -98,9 +88,10 @@ public:
      *
      * @param input Vector of given input values
      * @param output Vector of expected output values
+     * @param alpha Learning rate
      * @return The outputs error calculated by the lossFunction.
      */
-    double train(const vd_t &input, const vd_t &output);
+    double train(const vd_t &input, const vd_t &output, double alpha);
 
     /**
      * Tests the neural network on a given input-output pair.
