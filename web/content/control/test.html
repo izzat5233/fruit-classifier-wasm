@@ -23,37 +23,42 @@
     </div>
 </div>
 <hr class="my-4">
-<div class="row justify-content-center">
-    <table class="col table table-bordered">
-        <thead id="predictedInThead"></thead>
-        <tbody id="predictedInTbody"></tbody>
-    </table>
-    <table class="col table table-bordered">
-        <thead id="predictedOutThead"></thead>
-        <tbody id="predictedOutTbody"></tbody>
-    </table>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col">
+            <table class="table table-bordered">
+                <thead id="predictedThead"></thead>
+                <tbody id="predictedTbody"></tbody>
+            </table>
+        </div>
+    </div>
 </div>
 <script>
     function clearPredictedTable() {
-        document.getElementById('predictedInThead').innerHTML = "";
-        document.getElementById('predictedInTbody').innerHTML = "";
-        document.getElementById('predictedOutThead').innerHTML = "";
-        document.getElementById('predictedOutTbody').innerHTML = "";
+        document.getElementById('predictedThead').innerHTML = "";
+        document.getElementById('predictedTbody').innerHTML = "";
         document.getElementById("downloadOutputsButton").disabled = true;
     }
 
     function getTestOutputs() {
         clearPredictedTable();
         document.getElementById("downloadOutputsButton").disabled = false;
-
         network.predictTestingOutputs();
-        let input = network.getTestIn();
-        setupTableHeader("#predictedInThead", input.get(0).size(), "Input");
-        fillNumTable("#predictedInTbody", input);
+        const thead = "#predictedThead";
+        const tbody = "#predictedTbody";
 
-        let output = network.getPredictedOutputs();
-        setupTableHeader("#predictedOutThead", output.get(0).size(), "Output");
-        fillNumTable("#predictedOutTbody", output, window.innerWidth > 400 ? 8 : 4);
+        let input = network.getTestIn();
+        setupTableHeader(thead, input.get(0).size(), "Input");
+        fillNumTable(tbody, input);
+
+        let output = network.getTestOut();
+        setupTableHeader(thead, output.get(0).size(), "Output");
+        fillNumTable(tbody, output);
+
+        let predicted = network.getPredictedOutputs();
+        setupTableHeader(thead, predicted.get(0).size(), "Predicted");
+        fillNumTable(tbody, predicted);
+
         showSimpleToast("<h5>Computed " + input.size() + " predictions</h5>");
     }
 </script>

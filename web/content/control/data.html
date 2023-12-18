@@ -13,15 +13,13 @@
             <p class="btn btn-danger px-2" id="clearTrainingDataButton"
                onclick="onClearTrainingData()">Clear</p>
         </div>
-        <div class="row">
-            <table class="col table table-bordered">
-                <thead id="trainInPreviewThead"></thead>
-                <tbody id="trainInPreviewTbody"></tbody>
-            </table>
-            <table class="col table table-bordered">
-                <thead id="trainOutPreviewThead"></thead>
-                <tbody id="trainOutPreviewTbody"></tbody>
-            </table>
+        <div class="row justify-content-center">
+            <div class="col">
+                <table class="table table-bordered">
+                    <thead id="trainPreviewThead"></thead>
+                    <tbody id="trainPreviewTbody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
     <div class="col">
@@ -38,15 +36,13 @@
             <p class="btn btn-danger px-2" id="clearTestingDataButton"
                onclick="onClearTestingData()">Clear</p>
         </div>
-        <div class="row">
-            <table class="col table table-bordered">
-                <thead id="testInPreviewThead"></thead>
-                <tbody id="testInPreviewTbody"></tbody>
-            </table>
-            <table class="col table table-bordered">
-                <thead id="testOutPreviewThead"></thead>
-                <tbody id="testOutPreviewTbody"></tbody>
-            </table>
+        <div class="row justify-content-center">
+            <div class="col">
+                <table class="table table-bordered">
+                    <thead id="testPreviewThead"></thead>
+                    <tbody id="testPreviewTbody"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -99,17 +95,13 @@
     }
 
     function clearTrainPreviewTable() {
-        document.getElementById('trainInPreviewThead').innerHTML = "";
-        document.getElementById('trainInPreviewTbody').innerHTML = "";
-        document.getElementById('trainOutPreviewThead').innerHTML = "";
-        document.getElementById('trainOutPreviewTbody').innerHTML = "";
+        document.getElementById('trainPreviewThead').innerHTML = "";
+        document.getElementById('trainPreviewTbody').innerHTML = "";
     }
 
     function clearTestPreviewTable() {
-        document.getElementById('testInPreviewThead').innerHTML = "";
-        document.getElementById('testInPreviewTbody').innerHTML = "";
-        document.getElementById('testOutPreviewThead').innerHTML = "";
-        document.getElementById('testOutPreviewTbody').innerHTML = "";
+        document.getElementById('testPreviewThead').innerHTML = "";
+        document.getElementById('testPreviewTbody').innerHTML = "";
     }
 
     function onClearTrainingData() {
@@ -128,23 +120,29 @@
 
     function onPreviewTrainingData() {
         clearTrainPreviewTable()
+
         let input = network.getTrainInPreview();
-        setupTableHeader("#trainInPreviewThead", input.get(0).size(), "Input");
-        fillNumTable("#trainInPreviewTbody", input);
+        setupTableHeader("#trainPreviewThead", input.get(0).size(), "Input");
+        fillNumTable("#trainPreviewTbody", input);
+
         let output = network.getTrainOutPreview();
-        setupTableHeader("#trainOutPreviewThead", output.get(0).size(), "Output");
-        fillNumTable("#trainOutPreviewTbody", output);
+        setupTableHeader("#trainPreviewThead", output.get(0).size(), "Output");
+        fillNumTable("#trainPreviewTbody", output);
+
         return input.size();
     }
 
     function onPreviewTestingData() {
         clearTestPreviewTable()
+
         let input = network.getTestInPreview();
-        setupTableHeader("#testInPreviewThead", input.get(0).size(), "Input");
-        fillNumTable("#testInPreviewTbody", input);
+        setupTableHeader("#testPreviewThead", input.get(0).size(), "Input");
+        fillNumTable("#testPreviewTbody", input);
+
         let output = network.getTestOutPreview();
-        setupTableHeader("#testOutPreviewThead", output.get(0).size(), "Output");
-        fillNumTable("#testOutPreviewTbody", output);
+        setupTableHeader("#testPreviewThead", output.get(0).size(), "Output");
+        fillNumTable("#testPreviewTbody", output);
+
         return input.size();
     }
 </script>
