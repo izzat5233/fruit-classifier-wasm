@@ -52,33 +52,40 @@ double Module::getLearningRate() const {
 }
 
 void Module::NormalizedData::set(const vvd_t &data) {
-    normalized.clear();
     minMax.clear();
-    normalized.reserve(data.size());
     minMax.reserve(data.size());
     for (const vd_t &line: data) {
         double minVal = *std::min_element(line.begin(), line.end());
         double maxVal = *std::max_element(line.begin(), line.end());
-        normalized.push_back(process::minmax(line));
         minMax.emplace_back(minVal, maxVal);
     }
+    normalized = normalize(data);
 }
 
 vvd_t Module::NormalizedData::get() const {
-    return get(normalized);
+    return denormalize(normalized);
 }
 
-vvd_t Module::NormalizedData::get(const vvd_t &processed) const {
+const vvd_t &Module::NormalizedData::use() const {
+    return normalized;
+}
+
+vvd_t Module::NormalizedData::normalize(const nn::vvd_t &original) const {
+    vvd_t norm;
+    norm.reserve(original.size());
+    for (std::size_t i = 0; i < original.size(); ++i) {
+        norm.push_back(process::minmax(original[i], minMax[i].first, minMax[i].second));
+    }
+    return norm;
+}
+
+vvd_t Module::NormalizedData::denormalize(const vvd_t &processed) const {
     vvd_t original;
     original.reserve(processed.size());
     for (std::size_t i = 0; i < processed.size(); ++i) {
         original.push_back(process::inverseMinmax(processed[i], minMax[i].first, minMax[i].second));
     }
     return original;
-}
-
-const vvd_t &Module::NormalizedData::use() const {
-    return normalized;
 }
 
 void Module::setTrainInput(const vvd_t &data) {
@@ -98,19 +105,19 @@ void Module::setTrainOutput(const vvd_t &data) {
 }
 
 void Module::setTestInput(const vvd_t &data) {
-    testInput.set(data);
+    testInput = data;
 }
 
 [[nodiscard]] vvd_t Module::getTestInput() const {
-    return testInput.get();
+    return testInput;
 }
 
 void Module::setTestOutput(const vvd_t &data) {
-    testOutput.set(data);
+    testOutput = data;
 }
 
 [[nodiscard]] vvd_t Module::getTestOutput() const {
-    return testOutput.get();
+    return testOutput;
 }
 
 double Module::train() {
@@ -126,8 +133,8 @@ double Module::train() {
 }
 
 double Module::test() const {
-    const vvd_t &inputs = testInput.use();
-    const vvd_t &outputs = testOutput.use();
+    const vvd_t &inputs = trainInput.normalize(testInput);
+    const vvd_t &outputs = trainOutput.normalize(testOutput);
     assert(inputs.size() == outputs.size());
 
     double sum = 0;
@@ -159,21 +166,14 @@ vpd_t Module::trainAndTest(std::size_t epochs) {
 }
 
 vvd_t Module::predict() const {
-    const vvd_t &normalized = testInput.use();
-    vvd_t processed(normalized.size());
-    for (std::size_t i = 0; i < processed.size(); ++i) {
-        processed[i] = network->predict(normalized[i]);
-    }
-    return testInput.get(processed);
+    return predict(testInput);
 }
 
 vvd_t Module::predict(const vvd_t &inputData) const {
-    NormalizedData data;
-    data.set(inputData);
-    const vvd_t &normalized = data.use();
+    const vvd_t &normalized = trainInput.normalize(inputData);
     vvd_t processed(normalized.size());
     for (std::size_t i = 0; i < processed.size(); ++i) {
         processed[i] = network->predict(normalized[i]);
     }
-    return data.get(processed);
+    return trainOutput.denormalize(processed);
 }

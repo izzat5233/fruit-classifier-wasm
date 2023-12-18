@@ -33,18 +33,24 @@ private:
         [[nodiscard]] vvd_t get() const;
 
         /**
-         * Gets the denormalized version of the processed data.
-         * Uses the min-max values stored previously in the de-normalization process.
-         * @param processed The processed data to be denormalized.
-         * @return The denormalized data.
-         */
-        [[nodiscard]] vvd_t get(const vvd_t &processed) const;
-
-        /**
          * Provides direct access to the normalized data.
          * @return A reference to the normalized data.
          */
         [[nodiscard]] const vvd_t &use() const;
+
+        /**
+         * Uses the min-max values stored to normalize the given data.
+         * @param original The data to be normalized.
+         * @return The normalized data.
+         */
+        [[nodiscard]] vvd_t normalize(const vvd_t &original) const;
+
+        /**
+         * Uses the min-max values stored to de-normalize the given data.
+         * @param processed The processed data to be denormalized.
+         * @return The denormalized data.
+         */
+        [[nodiscard]] vvd_t denormalize(const vvd_t &processed) const;
     };
 
     std::optional<Network> network;
@@ -52,8 +58,9 @@ private:
 
     NormalizedData trainInput;
     NormalizedData trainOutput;
-    NormalizedData testInput;
-    NormalizedData testOutput;
+
+    vvd_t testInput;
+    vvd_t testOutput;
 
 public:
     /**
@@ -125,26 +132,24 @@ public:
 
     /**
      * Sets the testing input data.
-     * Normalizes the data and stores it for use in testing the network.
      * @param data The testing input data to be set.
      */
     void setTestInput(const vvd_t &data);
 
     /**
-     * Retrieves the original (denormalized) testing input data.
+     * Retrieves the testing input data.
      * @return The original testing input data.
      */
     [[nodiscard]] vvd_t getTestInput() const;
 
     /**
      * Sets the testing output data.
-     * Normalizes the data and stores it for use in testing the network.
      * @param data The testing output data to be set.
      */
     void setTestOutput(const vvd_t &data);
 
     /**
-     * Retrieves the original (denormalized) testing output data.
+     * Retrieves the testing output data.
      * @return The original testing output data.
      */
     [[nodiscard]] vvd_t getTestOutput() const;

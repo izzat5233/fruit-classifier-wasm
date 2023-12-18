@@ -7,15 +7,13 @@
 
 using namespace nn;
 
-vd_t process::minmax(const vd_t &data) {
+vd_t process::minmax(const vd_t &data, double minParam, double maxParam) {
     if (data.size() == 1) { return {data[0]}; } // turn off for single outputs
-    double minVal = *std::min_element(data.begin(), data.end());
-    double maxVal = *std::max_element(data.begin(), data.end());
-    if (minVal == maxVal) { return vd_t(data.size(), 0.5); }
+    if (minParam == maxParam) { return vd_t(data.size(), 0.5); }
 
     vd_t normalized(data.size());
-    std::transform(data.begin(), data.end(), normalized.begin(), [minVal, maxVal](double x) {
-        return (x - minVal) / (maxVal - minVal);
+    std::transform(data.begin(), data.end(), normalized.begin(), [minParam, maxParam](double x) {
+        return (x - minParam) / (maxParam - minParam);
     });
     return normalized;
 }
