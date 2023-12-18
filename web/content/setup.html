@@ -64,7 +64,8 @@
     </div>
     <div class="accordion-item">
         <h2 class="accordion-header">
-            <button class="accordion-button collapsed lead fs-4" type="button" data-bs-toggle="collapse" aria-expanded="false"
+            <button class="accordion-button collapsed lead fs-4" type="button" data-bs-toggle="collapse"
+                    aria-expanded="false"
                     data-bs-target="#visualizerCollapseThree" aria-controls="visualizerCollapseThree">
                 Advanced Controls
             </button>
@@ -97,6 +98,12 @@
                     <label for="outputFunctionInput" class="form-label">Output Function</label>
                     <input id="outputFunctionInput" class="form-control" type="text" aria-label="Disabled input example"
                            disabled readonly>
+                </div>
+                <div class="col-sm-6">
+                    <label for="normalizationInput" class="form-label">Normalization</label>
+                    <select class="form-select" id="normalizationInput">
+                        <option value="minmax">Minmax [0, 1]</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -148,8 +155,8 @@
 
     function updateOutputFunctionLabel() {
         document.getElementById('outputFunctionInput').value = structure[structure.length - 1] === 1
-            ? "Sigmoid (Binary Classification)"
-            : "Softmax (Multi Classification)";
+            ? "Sigmoid (Single Output)"
+            : "Softmax (Multiple Outputs)";
     }
 
     document.addEventListener('DOMContentLoaded', () => {

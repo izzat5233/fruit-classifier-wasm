@@ -8,12 +8,12 @@ draft = false
 
 {{< include-script "wasm/main.js" >}}
 
-{{< include-html "visualizer.html" >}}
+{{< include-html "setup.html" >}}
 
 ---
 
 # It's Super Fast, Give it a try!
 
-{{< include-html "control-panel.html" >}}
+{{< include-html "control.html" >}}
 
 ---
