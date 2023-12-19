@@ -167,21 +167,19 @@ namespace nn {
          * Min-Max Normalization.
          * Normalizes the data using Min-Max scaling.
          * @param data Vector of data points
-         * @param minParam Minimum value parameter used in normalization.
-         * @param maxParam Minimum value parameter used in normalization.
+         * @param minMaxParams parameters used in normalization process.
          * @return Normalized data vector
          */
-        vd_t minmax(const vd_t &data, double minParam, double maxParam);
+        vd_t minmax(const vd_t &data, const vpd_t& minMaxParams);
 
         /**
          * Inverse Min-Max Normalization (De-normalization).
          * Reverts the normalized data back to its original scale.
          * @param data Vector of normalized data points
-         * @param originalMin The original minimum value of the data before normalization
-         * @param originalMax The original maximum value of the data before normalization
+         * @param minMaxParams parameters used in de-normalization process.
          * @return Denormalized data vector
          */
-        vd_t inverseMinmax(const vd_t &data, double originalMin, double originalMax);
+        vd_t inverseMinmax(const vd_t &data, const vpd_t& minMaxParams);
     }
 
     /**

@@ -3,26 +3,31 @@
 //
 
 #include "nn.h"
-#include <algorithm>
+#include <cassert>
 
 using namespace nn;
 
-vd_t process::minmax(const vd_t &data, double minParam, double maxParam) {
-    if (data.size() == 1) { return {data[0]}; } // turn off for single outputs
-    if (minParam == maxParam) { return vd_t(data.size(), 0.5); }
+vd_t process::minmax(const vd_t &data, const vpd_t &minMaxParams) {
+    assert(data.size() == minMaxParams.size());
+    if (data.size() == 1) { return {data[0]}; } // turn off for single vectors
 
     vd_t normalized(data.size());
-    std::transform(data.begin(), data.end(), normalized.begin(), [minParam, maxParam](double x) {
-        return (x - minParam) / (maxParam - minParam);
-    });
+    for (std::size_t i = 0; i < data.size(); ++i) {
+        auto [minParam, maxParam] = minMaxParams[i];
+        if (minParam == maxParam) { normalized[i] = 0.5; }
+        else normalized[i] = (data[i] - minParam) / (maxParam - minParam);
+    }
     return normalized;
 }
 
-vd_t process::inverseMinmax(const vd_t &data, double originalMin, double originalMax) {
-    if (data.size() == 1) { return {data[0]}; } // turn off for single outputs
+vd_t process::inverseMinmax(const vd_t &data, const vpd_t &minMaxParams) {
+    assert(data.size() == minMaxParams.size());
+    if (data.size() == 1) { return {data[0]}; } // turn off for single vectors
+
     vd_t denormalized(data.size());
-    std::transform(data.begin(), data.end(), denormalized.begin(), [originalMin, originalMax](double x) {
-        return x * (originalMax - originalMin) + originalMin;
-    });
+    for (std::size_t i = 0; i < data.size(); ++i) {
+        auto [minParam, maxParam] = minMaxParams[i];
+        denormalized[i] = data[i] * (maxParam - minParam) + minParam;
+    }
     return denormalized;
 }
