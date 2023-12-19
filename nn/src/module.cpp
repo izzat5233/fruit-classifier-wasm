@@ -52,15 +52,16 @@ double Module::getLearningRate() const {
 }
 
 void Module::NormalizedData::set(const vvd_t &data) {
-    minMax.resize(data[0].size());
-    for (std::size_t i = 0; i < minMax.size(); ++i) {
+    minMax.clear();
+    minMax.reserve(data[0].size());
+    for (std::size_t i = 0; i < data[0].size(); ++i) {
         double minParam = data[0][i];
         double maxParam = data[0][i];
         for (std::size_t j = 1; j < data.size(); ++j) {
             minParam = std::min(minParam, data[j][i]);
             maxParam = std::max(maxParam, data[j][i]);
         }
-        minMax[i] = {minParam, maxParam};
+        minMax.emplace_back(minParam, maxParam);
     }
     normalized = normalize(data);
 }
@@ -76,8 +77,8 @@ const vvd_t &Module::NormalizedData::use() const {
 vvd_t Module::NormalizedData::normalize(const nn::vvd_t &original) const {
     vvd_t norm;
     norm.reserve(original.size());
-    for (std::size_t i = 0; i < original.size(); ++i) {
-        norm.push_back(process::minmax(original[i], minMax));
+    for (const vd_t &data: original) {
+        norm.push_back(process::minmax(data, minMax));
     }
     return norm;
 }
@@ -85,8 +86,8 @@ vvd_t Module::NormalizedData::normalize(const nn::vvd_t &original) const {
 vvd_t Module::NormalizedData::denormalize(const vvd_t &processed) const {
     vvd_t original;
     original.reserve(processed.size());
-    for (std::size_t i = 0; i < processed.size(); ++i) {
-        original.push_back(process::inverseMinmax(processed[i], minMax));
+    for (const vd_t &data: processed) {
+        original.push_back(process::inverseMinmax(data, minMax));
     }
     return original;
 }

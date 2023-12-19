@@ -9,8 +9,6 @@ using namespace nn;
 
 vd_t process::minmax(const vd_t &data, const vpd_t &minMaxParams) {
     assert(data.size() == minMaxParams.size());
-    if (data.size() == 1) { return {data[0]}; } // turn off for single vectors
-
     vd_t normalized(data.size());
     for (std::size_t i = 0; i < data.size(); ++i) {
         auto [minParam, maxParam] = minMaxParams[i];
@@ -22,8 +20,6 @@ vd_t process::minmax(const vd_t &data, const vpd_t &minMaxParams) {
 
 vd_t process::inverseMinmax(const vd_t &data, const vpd_t &minMaxParams) {
     assert(data.size() == minMaxParams.size());
-    if (data.size() == 1) { return {data[0]}; } // turn off for single vectors
-
     vd_t denormalized(data.size());
     for (std::size_t i = 0; i < data.size(); ++i) {
         auto [minParam, maxParam] = minMaxParams[i];
