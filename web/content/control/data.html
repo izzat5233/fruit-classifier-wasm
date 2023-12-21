@@ -1,19 +1,26 @@
 <div class="row">
     <div class="col">
         <h5>Training Data</h5>
-        <div class="btn-group">
-            <p class="btn btn-light" id="inputTrainingDataButton"
-               onclick="network.promptInputTrainingData()">Browse Input File</p>
-            <p class="btn btn-light" id="outputTrainingDataButton"
-               onclick="network.promptOutputTrainingData()">Browse Output File</p>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-light" id="inputTrainingDataButton"
+                    onclick="network.promptInputTrainingData()">Browse Input File
+            </button>
+            <button type="button" class="btn btn-light" id="outputTrainingDataButton"
+                    onclick="network.promptOutputTrainingData()">Browse Output File
+            </button>
         </div>
-        <div class="d-inline-block">
-            <p class="btn btn-primary px-2" id="prepareTrainingDataButton"
-               onclick="network.prepareTrainingData()">Load</p>
-            <p class="btn btn-danger px-2" id="clearTrainingDataButton"
-               onclick="onClearTrainingData()">Clear</p>
+        <div class="btn-group mt-2" role="group">
+            <button type="button" class="btn btn-primary" id="prepareTrainingDataButton"
+                    onclick="network.prepareTrainingData()">Load
+            </button>
+            <button type="button" class="btn btn-outline-primary bi bi-download" id="downloadTrainFilesButton" disabled
+                    onclick="network.downloadTrainIn(); network.downloadTrainOut()">Download
+            </button>
+            <button type="button" class="btn btn-danger" id="clearTrainingDataButton" onclick="onClearTrainingData()">
+                Clear
+            </button>
         </div>
-        <div class="row justify-content-center">
+        <div class="row justify-content-center mt-3">
             <div class="col table-responsive">
                 <table class="table table-bordered">
                     <thead id="trainPreviewThead"></thead>
@@ -24,19 +31,26 @@
     </div>
     <div class="col">
         <h5>Testing Data</h5>
-        <div class="btn-group">
-            <p class="btn btn-light" id="inputTestingDataButton"
-               onclick="network.promptInputTestingData()">Browse Input File</p>
-            <p class="btn btn-light" id="outputTestingDataButton"
-               onclick="network.promptOutputTestingData()">Browse Output File</p>
+        <div class="btn-group" role="group">
+            <button type="button" class="btn btn-light" id="inputTestingDataButton"
+                    onclick="network.promptInputTestingData()">Browse Input File
+            </button>
+            <button type="button" class="btn btn-light" id="outputTestingDataButton"
+                    onclick="network.promptOutputTestingData()">Browse Output File
+            </button>
         </div>
-        <div class="d-inline-block">
-            <p class="btn btn-primary px-2" id="prepareTestingDataButton"
-               onclick="network.prepareTestingData()">Load</p>
-            <p class="btn btn-danger px-2" id="clearTestingDataButton"
-               onclick="onClearTestingData()">Clear</p>
+        <div class="btn-group mt-2" role="group">
+            <button type="button" class="btn btn-primary" id="prepareTestingDataButton"
+                    onclick="network.prepareTestingData()">Load
+            </button>
+            <button type="button" class="btn btn-outline-primary bi bi-download" id="downloadTestFilesButton" disabled
+                    onclick="network.downloadTestIn(); network.downloadTestOut()">Download
+            </button>
+            <button type="button" class="btn btn-danger" id="clearTestingDataButton" onclick="onClearTestingData()">
+                Clear
+            </button>
         </div>
-        <div class="row justify-content-center">
+        <div class="row justify-content-center mt-3">
             <div class="col table-responsive">
                 <table class="table table-bordered">
                     <thead id="testPreviewThead"></thead>
@@ -75,6 +89,7 @@
             "<h5>Loaded " + dataSize + " rows</h5>" +
             "<h5>" + previewSize + " preview rows are shown</h5>";
         showSimpleToast(html);
+        document.getElementById('downloadTrainFilesButton').disabled = false;
     }
 
     function onTestingDataPrepared(dataSize) {
@@ -83,6 +98,7 @@
             "<h5>Loaded " + dataSize + " rows</h5>" +
             "<h5>" + previewSize + " preview rows are shown</h5>";
         showSimpleToast(html);
+        document.getElementById('downloadTestFilesButton').disabled = false;
     }
 
     function onClearFileData(input, output) {
@@ -97,11 +113,13 @@
     function clearTrainPreviewTable() {
         document.getElementById('trainPreviewThead').innerHTML = "";
         document.getElementById('trainPreviewTbody').innerHTML = "";
+        document.getElementById('downloadTrainFilesButton').disabled = true;
     }
 
     function clearTestPreviewTable() {
         document.getElementById('testPreviewThead').innerHTML = "";
         document.getElementById('testPreviewTbody').innerHTML = "";
+        document.getElementById('downloadTestFilesButton').disabled = true;
     }
 
     function onClearTrainingData() {
