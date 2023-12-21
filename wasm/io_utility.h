@@ -14,15 +14,13 @@
 #define UPLOAD_HANDLER_PARAMETERS \
 const std::string &filename, const std::string &mime_type, std::string_view buffer, void *callback_data
 
-class CSVFile {
+class FileData {
     std::function<void(void)> onProcessDone;
     std::string filename;
     nn::vvd_t data;
 
-    friend void processCsvData(UPLOAD_HANDLER_PARAMETERS);
-
 public:
-    explicit CSVFile(std::function<void(void)> onProcessDone) {
+    explicit FileData(std::function<void(void)> onProcessDone) {
         this->onProcessDone = std::move(onProcessDone);
     }
 
@@ -34,6 +32,15 @@ public:
         return filename;
     }
 
+    void setFilename(const std::string &newFilename) {
+        this->filename = newFilename;
+    }
+
+    void setData(const nn::vvd_t &newData) {
+        this->data = newData;
+        onProcessDone();
+    }
+
     [[nodiscard]] nn::vvd_t getPreview() const {
         nn::vvd_t res;
         std::size_t inc = std::max((std::size_t) 1, data.size() / 10);
@@ -43,10 +50,10 @@ public:
 };
 
 void processCsvData(UPLOAD_HANDLER_PARAMETERS) {
-    auto file = static_cast<CSVFile *>(callback_data);
-    file->data.clear();
-    file->filename = filename;
+    auto file = static_cast<FileData *>(callback_data);
+    file->setFilename(filename);
 
+    nn::vvd_t data;
     std::stringstream ss((std::string(buffer)));
     std::string line;
 
@@ -67,11 +74,11 @@ void processCsvData(UPLOAD_HANDLER_PARAMETERS) {
         }
 
         if (!row.empty()) {
-            file->data.push_back(row);
+            data.push_back(row);
         }
     }
 
-    file->onProcessDone();
+    file->setData(data);
 }
 
 std::string prepareCsvData(const nn::vvd_t &data) {

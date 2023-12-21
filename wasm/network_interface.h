@@ -22,19 +22,19 @@ private:
     nn::Module module;
     nn::vvd_t predictedCash;
 
-    CSVFile *inTrainFile = new CSVFile([this] {
+    FileData *inTrainFile = new FileData([this] {
         EM_ASM_ARGS({ onInputTrainingFileSet(UTF8ToString($0), $1) },
                     inTrainFile->getFilename().c_str(), inTrainFile->getData().size());
     });
-    CSVFile *outTrainFile = new CSVFile([this] {
+    FileData *outTrainFile = new FileData([this] {
         EM_ASM_ARGS({ onOutputTrainingFileSet(UTF8ToString($0), $1) },
                     outTrainFile->getFilename().c_str(), outTrainFile->getData().size());
     });
-    CSVFile *inTestFile = new CSVFile([this] {
+    FileData *inTestFile = new FileData([this] {
         EM_ASM_ARGS({ onInputTestingFileSet(UTF8ToString($0), $1) },
                     inTestFile->getFilename().c_str(), inTestFile->getData().size());
     });
-    CSVFile *outTestFile = new CSVFile([this] {
+    FileData *outTestFile = new FileData([this] {
         EM_ASM_ARGS({ onOutputTestingFileSet(UTF8ToString($0), $1) },
                     outTestFile->getFilename().c_str(), outTestFile->getData().size());
     });
@@ -96,16 +96,36 @@ public:
         emscripten_browser_file::upload(".csv,.txt", processCsvData, inTrainFile);
     }
 
+    void setInputTrainingData(const std::string &filename, const nn::vvd_t &data) {
+        inTrainFile->setFilename(filename);
+        inTrainFile->setData(data);
+    }
+
     void promptOutputTrainingData() {
         emscripten_browser_file::upload(".csv,.txt", processCsvData, outTrainFile);
+    }
+
+    void setOutputTrainingData(const std::string &filename, const nn::vvd_t &data) {
+        outTrainFile->setFilename(filename);
+        outTrainFile->setData(data);
     }
 
     void promptInputTestingData() {
         emscripten_browser_file::upload(".csv,.txt", processCsvData, inTestFile);
     }
 
+    void setInputTestingData(const std::string &filename, const nn::vvd_t &data) {
+        inTestFile->setFilename(filename);
+        inTestFile->setData(data);
+    }
+
     void promptOutputTestingData() {
         emscripten_browser_file::upload(".csv,.txt", processCsvData, outTestFile);
+    }
+
+    void setOutputTestingData(const std::string &filename, const nn::vvd_t &data) {
+        outTestFile->setFilename(filename);
+        outTestFile->setData(data);
     }
 
     void prepareTrainingData() {
@@ -224,9 +244,13 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("setLossFunction", &NetworkController::setLossFunction)
             .function("build", &NetworkController::build)
             .function("promptInputTrainingData", &NetworkController::promptInputTrainingData)
+            .function("setInputTrainingData", &NetworkController::setInputTrainingData)
             .function("promptOutputTrainingData", &NetworkController::promptOutputTrainingData)
+            .function("setOutputTrainingData", &NetworkController::setOutputTrainingData)
             .function("promptInputTestingData", &NetworkController::promptInputTestingData)
+            .function("setInputTestingData", &NetworkController::setInputTestingData)
             .function("promptOutputTestingData", &NetworkController::promptOutputTestingData)
+            .function("setOutputTestingData", &NetworkController::setOutputTestingData)
             .function("prepareTrainingData", &NetworkController::prepareTrainingData)
             .function("prepareTestingData", &NetworkController::prepareTestingData)
             .function("trainFor", &NetworkController::trainFor)
