@@ -41,6 +41,11 @@ public:
         onProcessDone();
     }
 
+    void clear() {
+        this->data.clear();
+        this->filename.clear();
+    }
+
     [[nodiscard]] nn::vvd_t getPreview() const {
         nn::vvd_t res;
         std::size_t inc = std::max((std::size_t) 1, data.size() / 10);

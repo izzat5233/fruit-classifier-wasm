@@ -10,9 +10,25 @@
             </button>
         </div>
         <div class="btn-group mt-2" role="group">
-            <button type="button" class="btn btn-primary" id="prepareTrainingDataButton"
-                    onclick="network.prepareTrainingData()">Load
-            </button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" id="prepareTrainingDataButton"
+                        onclick="network.prepareTrainingData()">Load
+                </button>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="visually-hidden">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button class="dropdown-item" onclick="loadTrainDataset('xor')">
+                            XOR Dataset
+                        </button>
+                        <button class="dropdown-item" onclick="loadTrainDataset('mobile')">
+                            Mobile Prices Dataset
+                        </button>
+                    </li>
+                </ul>
+            </div>
             <button type="button" class="btn btn-outline-primary bi bi-download" id="downloadTrainFilesButton" disabled
                     onclick="network.downloadTrainIn(); network.downloadTrainOut()">Download
             </button>
@@ -40,9 +56,25 @@
             </button>
         </div>
         <div class="btn-group mt-2" role="group">
-            <button type="button" class="btn btn-primary" id="prepareTestingDataButton"
-                    onclick="network.prepareTestingData()">Load
-            </button>
+            <div class="btn-group">
+                <button type="button" class="btn btn-primary" id="prepareTestingDataButton"
+                        onclick="network.prepareTestingData()">Load
+                </button>
+                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    <span class="visually-hidden">Toggle Dropdown</span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li>
+                        <button class="dropdown-item" onclick="loadTestDataset('xor')">
+                            XOR Dataset
+                        </button>
+                        <button class="dropdown-item" onclick="loadTestDataset('mobile')">
+                            Mobile Prices Dataset
+                        </button>
+                    </li>
+                </ul>
+            </div>
             <button type="button" class="btn btn-outline-primary bi bi-download" id="downloadTestFilesButton" disabled
                     onclick="network.downloadTestIn(); network.downloadTestOut()">Download
             </button>
@@ -126,14 +158,16 @@
         const input = document.getElementById('inputTrainingDataButton');
         const output = document.getElementById('outputTrainingDataButton');
         onClearFileData(input, output);
-        clearTrainPreviewTable()
+        clearTrainPreviewTable();
+        network.clearTrainingData();
     }
 
     function onClearTestingData() {
         const input = document.getElementById('inputTestingDataButton');
         const output = document.getElementById('outputTestingDataButton');
         onClearFileData(input, output);
-        clearTestPreviewTable()
+        clearTestPreviewTable();
+        network.clearTestingData();
     }
 
     function onPreviewTrainingData() {
@@ -172,5 +206,29 @@
         styleTableSelection(headers2, cells2, 'table-secondary');
 
         return input.size();
+    }
+
+    async function loadTrainDataset(dataset) {
+        try {
+            const input = await readCSV("datasets/" + dataset + "/train_in.csv");
+            const output = await readCSV("datasets/" + dataset + "/train_out.csv");
+            network.setInputTrainingData(dataset + " train input", input);
+            network.setOutputTrainingData(dataset + " train output", output);
+            network.prepareTrainingData();
+        } catch (error) {
+            console.error('Error in loadTrainDataset:', error);
+        }
+    }
+
+    async function loadTestDataset(dataset) {
+        try {
+            const input = await readCSV("datasets/" + dataset + "/test_in.csv");
+            const output = await readCSV("datasets/" + dataset + "/test_out.csv");
+            network.setInputTestingData(dataset + " test input", input);
+            network.setOutputTestingData(dataset + " test output", output);
+            network.prepareTestingData();
+        } catch (error) {
+            console.error('Error in loadTestDataset:', error);
+        }
     }
 </script>

@@ -140,6 +140,20 @@ public:
         EM_ASM_ARGS({ onTestingDataPrepared($0) }, inTestFile->getData().size());
     }
 
+    void clearTrainingData() {
+        module.setTrainInput({});
+        module.setTrainOutput({});
+        inTrainFile->clear();
+        outTrainFile->clear();
+    }
+
+    void clearTestingData() {
+        module.setTestInput({});
+        module.setTestOutput({});
+        inTestFile->clear();
+        outTestFile->clear();
+    }
+
     nn::vd_t trainFor(std::size_t epochs) {
         return module.train(epochs);
     }
@@ -158,7 +172,7 @@ public:
 
     void downloadPredictedOutputs() {
         std::string data = prepareCsvData(predictedCash);
-        emscripten_browser_file::download("predicted.csv", "text/csv", data.c_str(), data.size());
+        emscripten_browser_file::download("predictions.csv", "text/csv", data.c_str(), data.size());
     }
 
     nn::vvvd_t getWeights() {
@@ -184,7 +198,7 @@ public:
 
     void downloadTrainIn() {
         std::string data = prepareCsvData(module.getTrainInput());
-        emscripten_browser_file::download("trainIn.csv", "text/csv", data.c_str(), data.size());
+        emscripten_browser_file::download("train_in.csv", "text/csv", data.c_str(), data.size());
     }
 
     nn::vvd_t getTrainOut() {
@@ -197,7 +211,7 @@ public:
 
     void downloadTrainOut() {
         std::string data = prepareCsvData(module.getTrainOutput());
-        emscripten_browser_file::download("trainOut.csv", "text/csv", data.c_str(), data.size());
+        emscripten_browser_file::download("train_out.csv", "text/csv", data.c_str(), data.size());
     }
 
     nn::vvd_t getTestIn() {
@@ -210,7 +224,7 @@ public:
 
     void downloadTestIn() {
         std::string data = prepareCsvData(module.getTestInput());
-        emscripten_browser_file::download("testIn.csv", "text/csv", data.c_str(), data.size());
+        emscripten_browser_file::download("test_in.csv", "text/csv", data.c_str(), data.size());
     }
 
     nn::vvd_t getTestOut() {
@@ -223,7 +237,7 @@ public:
 
     void downloadTestOut() {
         std::string data = prepareCsvData(module.getTestOutput());
-        emscripten_browser_file::download("testOut.csv", "text/csv", data.c_str(), data.size());
+        emscripten_browser_file::download("test_out.csv", "text/csv", data.c_str(), data.size());
     }
 };
 
@@ -253,6 +267,8 @@ EMSCRIPTEN_BINDINGS(my_module) {
             .function("setOutputTestingData", &NetworkController::setOutputTestingData)
             .function("prepareTrainingData", &NetworkController::prepareTrainingData)
             .function("prepareTestingData", &NetworkController::prepareTestingData)
+            .function("clearTrainingData", &NetworkController::clearTrainingData)
+            .function("clearTestingData", &NetworkController::clearTestingData)
             .function("trainFor", &NetworkController::trainFor)
             .function("trainAndTestFor", &NetworkController::trainAndTestFor)
             .function("predictTestingOutputs", &NetworkController::predictTestingOutputs)
