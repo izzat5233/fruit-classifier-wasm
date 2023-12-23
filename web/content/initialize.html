@@ -1,0 +1,39 @@
+<script>
+    let network;
+
+    Module.onRuntimeInitialized = () => {
+        network = new Module.Network();
+        network.init();
+    }
+
+    function onNetworkBuilt() {
+        drawNetwork(toArr(network.getDimensions()));
+        clearErrorChart();
+    }
+
+    function onActivationFunctionSet() {
+        document.getElementById('activationFunctionInput').value = network.getActivationFunction();
+    }
+
+    function onLossFunctionSet() {
+        document.getElementById('lossFunctionInput').value = network.getLossFunction();
+    }
+
+    function onLearningRateSet() {
+        document.getElementById('learningRateInput').value = network.getLearningRate();
+    }
+
+    function onDimensionsSet() {
+        const dimensions = toArr(network.getDimensions());
+        const size = dimensions.length;
+        document.getElementById('inputLayerHeight').value = dimensions[0];
+        document.getElementById('outputLayerHeight').value = dimensions[size - 1];
+        document.getElementById('hiddenLayersCount').value = size - 2;
+        document.getElementById('outputFunctionInput').value = dimensions[size - 1] === 1
+            ? "Sigmoid (Single Output)"
+            : "Softmax (Multiple Outputs)";
+        dimensions.shift();
+        dimensions.pop();
+        createHiddenLayersInputs(dimensions);
+    }
+</script>

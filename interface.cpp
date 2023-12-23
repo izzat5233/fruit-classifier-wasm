@@ -82,7 +82,7 @@ public:
     void init() {
         _setDimensions({4, 3, 4});
         _setLearningRate(0.01);
-        _setActivationFunction("relu");
+        _setActivationFunction("tanh");
         _setLossFunction("sse");
         build();
     }

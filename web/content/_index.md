@@ -33,12 +33,14 @@ collapseId = "controlCollapseThree"
 expanded = false
 +++
 
+{{< include-script "wasm/main.js" >}}
+{{< include-html "initialize.html" >}}
+
 {{< include-script "js/data.js" >}}
 {{< include-script "js/io.js" >}}
 
 # Set up The Neural Network
 
-{{< include-script "wasm/main.js" >}}
 {{< accordion "setup" >}}
 
 {{< include-script "js/visualizer.js" >}}
