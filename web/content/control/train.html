@@ -1,4 +1,5 @@
 <script>
+    let trainIntervalId = null;
     let trainingErrors = [];
     let testingErrors = [];
     let svg, xScale, yScale, xAxisGroup, yAxisGroup;
@@ -69,29 +70,71 @@
         // Update the axes to reflect the reset domains
         xAxisGroup.call(d3.axisBottom(xScale));
         yAxisGroup.call(d3.axisLeft(yScale));
+
+        // Reset any ongoing training
+        if (trainIntervalId) {
+            clearInterval(trainIntervalId);
+            trainIntervalId = null;
+        }
     }
 </script>
 <div class="row justify-content-center">
     <div class="col">
-        <h5 class="py-4">Epochs:</h5>
-        <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
-            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio1"
-                   autocomplete="off" value="1" checked>
-            <label class="btn btn-light fs-5" for="epochsRadio1">1</label>
-            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio5"
-                   autocomplete="off" value="5">
-            <label class="btn btn-light fs-5" for="epochsRadio5">5</label>
-            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio10"
-                   autocomplete="off" value="10">
-            <label class="btn btn-light fs-5" for="epochsRadio10">10</label>
-            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio50"
-                   autocomplete="off" value="50">
-            <label class="btn btn-light fs-5" for="epochsRadio50">50</label>
-            <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio100"
-                   autocomplete="off" value="100">
-            <label class="btn btn-light fs-5" for="epochsRadio100">100</label>
-            <button type="button" title="start" onclick="handleStartTrain()"
-                    class="btn btn-lg btn-success bi bi-play-fill fs-5"></button>
+        <div>
+            <h5 class="py-4">Fixed Epochs:</h5>
+            <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+                <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio1"
+                       autocomplete="off" value="1" checked>
+                <label class="btn btn-light fs-5" for="epochsRadio1">1</label>
+                <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio5"
+                       autocomplete="off" value="5">
+                <label class="btn btn-light fs-5" for="epochsRadio5">5</label>
+                <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio10"
+                       autocomplete="off" value="10">
+                <label class="btn btn-light fs-5" for="epochsRadio10">10</label>
+                <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio50"
+                       autocomplete="off" value="50">
+                <label class="btn btn-light fs-5" for="epochsRadio50">50</label>
+                <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio100"
+                       autocomplete="off" value="100">
+                <label class="btn btn-light fs-5" for="epochsRadio100">100</label>
+                <button type="button" title="start" onclick="trainAndUpdateAfter(getSelectedEpochValue())"
+                        class="btn btn-lg btn-success bi bi-play-fill fs-5"></button>
+            </div>
+        </div>
+        <script>
+            function getSelectedEpochValue() {
+                const radioButtons = document.querySelectorAll('input[name="epochsRadio"]');
+                for (const radioButton of radioButtons) {
+                    if (radioButton.checked) {
+                        return Number(radioButton.value);
+                    }
+                }
+            }
+        </script>
+        <div>
+            <h5 class="py-4">Train/Pause:</h5>
+            <div class="btn-group" role="group" aria-label="Train Speeds">
+                <button type="button" class="btn btn-lg btn-success fs-5 icons-close"
+                        onclick="handleTrainPause('pause')">
+                    <i class="bi bi-pause"></i>
+                </button>
+                <button type="button" class="btn btn-lg btn-success fs-5 icons-close"
+                        onclick="handleTrainPause('slow')">
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+                <button type="button" class="btn btn-lg btn-success fs-5 icons-close"
+                        onclick="handleTrainPause('medium')">
+                    <i class="bi bi-chevron-right"></i>
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+                <button type="button" class="btn btn-lg btn-success fs-5 icons-close"
+                        onclick="handleTrainPause('fast')">
+                    <i class="bi bi-chevron-right"></i>
+                    <i class="bi bi-chevron-right"></i>
+                    <i class="bi bi-chevron-right"></i>
+                </button>
+            </div>
         </div>
         <div>
             <h5 class="py-4">Options:</h5>
@@ -104,7 +147,7 @@
         </div>
         <hr class="my-4">
         <div class="d-flex justify-content-center">
-            <button type="button" title="start" id="refreshWeightsButton" onclick="handleRandomizeWeights()"
+            <button type="button" title="start" id="refreshWeightsButton" onclick="network.build()"
                     class="btn btn-lg btn-danger bi bi-arrow-clockwise fs-5"> Randomize Weights
             </button>
         </div>
@@ -153,8 +196,20 @@
     </div>
 </div>
 <script>
-    function handleStartTrain() {
-        const epochs = getSelectedEpochValue();
+    function getSpeedFromType(speedType) {
+        switch (speedType) {
+            case 'fast':
+                return 0;
+            case 'medium':
+                return 20;
+            case 'slow':
+                return 100;
+            default:
+                return 20;
+        }
+    }
+
+    function trainAndUpdateAfter(epochs) {
         if (document.getElementById('useTestDataCheck').checked) {
             const res = toArrArr(network.trainAndTestFor(epochs));
             for (let pair of res) {
@@ -168,17 +223,16 @@
         updateErrorChart();
     }
 
-    function handleRandomizeWeights() {
-        network.build();
-        clearErrorChart();
-    }
-
-    function getSelectedEpochValue() {
-        const radioButtons = document.querySelectorAll('input[name="epochsRadio"]');
-        for (const radioButton of radioButtons) {
-            if (radioButton.checked) {
-                return Number(radioButton.value);
-            }
+    async function handleTrainPause(speedType) {
+        if (trainIntervalId) {
+            clearInterval(trainIntervalId);
+            trainIntervalId = null;
+        }
+        if (speedType !== 'pause') {
+            const speed = getSpeedFromType(speedType);
+            trainIntervalId = setInterval(() => {
+                trainAndUpdateAfter(1);
+            }, speed);
         }
     }
 </script>
