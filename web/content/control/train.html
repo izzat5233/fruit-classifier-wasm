@@ -17,7 +17,7 @@
             <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio100"
                    autocomplete="off" value="100">
             <label class="btn btn-light fs-5" for="epochsRadio100">100</label>
-            <button type="button" title="start" id="startTrainingButton" onclick="startTraining()"
+            <button type="button" title="start" onclick="handleStartTrain()"
                     class="btn btn-lg btn-success bi bi-play-fill fs-5"></button>
         </div>
         <div>
@@ -46,7 +46,7 @@
     </div>
 </div>
 <script>
-    function startTraining() {
+    function handleStartTrain() {
         const trainLogger = document.getElementById('trainingLogger');
         const testLogger = document.getElementById('testingLogger');
         trainLogger.innerHTML = "";

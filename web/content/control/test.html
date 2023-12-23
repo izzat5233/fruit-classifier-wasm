@@ -1,23 +1,25 @@
+<script>
+    let predictionsTableObject = {headers: [], data: []};
+</script>
 <div class="row justify-content-center">
     <div class="col-12 d-flex flex-column flex-md-row gap-2 justify-content-center align-items-center">
         <div class="btn-group-vertical btn-group-sm mb-2 mb-md-0" role="group" aria-label="Get Outputs">
-            <button type="button" class="btn btn-lg btn-primary fs-5" onclick="getTestOutputs()">Get Predictions
+            <button type="button" class="btn btn-lg btn-primary fs-5" onclick="handleGetPredictions()">Get Predictions
             </button>
             <button type="button" class="btn btn-lg btn-outline-primary bi bi-x-lg fs-5" id="clearOutputsButton"
-                    onclick="clearPredictedTable()">Clear
+                    onclick="handleClearPredictions()">Clear
             </button>
         </div>
         <div class="btn-group-vertical btn-group-sm" role="group" aria-label="Download Data">
-            <button type="button" class="btn btn-lg btn-outline-primary bi bi-download fs-5" id="downloadWeightsButton"
-                    onclick="network.downloadNetwork()"> Download Network Data
+            <button type="button" class="btn btn-lg btn-outline-primary bi bi-download fs-5"
+                    id="downloadWeightsButton" onclick="handleDownloadNetworkData()"> Download Network Data
             </button>
             <button type="button" class="btn btn-lg btn-outline-primary bi bi-download fs-5" disabled
-                    id="downloadOutputsButton" onclick="network.downloadPredictedOutputs()"> Download Predictions
+                    id="downloadOutputsButton" onclick="handleDownloadPredictions()"> Download Predictions
             </button>
         </div>
     </div>
 </div>
-
 <hr class="my-4">
 <div class="container">
     <div class="row justify-content-center">
@@ -30,34 +32,44 @@
     </div>
 </div>
 <script>
-    function clearPredictedTable() {
+    function handleClearPredictions() {
+        predictionsTableObject = {headers: [], data: []};
         document.getElementById('predictedThead').innerHTML = "";
         document.getElementById('predictedTbody').innerHTML = "";
         document.getElementById("downloadOutputsButton").disabled = true;
     }
 
-    function getTestOutputs() {
-        clearPredictedTable();
+    function handleGetPredictions() {
+        handleClearPredictions();
         document.getElementById("downloadOutputsButton").disabled = false;
-        network.predictTestingOutputs();
+
+        predictionsTableObject.data = toArrArr(network.getPredictions());
+        predictionsTableObject.headers = testOutputTableObject.headers;
+
         const thead = "#predictedThead";
         const tbody = "#predictedTbody";
 
-        let input = network.getTestIn();
-        const headers1 = appendTableHeaders(thead, input.get(0).size(), "Input");
-        const cells1 = appendTableCells(tbody, input);
-        styleTableSelection(headers1, cells1, 'table-default');
+        const h1 = appendTableHeaders(thead, testInputTableObject.headers);
+        const b1 = appendTableCells(tbody, testInputTableObject.data);
+        styleTableSelection(h1, b1, 'table-default');
 
-        let output = network.getTestOut();
-        const headers2 = appendTableHeaders(thead, output.get(0).size(), "Output");
-        const cells2 = appendTableCells(tbody, output);
-        styleTableSelection(headers2, cells2, 'table-secondary');
+        const h2 = appendTableHeaders(thead, testOutputTableObject.headers);
+        const b2 = appendTableCells(tbody, testOutputTableObject.data);
+        styleTableSelection(h2, b2, 'table-secondary');
 
-        let predicted = network.getPredictedOutputs();
-        const headers3 = appendTableHeaders(thead, predicted.get(0).size(), "Predicted");
-        const cells3 = appendTableCells(tbody, predicted);
-        styleTableSelection(headers3, cells3, 'table-primary');
+        const h3 = appendTableHeaders(thead, predictionsTableObject.headers);
+        const b3 = appendTableCells(tbody, predictionsTableObject.data);
+        styleTableSelection(h3, b3, 'table-primary');
+    }
 
-        showSimpleToast("<h5>Computed " + input.size() + " predictions</h5>");
+    function handleDownloadPredictions() {
+        downloadCSV(arrArrToCsv(tableObjectToArrArr(predictionsTableObject)), "predictions.csv");
+    }
+
+    function handleDownloadNetworkData() {
+        downloadJson({
+            weights: toArrArrArr(network.getWeights()),
+            biases: toArrArr(network.getBiases())
+        }, "network_data.csv");
     }
 </script>

@@ -1,20 +1,39 @@
 <script>
     let network;
 
-    let structure = [2, 2];
-
-    function updateNetworkDimensions(dimensions) {
-        let vec = new Module.VecUInt();
-        for (const number of dimensions) vec.push_back(number);
-        network.setDimensions(vec);
-    }
-
     Module.onRuntimeInitialized = () => {
         network = new Module.Network();
-        network.setActivationFunction(document.getElementById('activationFunctionInput').value);
-        network.setLossFunction(document.getElementById('lossFunctionInput').value);
-        network.setLearningRate(document.getElementById('learningRateInput').value);
-        updateNetworkDimensions(structure);
+        network.init();
+    }
+
+    function onDimensionsSet() {
+        const dimensions = toArr(network.getDimensions());
+        const size = dimensions.length;
+        document.getElementById('inputLayerHeight').value = dimensions[0];
+        document.getElementById('outputLayerHeight').value = dimensions[size - 1];
+        document.getElementById('hiddenLayersCount').value = size - 2;
+        document.getElementById('outputFunctionInput').value = dimensions[size - 1] === 1
+            ? "Sigmoid (Single Output)"
+            : "Softmax (Multiple Outputs)";
+        dimensions.shift();
+        dimensions.pop();
+        createHiddenLayersInputs(dimensions);
+    }
+
+    function onActivationFunctionSet() {
+        document.getElementById('activationFunctionInput').value = network.getActivationFunction();
+    }
+
+    function onLossFunctionSet() {
+        document.getElementById('lossFunctionInput').value = network.getLossFunction();
+    }
+
+    function onLearningRateSet() {
+        document.getElementById('learningRateInput').value = network.getLearningRate();
+    }
+
+    function onNetworkBuilt() {
+        drawNetwork(toArr(network.getDimensions()));
     }
 </script>
 <div class="container flex-column gap-4">
@@ -22,85 +41,73 @@
         <div class="col">
             <label for="inputLayerHeight" class="form-label">Input Layer Height</label>
             <input type="range" class="form-range" min="1" max="30" step="1" id="inputLayerHeight"
-                   value="2" oninput="setStructureInput(Number(value))">
+                   value="2" oninput="setInputHeight(Number(value))">
         </div>
         <div class="col">
             <label for="hiddenLayersCount" class="form-label">Hidden Layers Count</label>
             <input type="range" class="form-range" min="0" max="10" step="1" id="hiddenLayersCount"
-                   value="1" oninput="updateStructureLength(Number(value) + 2)">
+                   value="1" oninput="setHiddenLayersCount(Number(value))">
         </div>
         <div class="col">
             <label for="outputLayerHeight" class="form-label">Output Layer Height</label>
             <input type="range" class="form-range" min="1" max="30" step="1" id="outputLayerHeight"
-                   value="2" oninput="setStructureOutput(Number(value))">
+                   value="2" oninput="setOutputHeight(Number(value))">
         </div>
     </div>
     <hr>
-    <div id="hiddenLayersContainer"></div>
+    <div id="hiddenLayersContainer">
+        <script>
+            function createHiddenLayersInputs(values) {
+                const container = d3.select('#hiddenLayersContainer');
+                const layers = container.selectAll('.hidden-layer-input')
+                    .data(values, (_, i) => i);
+
+                layers.enter()
+                    .append('input')
+                    .attr('type', 'range')
+                    .attr('min', '1')
+                    .attr('max', '30')
+                    .attr('value', (d) => d)
+                    .attr('index', (_, i) => i)
+                    .attr('class', 'form-range hidden-layer-input')
+                    .attr('id', (_, i) => 'hiddenLayerSizeInput' + i)
+                    .on('input', function () {
+                        const index = Number(this.getAttribute('index'));
+                        setDimensionHeight(index + 1, this.value);
+                    });
+
+                layers.exit().remove();
+                layers.attr('value', (d) => d);
+            }
+        </script>
+    </div>
 </div>
 <script>
-    function onStructureChange() {
-        drawNetwork(structure);
-        if (network) updateNetworkDimensions(structure);
-        updateOutputFunctionLabel();
+    function setInputHeight(value) {
+        setDimensionHeight(0, value);
     }
 
-    function setStructureInput(value) {
-        structure[0] = value;
-        document.getElementById('inputLayerHeight').value = value;
-        onStructureChange();
+    function setOutputHeight(value) {
+        const dimensions = network.getDimensions();
+        setDimensionHeight(dimensions.size() - 1, value);
     }
 
-    function setStructureOutput(value) {
-        structure[structure.length - 1] = value;
-        document.getElementById('outputLayerHeight').value = value;
-        onStructureChange();
+    function setDimensionHeight(index, value) {
+        const dimensions = network.getDimensions();
+        dimensions.set(index, Number(value));
+        network.setDimensions(dimensions);
     }
 
-    function createHiddenLayerInput(index, value) {
-        const input = document.createElement('input');
-        input.type = 'range';
-        input.min = '1';
-        input.max = '30';
-        input.value = value;
-        input.index = index;
-        input.className = 'form-range hidden-layer-input';
-        input.id = 'hiddenLayerSizeInput' + index;
-        input.oninput = () => {
-            structure[Number(input.index) + 1] = Number(input.value);
-            onStructureChange();
-        }
-        return input;
+    function setHiddenLayersCount(value, newHeights = 3) {
+        const dimensions = toArr(network.getDimensions());
+        const first = dimensions.shift();
+        const last = dimensions.pop();
+
+        while (dimensions.length > value) dimensions.pop();
+        while (dimensions.length < value) dimensions.push(newHeights);
+
+        dimensions.unshift(first);
+        dimensions.push(last);
+        network.setDimensions(toVecUInt(dimensions));
     }
-
-    function updateStructureLength(desiredLength, defaultValue = 3) {
-        const cont = document.getElementById('hiddenLayersContainer');
-        const last = structure.pop()
-
-        while (structure.length > desiredLength - 1) {
-            structure.pop();
-            cont.removeChild(cont.children[cont.children.length - 1]);
-        }
-
-        let index = structure.length - 1;
-        while (structure.length < desiredLength - 1) {
-            structure.push(defaultValue);
-            cont.appendChild(createHiddenLayerInput(index, defaultValue));
-            index++;
-        }
-
-        structure.push(last);
-        onStructureChange();
-    }
-
-    function updateOutputFunctionLabel() {
-        document.getElementById('outputFunctionInput').value = structure[structure.length - 1] === 1
-            ? "Sigmoid (Single Output)"
-            : "Softmax (Multiple Outputs)";
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-        updateStructureLength(3);
-        onStructureChange();
-    });
 </script>

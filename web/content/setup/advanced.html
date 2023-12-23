@@ -2,7 +2,7 @@
     <div class="col-sm-6">
         <label for="learningRateInput" class="form-label">Learning Rate</label>
         <input type="number" step="0.01" min="0.001" max="3" class="form-control" id="learningRateInput"
-               oninput="network.setLearningRate(value)" value="0.1">
+               oninput="network.setLearningRate(value)">
     </div>
     <div class="col-sm-6">
         <label for="activationFunctionInput" class="form-label">Activation Function</label>
@@ -15,8 +15,7 @@
     </div>
     <div class="col-sm-6">
         <label for="lossFunctionInput" class="form-label">Loss Function</label>
-        <select class="form-select" id="lossFunctionInput"
-                onchange="network.setLossFunction(value)">
+        <select class="form-select" id="lossFunctionInput" onchange="network.setLossFunction(value)">
             <option value="sse">Sum Square Error</option>
             <option value="mse">Mean Square Error</option>
         </select>

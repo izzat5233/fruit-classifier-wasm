@@ -1,41 +1,160 @@
+<script>
+    let trainInputTableObject = {headers: [], data: []};
+    let trainOutputTableObject = {headers: [], data: []};
+    let testInputTableObject = {headers: [], data: []};
+    let testOutputTableObject = {headers: [], data: []};
+
+    async function handleTableObjectUpload(fileInput, headersAlt) {
+        return await handleTextFileUpload(fileInput)
+            .then(csvToArrArr)
+            .then((arrArr) => arrArrToTableObject(arrArr, headersAlt));
+    }
+
+    async function handleTableObjectPath(filepath, headersAlt) {
+        return await readTextFilePath(filepath)
+            .then(csvToArrArr)
+            .then((arrArr) => arrArrToTableObject(arrArr, headersAlt));
+    }
+
+    function activateFileInputButton(btn, name, size) {
+        btn.innerHTML = name + "<br>" + "Valid Rows: " + size;
+        btn.classList.add('active');
+    }
+
+    function deactivateFileInputButton(btn, name) {
+        btn.innerHTML = name;
+        btn.classList.remove('active');
+    }
+</script>
+<div class="row">
+    <div class="col">
+        <div class="btn-group mt-2" role="group">
+            <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"
+                    aria-expanded="false">Use Dataset
+            </button>
+            <ul class="dropdown-menu">
+                <li>
+                    <button class="dropdown-item" onclick="handleLoadDataset('xor')">
+                        XOR Dataset
+                    </button>
+                    <button class="dropdown-item" onclick="handleLoadDataset('mobile')">
+                        Mobile Prices Dataset
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <script>
+            async function handleLoadDataset(dataset) {
+                trainInputTableObject = await handleTableObjectPath("datasets/" + dataset + "/train_in.csv", "Input");
+                trainOutputTableObject = await handleTableObjectPath("datasets/" + dataset + "/train_out.csv", "Output");
+                testInputTableObject = await handleTableObjectPath("datasets/" + dataset + "/test_in.csv", "Input");
+                testOutputTableObject = await handleTableObjectPath("datasets/" + dataset + "/test_out.csv", "Output");
+                network.setTrainInput(toVecVecNum(trainInputTableObject.data));
+                network.setTrainOutput(toVecVecNum(trainOutputTableObject.data));
+                network.setTestInput(toVecVecNum(testInputTableObject.data));
+                network.setTestOutput(toVecVecNum(testOutputTableObject.data));
+            }
+        </script>
+    </div>
+</div>
+<hr>
 <div class="row">
     <div class="col">
         <h5>Training Data</h5>
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-light" id="inputTrainingDataButton"
-                    onclick="network.promptInputTrainingData()">Browse Input File
+        <input type="file" id="trainInputFileInput" accept=".csv" style="display: none"
+               onchange="handleTrainInputUpload(this)">
+        <div class="btn-group-vertical" role="group">
+            <button type="button" class="btn btn-light" id="trainInputFileButton"
+                    onclick="document.getElementById('trainInputFileInput').click()">Browse Input File
             </button>
-            <button type="button" class="btn btn-light" id="outputTrainingDataButton"
-                    onclick="network.promptOutputTrainingData()">Browse Output File
+            <button type="button" class="btn btn-light" id="trainInputClearButton"
+                    disabled onclick="handleTrainInputClear()">Clear
             </button>
-        </div>
-        <div class="btn-group mt-2" role="group">
-            <div class="btn-group">
-                <button type="button" class="btn btn-primary" id="prepareTrainingDataButton"
-                        onclick="network.prepareTrainingData()">Load
-                </button>
-                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                    <span class="visually-hidden">Toggle Dropdown</span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <button class="dropdown-item" onclick="loadTrainDataset('xor')">
-                            XOR Dataset
-                        </button>
-                        <button class="dropdown-item" onclick="loadTrainDataset('mobile')">
-                            Mobile Prices Dataset
-                        </button>
-                    </li>
-                </ul>
-            </div>
-            <button type="button" class="btn btn-outline-primary bi bi-download" id="downloadTrainFilesButton" disabled
-                    onclick="network.downloadTrainIn(); network.downloadTrainOut()">Download
-            </button>
-            <button type="button" class="btn btn-danger" id="clearTrainingDataButton" onclick="onClearTrainingData()">
-                Clear
+            <button type="button" class="btn btn-light" id="trainInputDownloadButton"
+                    disabled onclick="handleTrainInputDownload()">Download
             </button>
         </div>
+        <script>
+            async function handleTrainInputUpload(fileInput) {
+                trainInputTableObject = await handleTableObjectUpload(fileInput, "Input");
+                network.setTrainInput(toVecVecNum(trainInputTableObject.data));
+            }
+
+            function onTrainInputSet() {
+                const btn = document.getElementById('trainInputFileButton');
+                activateFileInputButton(btn, "Train Input Loaded", trainInputTableObject.data.length);
+                document.getElementById('trainInputClearButton').disabled = false;
+                document.getElementById('trainInputDownloadButton').disabled = false;
+                setInputHeight(trainInputTableObject.data[0].length);
+                previewTrainTable();
+            }
+
+            function handleTrainInputClear() {
+                network.clearTrainInput();
+            }
+
+            function onTrainInputCleared() {
+                trainInputTableObject = {headers: [], data: []};
+                const btn = document.getElementById('trainInputFileButton');
+                deactivateFileInputButton(btn, "Browse Input File");
+                document.getElementById('trainInputClearButton').disabled = true;
+                document.getElementById('trainInputDownloadButton').disabled = true;
+                previewTrainTable();
+            }
+
+            function handleTrainInputDownload() {
+                const arrArr = tableObjectToArrArr(trainInputTableObject);
+                const csvString = arrArrToCsv(arrArr);
+                downloadCSV(csvString, "train_input.csv");
+            }
+        </script>
+        <input type="file" id="trainOutputFileInput" accept=".csv" style="display: none"
+               onchange="handleTrainOutputUpload(this)">
+        <div class="btn-group-vertical" role="group">
+            <button type="button" class="btn btn-light" id="trainOutputFileButton"
+                    onclick="document.getElementById('trainOutputFileInput').click()">Browse Output File
+            </button>
+            <button type="button" class="btn btn-light" id="trainOutputClearButton"
+                    disabled onclick="handleTrainOutputClear()">Clear
+            </button>
+            <button type="button" class="btn btn-light" id="trainOutputDownloadButton"
+                    disabled onclick="handleTrainOutputDownload()">Download
+            </button>
+        </div>
+        <script>
+            async function handleTrainOutputUpload(fileInput) {
+                trainOutputTableObject = await handleTableObjectUpload(fileInput, "Output");
+                network.setTrainOutput(toVecVecNum(trainOutputTableObject.data));
+            }
+
+            function onTrainOutputSet() {
+                const btn = document.getElementById('trainOutputFileButton');
+                activateFileInputButton(btn, "Train Output Loaded", trainOutputTableObject.data.length);
+                document.getElementById('trainOutputClearButton').disabled = false;
+                document.getElementById('trainOutputDownloadButton').disabled = false;
+                setOutputHeight(trainOutputTableObject.data[0].length);
+                previewTrainTable();
+            }
+
+            function handleTrainOutputClear() {
+                network.clearTrainOutput();
+            }
+
+            function onTrainOutputCleared() {
+                trainOutputTableObject = {headers: [], data: []};
+                const btn = document.getElementById('trainOutputFileButton');
+                deactivateFileInputButton(btn, "Browse Output File");
+                document.getElementById('trainOutputClearButton').disabled = true;
+                document.getElementById('trainOutputDownloadButton').disabled = true;
+                previewTrainTable();
+            }
+
+            function handleTrainOutputDownload() {
+                const arrArr = tableObjectToArrArr(trainOutputTableObject);
+                const csvString = arrArrToCsv(arrArr);
+                downloadCSV(csvString, "train_output.csv");
+            }
+        </script>
         <div class="row justify-content-center mt-3">
             <div class="col table-responsive">
                 <table class="table table-bordered">
@@ -44,44 +163,118 @@
                 </table>
             </div>
         </div>
+        <script>
+            function previewTrainTable() {
+                document.getElementById('trainPreviewThead').innerHTML = '';
+                document.getElementById('trainPreviewTbody').innerHTML = '';
+
+                const inputArrArr = sampleArrArr(trainInputTableObject.data);
+                const outputArrArr = sampleArrArr(trainOutputTableObject.data);
+
+                const h1 = appendTableHeaders("#trainPreviewThead", trainInputTableObject.headers);
+                const b1 = appendTableCells("#trainPreviewTbody", inputArrArr);
+                styleTableSelection(h1, b1, 'table-default');
+
+                const h2 = appendTableHeaders("#trainPreviewThead", trainOutputTableObject.headers);
+                const b2 = appendTableCells("#trainPreviewTbody", outputArrArr);
+                styleTableSelection(h2, b2, 'table-secondary');
+            }
+        </script>
     </div>
     <div class="col">
         <h5>Testing Data</h5>
-        <div class="btn-group" role="group">
-            <button type="button" class="btn btn-light" id="inputTestingDataButton"
-                    onclick="network.promptInputTestingData()">Browse Input File
+        <input type="file" id="testInputFileInput" accept=".csv" style="display: none"
+               onchange="handleTestInputUpload(this)">
+        <div class="btn-group-vertical" role="group">
+            <button type="button" class="btn btn-light" id="testInputFileButton"
+                    onclick="document.getElementById('testInputFileInput').click()">Browse Input File
             </button>
-            <button type="button" class="btn btn-light" id="outputTestingDataButton"
-                    onclick="network.promptOutputTestingData()">Browse Output File
+            <button type="button" class="btn btn-light" id="testInputClearButton"
+                    disabled onclick="handleTestInputClear()">Clear
             </button>
-        </div>
-        <div class="btn-group mt-2" role="group">
-            <div class="btn-group">
-                <button type="button" class="btn btn-primary" id="prepareTestingDataButton"
-                        onclick="network.prepareTestingData()">Load
-                </button>
-                <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                    <span class="visually-hidden">Toggle Dropdown</span>
-                </button>
-                <ul class="dropdown-menu">
-                    <li>
-                        <button class="dropdown-item" onclick="loadTestDataset('xor')">
-                            XOR Dataset
-                        </button>
-                        <button class="dropdown-item" onclick="loadTestDataset('mobile')">
-                            Mobile Prices Dataset
-                        </button>
-                    </li>
-                </ul>
-            </div>
-            <button type="button" class="btn btn-outline-primary bi bi-download" id="downloadTestFilesButton" disabled
-                    onclick="network.downloadTestIn(); network.downloadTestOut()">Download
-            </button>
-            <button type="button" class="btn btn-danger" id="clearTestingDataButton" onclick="onClearTestingData()">
-                Clear
+            <button type="button" class="btn btn-light" id="testInputDownloadButton"
+                    disabled onclick="handleTestInputDownload()">Download
             </button>
         </div>
+        <script>
+            async function handleTestInputUpload(fileInput) {
+                testInputTableObject = await handleTableObjectUpload(fileInput, "Input");
+                network.setTestInput(toVecVecNum(testInputTableObject.data));
+            }
+
+            function onTestInputSet() {
+                const btn = document.getElementById('testInputFileButton');
+                activateFileInputButton(btn, "Test Input Loaded", testInputTableObject.data.length);
+                document.getElementById('testInputClearButton').disabled = false;
+                document.getElementById('testInputDownloadButton').disabled = false;
+                previewTestTable();
+            }
+
+            function handleTestInputClear() {
+                network.clearTestInput();
+            }
+
+            function onTestInputCleared() {
+                testInputTableObject = {headers: [], data: []};
+                const btn = document.getElementById('testInputFileButton');
+                deactivateFileInputButton(btn, "Browse Input File");
+                document.getElementById('testInputClearButton').disabled = true;
+                document.getElementById('testInputDownloadButton').disabled = true;
+                previewTestTable();
+            }
+
+            function handleTestInputDownload() {
+                const arrArr = tableObjectToArrArr(testInputTableObject);
+                const csvString = arrArrToCsv(arrArr);
+                downloadCSV(csvString, "test_input.csv");
+            }
+        </script>
+        <input type="file" id="testOutputFileInput" accept=".csv" style="display: none"
+               onchange="handleTestOutputUpload(this)">
+        <div class="btn-group-vertical" role="group">
+            <button type="button" class="btn btn-light" id="testOutputFileButton"
+                    onclick="document.getElementById('testOutputFileInput').click()">Browse Output File
+            </button>
+            <button type="button" class="btn btn-light" id="testOutputClearButton"
+                    disabled onclick="handleTestOutputClear()">Clear
+            </button>
+            <button type="button" class="btn btn-light" id="testOutputDownloadButton"
+                    disabled onclick="handleTestOutputDownload()">Download
+            </button>
+        </div>
+        <script>
+            async function handleTestOutputUpload(fileInput) {
+                testOutputTableObject = await handleTableObjectUpload(fileInput, "Output");
+                network.setTestOutput(toVecVecNum(testOutputTableObject.data));
+            }
+
+            function onTestOutputSet() {
+                const btn = document.getElementById('testOutputFileButton');
+                activateFileInputButton(btn, "Test Output Loaded", testOutputTableObject.data.length);
+                document.getElementById('testOutputClearButton').disabled = false;
+                document.getElementById('testOutputDownloadButton').disabled = false;
+                previewTestTable();
+            }
+
+            function handleTestOutputClear() {
+                network.clearTestOutput();
+            }
+
+            function onTestOutputCleared() {
+                testOutputTableObject = {headers: [], data: []};
+                const btn = document.getElementById('testOutputFileButton');
+                deactivateFileInputButton(btn, "Browse Output File");
+                document.getElementById('testOutputClearButton').disabled = true;
+                document.getElementById('testOutputDownloadButton').disabled = true;
+                previewTestTable();
+            }
+
+            function handleTestOutputDownload() {
+                const arrArr = tableObjectToArrArr(testOutputTableObject);
+                const csvString = arrArrToCsv(arrArr);
+                downloadCSV(csvString, "test_output.csv");
+            }
+        </script>
         <div class="row justify-content-center mt-3">
             <div class="col table-responsive">
                 <table class="table table-bordered">
@@ -90,145 +283,22 @@
                 </table>
             </div>
         </div>
+        <script>
+            function previewTestTable() {
+                document.getElementById('testPreviewThead').innerHTML = '';
+                document.getElementById('testPreviewTbody').innerHTML = '';
+
+                const inputArrArr = sampleArrArr(testInputTableObject.data);
+                const outputArrArr = sampleArrArr(testOutputTableObject.data);
+
+                const h1 = appendTableHeaders("#testPreviewThead", testInputTableObject.headers);
+                const b1 = appendTableCells("#testPreviewTbody", inputArrArr);
+                styleTableSelection(h1, b1, 'table-default');
+
+                const h2 = appendTableHeaders("#testPreviewThead", testOutputTableObject.headers);
+                const b2 = appendTableCells("#testPreviewTbody", outputArrArr);
+                styleTableSelection(h2, b2, 'table-secondary');
+            }
+        </script>
     </div>
 </div>
-<script>
-    function onDataFileSet(element, filename, dataSize) {
-        element.setAttribute('data-size', dataSize);
-        element.innerHTML = filename + "<br>" + "Valid Rows: " + Number(dataSize);
-        element.classList.add('active');
-    }
-
-    function onInputTrainingFileSet(filename, dataSize) {
-        onDataFileSet(document.getElementById('inputTrainingDataButton'), filename, dataSize);
-    }
-
-    function onOutputTrainingFileSet(filename, dataSize) {
-        onDataFileSet(document.getElementById('outputTrainingDataButton'), filename, dataSize);
-    }
-
-    function onInputTestingFileSet(filename, dataSize) {
-        onDataFileSet(document.getElementById('inputTestingDataButton'), filename, dataSize);
-    }
-
-    function onOutputTestingFileSet(filename, dataSize) {
-        onDataFileSet(document.getElementById('outputTestingDataButton'), filename, dataSize);
-    }
-
-    function onTrainingDataPrepared(dataSize) {
-        const previewSize = onPreviewTrainingData();
-        const html =
-            "<h5>Loaded " + dataSize + " rows</h5>" +
-            "<h5>" + previewSize + " preview rows are shown</h5>";
-        showSimpleToast(html);
-        document.getElementById('downloadTrainFilesButton').disabled = false;
-    }
-
-    function onTestingDataPrepared(dataSize) {
-        const previewSize = onPreviewTestingData();
-        const html =
-            "<h5>Loaded " + dataSize + " rows</h5>" +
-            "<h5>" + previewSize + " preview rows are shown</h5>";
-        showSimpleToast(html);
-        document.getElementById('downloadTestFilesButton').disabled = false;
-    }
-
-    function onClearFileData(input, output) {
-        input.removeAttribute('data-size');
-        input.classList.remove('active');
-        input.innerHTML = "Browse Input File";
-        output.removeAttribute('data-size');
-        output.classList.remove('active');
-        output.innerHTML = "Browse Output File";
-    }
-
-    function clearTrainPreviewTable() {
-        document.getElementById('trainPreviewThead').innerHTML = "";
-        document.getElementById('trainPreviewTbody').innerHTML = "";
-        document.getElementById('downloadTrainFilesButton').disabled = true;
-    }
-
-    function clearTestPreviewTable() {
-        document.getElementById('testPreviewThead').innerHTML = "";
-        document.getElementById('testPreviewTbody').innerHTML = "";
-        document.getElementById('downloadTestFilesButton').disabled = true;
-    }
-
-    function onClearTrainingData() {
-        const input = document.getElementById('inputTrainingDataButton');
-        const output = document.getElementById('outputTrainingDataButton');
-        onClearFileData(input, output);
-        clearTrainPreviewTable();
-        network.clearTrainingData();
-    }
-
-    function onClearTestingData() {
-        const input = document.getElementById('inputTestingDataButton');
-        const output = document.getElementById('outputTestingDataButton');
-        onClearFileData(input, output);
-        clearTestPreviewTable();
-        network.clearTestingData();
-    }
-
-    function onPreviewTrainingData() {
-        clearTrainPreviewTable()
-
-        let input = network.getTrainInPreview();
-        const inputSize = input.get(0).size();
-        setStructureInput(inputSize);
-
-        const headers1 = appendTableHeaders("#trainPreviewThead", inputSize, "Input");
-        const cells1 = appendTableCells("#trainPreviewTbody", input);
-        styleTableSelection(headers1, cells1, 'table-default');
-
-        let output = network.getTrainOutPreview();
-        const outputSize = output.get(0).size();
-        setStructureOutput(outputSize);
-
-        const headers2 = appendTableHeaders("#trainPreviewThead", outputSize, "Output");
-        const cells2 = appendTableCells("#trainPreviewTbody", output);
-        styleTableSelection(headers2, cells2, 'table-secondary');
-
-        return input.size();
-    }
-
-    function onPreviewTestingData() {
-        clearTestPreviewTable()
-
-        let input = network.getTestInPreview();
-        const headers1 = appendTableHeaders("#testPreviewThead", input.get(0).size(), "Input");
-        const cells1 = appendTableCells("#testPreviewTbody", input);
-        styleTableSelection(headers1, cells1, 'table-default');
-
-        let output = network.getTestOutPreview();
-        const headers2 = appendTableHeaders("#testPreviewThead", output.get(0).size(), "Output");
-        const cells2 = appendTableCells("#testPreviewTbody", output);
-        styleTableSelection(headers2, cells2, 'table-secondary');
-
-        return input.size();
-    }
-
-    async function loadTrainDataset(dataset) {
-        try {
-            const input = await readCSV("datasets/" + dataset + "/train_in.csv");
-            const output = await readCSV("datasets/" + dataset + "/train_out.csv");
-            network.setInputTrainingData(dataset + " train input", input);
-            network.setOutputTrainingData(dataset + " train output", output);
-            network.prepareTrainingData();
-        } catch (error) {
-            console.error('Error in loadTrainDataset:', error);
-        }
-    }
-
-    async function loadTestDataset(dataset) {
-        try {
-            const input = await readCSV("datasets/" + dataset + "/test_in.csv");
-            const output = await readCSV("datasets/" + dataset + "/test_out.csv");
-            network.setInputTestingData(dataset + " test input", input);
-            network.setOutputTestingData(dataset + " test output", output);
-            network.prepareTestingData();
-        } catch (error) {
-            console.error('Error in loadTestDataset:', error);
-        }
-    }
-</script>

@@ -27,11 +27,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_subdirectory(test)
 else ()
     # Add an executable for the main.cpp
-    add_executable(main_executable wasm/main.cpp
-            wasm/emscripten_browser_file.h
-            wasm/io_utility.h
-            wasm/network_interface.h
-            nn/module.h)
+    add_executable(main_executable interface.cpp)
 
     # Include directories for nn library
     target_include_directories(main_executable PUBLIC ${PROJECT_SOURCE_DIR}/nn)
