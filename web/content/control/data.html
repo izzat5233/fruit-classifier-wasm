@@ -63,9 +63,9 @@
         <div class="px-2">
             <p>Data is always one-hot encoded if categorical columns are found.</p>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="dataEncodeDataCheck"
-                       checked onchange="handleDataOptionsChange()">
-                <label class="form-check-label" for="dataEncodeDataCheck">Show Encoded Data</label>
+                <input class="form-check-input" type="checkbox" id="dataOriginalDataCheck"
+                       onchange="handleDataOptionsChange()">
+                <label class="form-check-label" for="dataOriginalDataCheck">Show Original Data</label>
             </div>
         </div>
         <script>
@@ -199,7 +199,7 @@
             function previewTrainTable() {
                 document.getElementById('trainPreviewThead').innerHTML = '';
                 document.getElementById('trainPreviewTbody').innerHTML = '';
-                const encoded = document.getElementById('dataEncodeDataCheck').checked;
+                const encoded = !document.getElementById('dataOriginalDataCheck').checked;
 
                 const input = trainInputTableObject.getPreviewData(encoded);
                 const h1 = appendTableHeaders("#trainPreviewThead", input.headers);
@@ -321,7 +321,7 @@
             function previewTestTable() {
                 document.getElementById('testPreviewThead').innerHTML = '';
                 document.getElementById('testPreviewTbody').innerHTML = '';
-                const encoded = document.getElementById('dataEncodeDataCheck').checked;
+                const encoded = !document.getElementById('dataOriginalDataCheck').checked;
 
                 const input = testInputTableObject.getPreviewData(encoded);
                 const h1 = appendTableHeaders("#testPreviewThead", input.headers);
