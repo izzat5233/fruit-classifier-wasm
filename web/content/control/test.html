@@ -1,5 +1,5 @@
 <script>
-    let predictionsTableObject = {headers: [], data: []};
+    const predictionsTableObject = new TableObject();
 </script>
 <div class="row justify-content-center">
     <div class="col-12 d-flex flex-column flex-md-row gap-2 justify-content-center align-items-center">
@@ -19,6 +19,25 @@
             </button>
         </div>
     </div>
+    <div class="col">
+        <div class="px-2">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="testDecodeDataCheck"
+                       checked onchange="handlePredictionsOptionsChange()">
+                <label class="form-check-label" for="testDecodeDataCheck">Decode Data (If Necessary)</label>
+            </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="testInputDataCheck"
+                       onchange="handlePredictionsOptionsChange()">
+                <label class="form-check-label" for="testInputDataCheck">Show Input Data</label>
+            </div>
+        </div>
+        <script>
+            function handlePredictionsOptionsChange() {
+                previewPredictionsTable();
+            }
+        </script>
+    </div>
 </div>
 <hr class="my-4">
 <div class="container">
@@ -33,37 +52,19 @@
 </div>
 <script>
     function handleClearPredictions() {
-        predictionsTableObject = {headers: [], data: []};
-        document.getElementById('predictedThead').innerHTML = "";
-        document.getElementById('predictedTbody').innerHTML = "";
-        document.getElementById("downloadOutputsButton").disabled = true;
+        predictionsTableObject.clear();
+        previewPredictionsTable();
     }
 
     function handleGetPredictions() {
-        handleClearPredictions();
-        document.getElementById("downloadOutputsButton").disabled = false;
-
-        predictionsTableObject.data = toArrArr(network.getPredictions());
         predictionsTableObject.headers = testOutputTableObject.headers;
-
-        const thead = "#predictedThead";
-        const tbody = "#predictedTbody";
-
-        const h1 = appendTableHeaders(thead, testInputTableObject.headers);
-        const b1 = appendTableCells(tbody, testInputTableObject.data);
-        styleTableSelection(h1, b1, 'table-default');
-
-        const h2 = appendTableHeaders(thead, testOutputTableObject.headers);
-        const b2 = appendTableCells(tbody, testOutputTableObject.data);
-        styleTableSelection(h2, b2, 'table-secondary');
-
-        const h3 = appendTableHeaders(thead, predictionsTableObject.headers);
-        const b3 = appendTableCells(tbody, predictionsTableObject.data);
-        styleTableSelection(h3, b3, 'table-primary');
+        const predictions = toArrArr(network.getPredictions());
+        predictionsTableObject.data = testOutputTableObject.decodeBasedOnMaxProbability(predictions);
+        previewPredictionsTable();
     }
 
     function handleDownloadPredictions() {
-        downloadCSV(arrArrToCsv(tableObjectToArrArr(predictionsTableObject)), "predictions.csv");
+        downloadCSV(arrArrToCsv(predictionsTableObject.data), "predictions.csv");
     }
 
     function handleDownloadNetworkData() {
@@ -71,5 +72,37 @@
             weights: toArrArrArr(network.getWeights()),
             biases: toArrArr(network.getBiases())
         }, "network_data.csv");
+    }
+
+    function previewPredictionsTable() {
+        document.getElementById('predictedThead').innerHTML = "";
+        document.getElementById('predictedTbody').innerHTML = "";
+        document.getElementById("downloadOutputsButton").disabled = false;
+
+        if (predictionsTableObject.headers.length === 0) {
+            document.getElementById("downloadOutputsButton").disabled = true;
+            return;
+        }
+
+        const encoded = !document.getElementById('testDecodeDataCheck').checked;
+        const thead = "#predictedThead";
+        const tbody = "#predictedTbody";
+
+        if (document.getElementById('testInputDataCheck').checked) {
+            const input = testInputTableObject.getPreviewData(encoded);
+            const h1 = appendTableHeaders(thead, input.headers);
+            const b1 = appendTableCells(tbody, input.data);
+            styleTableSelection(h1, b1, 'table-default');
+        }
+
+        const output = testOutputTableObject.getPreviewData(encoded);
+        const h2 = appendTableHeaders(thead, output.headers);
+        const b2 = appendTableCells(tbody, output.data);
+        styleTableSelection(h2, b2, 'table-secondary');
+
+        const predictions = predictionsTableObject.getPreviewData(encoded);
+        const h3 = appendTableHeaders(thead, predictions.headers);
+        const b3 = appendTableCells(tbody, predictions.data);
+        styleTableSelection(h3, b3, 'table-primary');
     }
 </script>

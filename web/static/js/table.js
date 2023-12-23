@@ -20,7 +20,7 @@ function appendTableCells(tbodySelector, arrArr, decimalPlaces = 4) {
 
         const rowCells = [];
         for (let item of arrArr[i]) {
-            const formatted = typeof item === 'number' ? item.toFixed(decimalPlaces) : item;
+            const formatted = isNaN(item) ? item : Number(item).toFixed(decimalPlaces);
             rowCells.push(tr.append('td').text(formatted));
         }
         allRows.push(rowCells);

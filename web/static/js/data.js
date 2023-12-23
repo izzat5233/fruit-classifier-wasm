@@ -57,34 +57,6 @@ function arrArrToCsv(arrArr) {
     return csvString;
 }
 
-function arrArrToTableObject(arrArr, alt = "Col", checkHeaders = true) {
-    if (!Array.isArray(arrArr) || arrArr.length === 0) {
-        console.error("Invalid input: arrArr must be a non-empty array");
-        return {headers: [], data: []};
-    }
-
-    const firstRow = arrArr[0];
-    if (checkHeaders && firstRow.every((val) => isNaN(val))) {
-        return {
-            headers: firstRow,
-            data: arrArr.slice(1)
-        }
-    } else {
-        return {
-            headers: firstRow.map((_, i) => `${alt}${i + 1}`),
-            data: arrArr
-        }
-    }
-}
-
-function tableObjectToArrArr(tableObject) {
-    if (!tableObject || !Array.isArray(tableObject.headers) || !Array.isArray(tableObject.data)) {
-        console.error("Invalid table data");
-        return [];
-    }
-    return [tableObject.headers, ...tableObject.data];
-}
-
 function sampleArrArr(arrArr, sampleSize = 10) {
     const res = [];
     const dataSize = arrArr.length;

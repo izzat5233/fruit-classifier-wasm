@@ -48,6 +48,7 @@ expanded = false
 
 # It's Super Fast, Give it a try!
 
+{{< include-script "js/TableObject.js" >}}
 {{< include-script "js/table.js" >}}
 {{< accordion "control" >}}
 
