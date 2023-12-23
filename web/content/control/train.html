@@ -1,3 +1,76 @@
+<script>
+    let trainingErrors = [];
+    let testingErrors = [];
+    let svg, xScale, yScale, xAxisGroup, yAxisGroup;
+
+    function updateHtmlLabel(elementId, data, label) {
+        const labelElement = document.getElementById(elementId);
+        if (data.length > 0) {
+            const lastDataPoint = data[data.length - 1];
+            labelElement.textContent = `${label}: ${lastDataPoint.toFixed(6)}`;
+            labelElement.style.display = 'inline-block'; // Show the label
+        } else {
+            labelElement.textContent = `${label}: N/A`;
+            labelElement.style.display = 'none'; // Hide the label if no data
+        }
+    }
+
+    function updateErrorChart() {
+        // Adjust domains based on the data
+        xScale.domain([0, Math.max(trainingErrors.length, testingErrors.length) - 1]);
+        yScale.domain([0, Math.max(...trainingErrors, ...testingErrors, 0)]);
+
+        // Update the axes using the new scales
+        xAxisGroup.call(d3.axisBottom(xScale));
+        yAxisGroup.call(d3.axisLeft(yScale));
+
+        // Define the line generator
+        const line = d3.line()
+            .x((_, i) => xScale(i))
+            .y(d => yScale(d));
+
+        // Update or remove the training error line
+        if (trainingErrors.length > 0) {
+            svg.select("#trainingLine")
+                .datum(trainingErrors)
+                .attr("d", line);
+            updateHtmlLabel("trainingLabel", trainingErrors, "Training Error");
+        }
+
+        // Update or remove the testing error line
+        if (testingErrors.length > 0) {
+            svg.select("#testingLine")
+                .datum(testingErrors)
+                .attr("d", line);
+            updateHtmlLabel("testingLabel", testingErrors, "Testing Error");
+        }
+    }
+
+    function clearErrorChart() {
+        // Remove the error lines if they exist
+        svg.select("#trainingLine").remove();
+        svg.select("#testingLine").remove();
+
+        // Reset the error data arrays
+        trainingErrors = [];
+        testingErrors = [];
+
+        // You could also re-initialize the line paths if you plan to add them back later
+        svg.append("path").attr("id", "trainingLine").attr("stroke", "blue").attr("fill", "none");
+        svg.append("path").attr("id", "testingLine").attr("stroke", "red").attr("fill", "none");
+
+        updateHtmlLabel("trainingLabel", trainingErrors, "Training Error");
+        updateHtmlLabel("testingLabel", testingErrors, "Testing Error");
+
+        // Optionally, reset the scale domains if you want to go back to the default view
+        xScale.domain([0, 100]); // Adjust to your initial x domain
+        yScale.domain([0, 1]); // Adjust to your initial y domain
+
+        // Update the axes to reflect the reset domains
+        xAxisGroup.call(d3.axisBottom(xScale));
+        yAxisGroup.call(d3.axisLeft(yScale));
+    }
+</script>
 <div class="row justify-content-center">
     <div class="col">
         <h5 class="py-4">Epochs:</h5>
@@ -31,41 +104,73 @@
         </div>
         <hr class="my-4">
         <div class="d-flex justify-content-center">
-            <button type="button" title="start" id="refreshWeightsButton" onclick="network.build()"
+            <button type="button" title="start" id="refreshWeightsButton" onclick="handleRandomizeWeights()"
                     class="btn btn-lg btn-danger bi bi-arrow-clockwise fs-5"> Randomize Weights
             </button>
         </div>
     </div>
     <div class="col">
-        <h5 class="py-4">Training Errors:</h5>
-        <div id="trainingLogger"></div>
-    </div>
-    <div class="col">
-        <h5 class="py-4">Testing Errors:</h5>
-        <div id="testingLogger"></div>
+        <h5 class="py-4">Training and Testing Errors:</h5>
+        <div id="errorChart">
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    // Set the dimensions and margins of the graph
+                    const margin = {top: 10, right: 30, bottom: 30, left: 60},
+                        width = 460 - margin.left - margin.right,
+                        height = 400 - margin.top - margin.bottom;
+
+                    // Append the svg object to the div called 'errorChart'
+                    svg = d3.select("#errorChart")
+                        .append("svg")
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom)
+                        .append("g")
+                        .attr("transform", `translate(${margin.left},${margin.top})`);
+
+                    // Initialize scales without domains
+                    xScale = d3.scaleLinear().range([0, width]);
+                    yScale = d3.scaleLinear().range([height, 0]);
+
+                    // Add the X axis group to the SVG
+                    xAxisGroup = svg.append("g")
+                        .attr("transform", `translate(0,${height})`)
+                        .attr("class", "x-axis");
+
+                    // Add the Y axis group to the SVG
+                    yAxisGroup = svg.append("g")
+                        .attr("class", "y-axis");
+
+                    // Initialize line paths
+                    svg.append("path").attr("id", "trainingLine").attr("stroke", "blue").attr("fill", "none");
+                    svg.append("path").attr("id", "testingLine").attr("stroke", "red").attr("fill", "none");
+                });
+            </script>
+        </div>
+        <div class="chart-labels d-flex justify-content-start align-items-center mt-2">
+            <span id="trainingLabel" class="badge bg-primary me-2 fs-5 py-2 px-3">Training Error: N/A</span>
+            <span id="testingLabel" class="badge bg-danger fs-5 py-2 px-3">Testing Error: N/A</span>
+        </div>
     </div>
 </div>
 <script>
     function handleStartTrain() {
-        const trainLogger = document.getElementById('trainingLogger');
-        const testLogger = document.getElementById('testingLogger');
-        trainLogger.innerHTML = "";
-        testLogger.innerHTML = "";
-
         const epochs = getSelectedEpochValue();
-        let res;
         if (document.getElementById('useTestDataCheck').checked) {
-            res = network.trainAndTestFor(epochs);
-            for (let i = 0; i < res.size(); ++i) {
-                trainLogger.innerHTML += "<p>" + res.get(i).get(0) + "</p>";
-                testLogger.innerHTML += "<p>" + res.get(i).get(1) + "</p>";
+            const res = toArrArr(network.trainAndTestFor(epochs));
+            for (let pair of res) {
+                trainingErrors.push(pair[0]);
+                testingErrors.push(pair[1]);
             }
         } else {
-            res = network.trainFor(epochs);
-            for (let i = 0; i < res.size(); ++i) {
-                trainLogger.innerHTML += "<p>" + res.get(i) + "</p>";
-            }
+            const res = toArr(network.trainFor(epochs));
+            for (let i of res) trainingErrors.push(i);
         }
+        updateErrorChart();
+    }
+
+    function handleRandomizeWeights() {
+        network.build();
+        clearErrorChart();
     }
 
     function getSelectedEpochValue() {
