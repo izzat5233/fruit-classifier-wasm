@@ -47,7 +47,7 @@
 </div>
 <script>
     function getDecodedPredictions() {
-        return testOutputTableObject.decodeBasedOnMaxProbability(predictionsEncodedData);
+        return testOutputTableObject.decodeData(predictionsEncodedData);
     }
 
     function handleClearPredictions() {
@@ -69,7 +69,7 @@
         downloadJson({
             weights: toArrArrArr(network.getWeights()),
             biases: toArrArr(network.getBiases())
-        }, "network_data.csv");
+        }, "network_data.json");
     }
 
     function previewPredictionsTable() {
@@ -98,18 +98,8 @@
         const b2 = appendTableCells(tbody, output.data);
         styleTableSelection(h2, b2, 'table-secondary');
 
-        let predictions;
-        if (encoded) {
-            predictions = {
-                headers: testOutputTableObject.getEncodedHeaders(),
-                data: sampleArrArr(predictionsEncodedData),
-            }
-        } else {
-            predictions = {
-                headers: testOutputTableObject.headers,
-                data: sampleArrArr(getDecodedPredictions()),
-            }
-        }
+        let predictions = testOutputTableObject.prepareSimilarData(encoded, predictionsEncodedData);
+        predictions.data = sampleArrArr(predictions.data);
         const h3 = appendTableHeaders(thead, predictions.headers);
         const b3 = appendTableCells(tbody, predictions.data);
         styleTableSelection(h3, b3, 'table-primary');

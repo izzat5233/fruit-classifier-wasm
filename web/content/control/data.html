@@ -26,6 +26,51 @@
 </script>
 <div class="row">
     <div class="col">
+        <div class="px-2">
+            <p><span class="fw-bold fs-5">Encoding Technique</span><br><span class="fw-light">
+                Data is always encoded if categorical columns are detected.</span>
+            </p>
+            <div class="px-2 d-flex flex-column gap-2">
+                <div onchange="handleDataEncodingOptionChange()">
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="dataEncodingRadio"
+                               id="dataEncodingRadioLabelOption" checked>
+                        <label class="form-check-label" for="dataEncodingRadioLabelOption">
+                            Label Encoding <span class="fw-light">(0, 1, 2,...)</span>
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="dataEncodingRadio"
+                               id="dataEncodingRadioOneHotOption">
+                        <label class="form-check-label" for="dataEncodingRadioOneHotOption">
+                            One-Hot Encoding <span class="fw-light">(001, 010, 100, ...)</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="form-check" onchange="previewTrainTable(); previewTestTable()">
+                    <input class="form-check-input" type="checkbox" id="dataOriginalDataCheck">
+                    <label class="form-check-label" for="dataOriginalDataCheck">
+                        Show original data in preview
+                    </label>
+                </div>
+            </div>
+        </div>
+        <script>
+            function handleDataEncodingOptionChange() {
+                const isLabelEncoding = document.getElementById('dataEncodingRadioLabelOption').checked;
+                const value = isLabelEncoding ? 'label' : 'oneHot';
+                trainInputTableObject.reset(value);
+                trainOutputTableObject.reset(value);
+                testInputTableObject.reset(value);
+                testOutputTableObject.reset(value);
+                handleTrainInputClear();
+                handleTrainOutputClear();
+                handleTestInputClear();
+                handleTestOutputClear();
+            }
+        </script>
+    </div>
+    <div class="col">
         <div class="btn-group mt-2" role="group">
             <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"
                     aria-expanded="false">Use Dataset
@@ -56,22 +101,6 @@
                 setTrainOutput();
                 setTestInput();
                 setTestOutput();
-            }
-        </script>
-    </div>
-    <div class="col">
-        <div class="px-2">
-            <p>Data is always one-hot encoded if categorical columns are found.</p>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="dataOriginalDataCheck"
-                       onchange="handleDataOptionsChange()">
-                <label class="form-check-label" for="dataOriginalDataCheck">Show Original Data</label>
-            </div>
-        </div>
-        <script>
-            function handleDataOptionsChange() {
-                previewTrainTable();
-                previewTestTable();
             }
         </script>
     </div>

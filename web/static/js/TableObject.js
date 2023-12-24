@@ -1,9 +1,18 @@
 class TableObject {
-    constructor() {
+    constructor(encodingType = 'label') {
+        this.reset(encodingType);
+    }
+
+    reset(encodingType) {
+        this._encodingType = encodingType;
         this._headers = [];
         this._data = [];
         this._categoricalColumns = [];
         this._encodedColumns = {};
+    }
+
+    clear() {
+        this.reset(this._encodingType);
     }
 
     set headers(headers) {
@@ -52,11 +61,6 @@ class TableObject {
         this.data = data;
     }
 
-    clear() {
-        this._headers = [];
-        this._data = [];
-    }
-
     #updateCategoricalColumns() {
         if (this._data.length > 0 && this._headers.length > 0) {
             this._categoricalColumns = this.#detectCategoricalColumns();
@@ -81,23 +85,37 @@ class TableObject {
 
         this._categoricalColumns.forEach(column => {
             let uniqueValuesMap = new Set(this.data.map(row => row[this.headers.indexOf(column)]));
-            let encodedColumnData = this.data.map(row => {
-                let encodedRow = [];
-                uniqueValuesMap.forEach(uniqueValue => {
-                    encodedRow.push(row[this.headers.indexOf(column)] === uniqueValue ? 1 : 0);
+
+            if (this._encodingType === 'label') {
+                let labelMap = Array.from(uniqueValuesMap).reduce((acc, val, index) => {
+                    acc[val] = index;
+                    return acc;
+                }, {});
+
+                encodedColumns[column] = {
+                    uniqueValues: Array.from(uniqueValuesMap),
+                    labelMap: labelMap
+                };
+            } else {
+                let encodedColumnData = this.data.map(row => {
+                    let encodedRow = [];
+                    uniqueValuesMap.forEach(uniqueValue => {
+                        encodedRow.push(row[this.headers.indexOf(column)] === uniqueValue ? 1 : 0);
+                    });
+                    return encodedRow;
                 });
-                return encodedRow;
-            });
-            encodedColumns[column] = {
-                uniqueValues: Array.from(uniqueValuesMap),
-                data: encodedColumnData
-            };
+                encodedColumns[column] = {
+                    uniqueValues: Array.from(uniqueValuesMap),
+                    data: encodedColumnData
+                };
+            }
         });
 
         return encodedColumns;
     }
 
     getEncodedHeaders() {
+        if (this._encodingType === 'label') return this._headers;
         let encodedHeaders = [];
 
         this.headers.forEach(header => {
@@ -119,14 +137,19 @@ class TableObject {
 
             this.headers.forEach((header, headerIndex) => {
                 if (this._categoricalColumns.includes(header)) {
-                    // Find the index of the value in the row for the categorical column
-                    const valueIndex = this._encodedColumns[header].uniqueValues.indexOf(row[headerIndex]);
-                    // Create a one-hot encoded array for this value
-                    const oneHotArray = Array(this._encodedColumns[header].uniqueValues.length).fill(0);
-                    if (valueIndex >= 0) {
-                        oneHotArray[valueIndex] = 1;
+                    if (this._encodingType === 'label') {
+                        // Label encoding
+                        const labelValue = this._encodedColumns[header].labelMap[row[headerIndex]];
+                        encodedRow.push(labelValue);
+                    } else {
+                        // One-hot encoding
+                        const valueIndex = this._encodedColumns[header].uniqueValues.indexOf(row[headerIndex]);
+                        const oneHotArray = Array(this._encodedColumns[header].uniqueValues.length).fill(0);
+                        if (valueIndex >= 0) {
+                            oneHotArray[valueIndex] = 1;
+                        }
+                        encodedRow = encodedRow.concat(oneHotArray);
                     }
-                    encodedRow = encodedRow.concat(oneHotArray);
                 } else {
                     encodedRow.push(row[headerIndex]);
                 }
@@ -136,32 +159,40 @@ class TableObject {
         });
     }
 
-    decodeBasedOnMaxProbability(encodedData) {
+    decodeData(encodedData) {
         if (!Array.isArray(encodedData)) {
-            throw new Error("Encoded data must be of type array");
+            throw new Error("Encoded data must be an array");
         }
 
         return encodedData.map(encodedRow => {
             let decodedRow = [];
             let encodedIndex = 0;
 
-            this.headers.forEach(header => {
+            this.headers.forEach((header, headerIndex) => {
                 if (this._categoricalColumns.includes(header)) {
-                    // Decode the categorical column based on maximum probability
-                    const numberOfCategories = this._encodedColumns[header].uniqueValues.length;
-                    const encodedSegment = encodedRow.slice(encodedIndex, encodedIndex + numberOfCategories);
-                    const maxProbIndex = encodedSegment.indexOf(Math.max(...encodedSegment));
-                    const decodedValue = maxProbIndex >= 0 ? this._encodedColumns[header].uniqueValues[maxProbIndex] : null;
-
-                    decodedRow.push(decodedValue);
-                    encodedIndex += numberOfCategories;
+                    if (this._encodingType === 'label') {
+                        // Decode label encoding with rounding and clipping
+                        const numberOfLabels = this._encodedColumns[header].uniqueValues.length;
+                        let labelValueIndex = Math.round(encodedRow[encodedIndex]);
+                        labelValueIndex = Math.max(0, Math.min(labelValueIndex, numberOfLabels - 1));
+                        const decodedValue = this._encodedColumns[header].uniqueValues[labelValueIndex];
+                        decodedRow.push(decodedValue);
+                        encodedIndex++;
+                    } else {
+                        // Decode one-hot encoding
+                        const numberOfCategories = this._encodedColumns[header].uniqueValues.length;
+                        const encodedSegment = encodedRow.slice(encodedIndex, encodedIndex + numberOfCategories);
+                        const maxProbIndex = encodedSegment.indexOf(Math.max(...encodedSegment));
+                        const decodedValue = this._encodedColumns[header].uniqueValues[maxProbIndex];
+                        decodedRow.push(decodedValue);
+                        encodedIndex += numberOfCategories;
+                    }
                 } else {
                     // For non-categorical columns, the value is directly taken from the encoded data
                     decodedRow.push(encodedRow[encodedIndex]);
                     encodedIndex++;
                 }
             });
-
             return decodedRow;
         });
     }
@@ -179,6 +210,22 @@ class TableObject {
         return {
             headers: headers,
             data: sampleArrArr(data),
+        }
+    }
+
+    prepareSimilarData(encoded, encodedData) {
+        let headers;
+        let data;
+        if (encoded) {
+            headers = this.getEncodedHeaders();
+            data = encodedData;
+        } else {
+            headers = this._headers;
+            data = this.decodeData(encodedData)
+        }
+        return {
+            headers: headers,
+            data: data
         }
     }
 }
