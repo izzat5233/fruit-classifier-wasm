@@ -1,6 +1,6 @@
 <div class="row gy-4">
     <div class="col-sm-6">
-        <label for="activationFunctionInput" class="form-label">Activation Function</label>
+        <label for="activationFunctionInput" class="form-label fw-bold">Activation Function</label>
         <select class="form-select" id="activationFunctionInput"
                 onchange="network.setActivationFunction(value)">
             <option value="relu">ReLU</option>
@@ -9,19 +9,19 @@
         </select>
     </div>
     <div class="col-sm-6">
-        <label for="lossFunctionInput" class="form-label">Loss Function</label>
+        <label for="lossFunctionInput" class="form-label fw-bold">Loss Function</label>
         <select class="form-select" id="lossFunctionInput" onchange="network.setLossFunction(value)">
             <option value="sse">Sum Square Error</option>
             <option value="mse">Mean Square Error</option>
         </select>
     </div>
     <div class="col-sm-6">
-        <label for="outputFunctionInput" class="form-label">Output Function</label>
+        <label for="outputFunctionInput" class="form-label fw-bold">Output Function</label>
         <input id="outputFunctionInput" class="form-control" type="text" aria-label="Disabled input example"
                disabled readonly>
     </div>
     <div class="col-sm-6">
-        <label for="normalizationInput" class="form-label">Normalization</label>
+        <label for="normalizationInput" class="form-label fw-bold">Normalization</label>
         <select class="form-select" id="normalizationInput">
             <option value="minmax">Minmax [0, 1]</option>
         </select>

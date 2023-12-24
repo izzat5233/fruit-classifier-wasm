@@ -90,7 +90,8 @@
 <div class="row justify-content-center">
     <div class="col">
         <div class="container">
-            <h4 class="py-4">Train/Pause:</h4>
+            <h4>Train/Pause:</h4>
+            <p class="fw-light">Speed does not affect training accuracy</p>
             <div class="btn-group" role="group" aria-label="Train Speeds">
                 <button type="button" class="btn btn-lg btn-success fs-5 icons-close"
                         onclick="handleTrainPause('pause')">
@@ -114,18 +115,20 @@
             </div>
             <div class="my-4 d-flex flex-column gap-2">
                 <div>
-                    <label for="learningRateInput" class="form-label text-nowrap">
-                        Learning Rate <span class="fw-light">(changing it will not reset the weights)</span></label>
+                    <label for="learningRateInput" class="form-label text-nowrap fw-bold">
+                        Learning Rate <span class="fw-light">(Safe to change, does not reset the weights)</span></label>
                     <input type="number" step="0.001" min="0.001" max="3" class="form-control" id="learningRateInput"
                            oninput="network.setLearningRate(value)">
                 </div>
                 <div>
-                    <label for="trainErrorGoalInput" class="form-label text-nowrap">Training Error Goal</label>
+                    <label for="trainErrorGoalInput" class="form-label text-nowrap fw-bold">
+                        Training Error Goal <span class="fw-light">(Training auto stops once reached)</span></label>
                     <input type="number" step="0.001" min="0" max="1" value="0.01" class="form-control"
                            id="trainErrorGoalInput" oninput="trainErrorGoal = Number(value)">
                 </div>
                 <div>
-                    <label for="testErrorGoalInput" class="form-label text-nowrap">Testing Error Goal </label>
+                    <label for="testErrorGoalInput" class="form-label text-nowrap fw-bold">
+                        Testing Error Goal <span class="fw-light">(Training auto stops once reached)</span></label>
                     <input type="number" step="0.001" min="0" max="1" value="0.01" class="form-control"
                            id="testErrorGoalInput" oninput="testErrorGoal = Number(value)">
                 </div>
@@ -134,7 +137,7 @@
         <hr>
         <div class="container mb-4">
             <h4>Fixed Epochs:</h4>
-            <p class="fw-light">(it will keep training even past the error goals)</p>
+            <p class="fw-light">Keeps training even past the error goals</p>
             <div class="btn-group" role="group" aria-label="Basic radio toggle button group">
                 <input type="radio" class="btn-check" name="epochsRadio" id="epochsRadio1"
                        autocomplete="off" value="1" checked>
@@ -167,11 +170,11 @@
         </script>
         <hr>
         <div class="container mb-4">
-            <h4 class="py-4">Options:</h4>
-            <div class="my-4 d-flex flex-column gap-2">
+            <h4>Options:</h4>
+            <div class="mt-4 d-flex flex-column gap-2">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="useTestDataCheck" checked>
-                    <label class="form-check-label" for="useTestDataCheck">Use Testing Data</label>
+                    <label class="form-check-label" for="useTestDataCheck">Include Testing Data</label>
                 </div>
             </div>
             <div class="mt-4 d-flex">

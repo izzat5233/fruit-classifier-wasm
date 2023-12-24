@@ -1,6 +1,6 @@
 {{ $accordionKey := .Get 0 }}
 {{ $accordionData := index .Page.Params.accordions $accordionKey }}
-<div id="accordion-{{ $accordionKey }}" class="accordion py-5">
+<div id="accordion-{{ $accordionKey }}" class="accordion py-3">
     {{ range $accordionData.items }}
     <div class="accordion-item">
         <h2 class="accordion-header">
