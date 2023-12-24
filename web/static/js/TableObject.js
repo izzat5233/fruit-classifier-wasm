@@ -131,8 +131,8 @@ class TableObject {
         return encodedHeaders;
     }
 
-    getEncodedData() {
-        return this.data.map(row => {
+    encodeData(decodedData) {
+        return decodedData.map(row => {
             let encodedRow = [];
 
             this.headers.forEach((header, headerIndex) => {
@@ -157,6 +157,10 @@ class TableObject {
 
             return encodedRow;
         });
+    }
+
+    getEncodedData() {
+        return this.encodeData(this.data);
     }
 
     decodeData(encodedData) {
@@ -213,15 +217,15 @@ class TableObject {
         }
     }
 
-    prepareSimilarData(encoded, encodedData) {
+    prepareSimilarData(encoded, similarData, isDataEncoded = true) {
         let headers;
         let data;
         if (encoded) {
             headers = this.getEncodedHeaders();
-            data = encodedData;
+            data = isDataEncoded ? similarData : this.encodeData(similarData);
         } else {
             headers = this._headers;
-            data = this.decodeData(encodedData)
+            data = isDataEncoded ? this.decodeData(similarData) : similarData;
         }
         return {
             headers: headers,

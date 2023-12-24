@@ -2,7 +2,72 @@
     let predictionsEncodedData = [];
 </script>
 <div class="row justify-content-center">
-    <div class="col-12 d-flex flex-column flex-md-row gap-2 justify-content-center align-items-center">
+    <h4 class="mb-4">Options:</h4>
+    <div class="d-flex flex-column gap-2 px-2" onchange="handleTestOptionsChange()">
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="testDecodeDataCheck" checked>
+            <label class="form-check-label" for="testDecodeDataCheck">Decode Data (If Necessary)</label>
+        </div>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" id="testInputDataCheck" checked>
+            <label class="form-check-label" for="testInputDataCheck">Show Input Data</label>
+        </div>
+    </div>
+    <script>
+        function handleTestOptionsChange() {
+            previewPredictionsTable();
+            handleCustomTest();
+        }
+    </script>
+</div>
+<hr class="my-4">
+<div class="container">
+    <h5>Custom Test</h5>
+    <div class="d-flex flex-column gap-2 justify-content-center">
+        <div class="d-flex flex-row gap-2 align-items-center">
+            <label for="customTestInput" class="form-label text-nowrap">
+                Inputs <span class="fw-light"> (Seperated by ',' characters)</span>
+            </label>
+            <input type="text" class="form-control" id="customTestInput" aria-describedby="customTest">
+            <button type="button" class="btn btn-primary fs-5" onclick="handleCustomTest()">Test
+            </button>
+            <button type="button" class="btn btn-outline-danger fs-5" onclick="handleCustomTestClear()">Clear
+            </button>
+        </div>
+        <div class="row table-responsive">
+            <table class="table table-bordered">
+                <thead id="customPredictedThead"></thead>
+                <tbody id="customPredictedTbody"></tbody>
+            </table>
+        </div>
+    </div>
+    <script>
+        function handleCustomTest() {
+            handleCustomTestClear();
+            const data = csvToArrArr(document.getElementById('customTestInput').value);
+            const encodedData = trainInputTableObject.encodeData(data);
+            const encodedPredictions = toArrArr(network.getCustomPredictions(toVecVecNum(encodedData)));
+
+            const encoded = !document.getElementById('testDecodeDataCheck').checked;
+            const thead = "#customPredictedThead";
+            const tbody = "#customPredictedTbody";
+
+            let predictions = trainOutputTableObject.prepareSimilarData(encoded, encodedPredictions);
+            const h = appendTableHeaders(thead, predictions.headers);
+            const b = appendTableCells(tbody, predictions.data);
+            styleTableSelection(h, b, 'table-primary');
+        }
+
+        function handleCustomTestClear() {
+            document.getElementById('customPredictedThead').innerHTML = "";
+            document.getElementById('customPredictedTbody').innerHTML = "";
+            document.getElementById('customTestInput').innerHTML = "";
+        }
+    </script>
+</div>
+<hr class="my-4">
+<div class="container">
+    <div class="mb-4 d-flex flex-column flex-md-row gap-2 justify-content-center align-items-center">
         <div class="btn-group-vertical btn-group-sm mb-2 mb-md-0" role="group" aria-label="Get Outputs">
             <button type="button" class="btn btn-lg btn-primary fs-5" onclick="handleGetPredictions()">Get Predictions
             </button>
@@ -19,23 +84,6 @@
             </button>
         </div>
     </div>
-    <div class="col">
-        <div class="px-2">
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="testDecodeDataCheck"
-                       checked onchange="previewPredictionsTable()">
-                <label class="form-check-label" for="testDecodeDataCheck">Decode Data (If Necessary)</label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="testInputDataCheck"
-                       checked onchange="previewPredictionsTable()">
-                <label class="form-check-label" for="testInputDataCheck">Show Input Data</label>
-            </div>
-        </div>
-    </div>
-</div>
-<hr class="my-4">
-<div class="container">
     <div class="row justify-content-center">
         <div class="col table-responsive">
             <table class="table table-bordered">
@@ -87,18 +135,20 @@
         const tbody = "#predictedTbody";
 
         if (document.getElementById('testInputDataCheck').checked) {
-            const input = testInputTableObject.getPreviewData(encoded);
+            const input = trainInputTableObject.prepareSimilarData(encoded, testInputTableObject.data, false);
+            input.data = sampleArrArr(input.data);
             const h1 = appendTableHeaders(thead, input.headers);
             const b1 = appendTableCells(tbody, input.data);
             styleTableSelection(h1, b1, 'table-default');
         }
 
-        const output = testOutputTableObject.getPreviewData(encoded);
+        const output = trainOutputTableObject.prepareSimilarData(encoded, testOutputTableObject.data, false);
+        output.data = sampleArrArr(output.data);
         const h2 = appendTableHeaders(thead, output.headers);
         const b2 = appendTableCells(tbody, output.data);
         styleTableSelection(h2, b2, 'table-secondary');
 
-        let predictions = testOutputTableObject.prepareSimilarData(encoded, predictionsEncodedData);
+        let predictions = trainOutputTableObject.prepareSimilarData(encoded, predictionsEncodedData);
         predictions.data = sampleArrArr(predictions.data);
         const h3 = appendTableHeaders(thead, predictions.headers);
         const b3 = appendTableCells(tbody, predictions.data);

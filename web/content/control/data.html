@@ -15,12 +15,12 @@
     }
 
     function setTestInput() {
-        const arrArr = testInputTableObject.getEncodedData();
+        const arrArr = trainInputTableObject.encodeData(testInputTableObject.data);
         network.setTestInput(toVecVecNum(arrArr));
     }
 
     function setTestOutput() {
-        const arrArr = testOutputTableObject.getEncodedData();
+        const arrArr = trainOutputTableObject.encodeData(testOutputTableObject.data);
         network.setTestOutput(toVecVecNum(arrArr));
     }
 </script>
@@ -77,14 +77,17 @@
             </button>
             <ul class="dropdown-menu">
                 <li>
-                    <button class="dropdown-item" onclick="handleLoadDataset('xor')">
-                        XOR Dataset
+                    <button class="dropdown-item" onclick="handleLoadDataset('fruits_simple')">
+                        Fruits Color & Sweetness Dataset (Simple)
                     </button>
                     <button class="dropdown-item" onclick="handleLoadDataset('fruits')">
-                        Fruits Color & Sweetness Dataset
+                        Fruits Color & Sweetness Dataset (Complex)
                     </button>
                     <button class="dropdown-item" onclick="handleLoadDataset('mobile')">
                         Mobile Prices Dataset
+                    </button>
+                    <button class="dropdown-item" onclick="handleLoadDataset('xor')">
+                        XOR Dataset
                     </button>
                 </li>
             </ul>
@@ -352,12 +355,14 @@
                 document.getElementById('testPreviewTbody').innerHTML = '';
                 const encoded = !document.getElementById('dataOriginalDataCheck').checked;
 
-                const input = testInputTableObject.getPreviewData(encoded);
+                const input = trainInputTableObject.prepareSimilarData(encoded, testInputTableObject.data, false);
+                input.data = sampleArrArr(input.data);
                 const h1 = appendTableHeaders("#testPreviewThead", input.headers);
                 const b1 = appendTableCells("#testPreviewTbody", input.data);
                 styleTableSelection(h1, b1, 'table-default');
 
-                const output = testOutputTableObject.getPreviewData(encoded);
+                const output = trainOutputTableObject.prepareSimilarData(encoded, testOutputTableObject.data, false);
+                output.data = sampleArrArr(output.data);
                 const h2 = appendTableHeaders("#testPreviewThead", output.headers);
                 const b2 = appendTableCells("#testPreviewTbody", output.data);
                 styleTableSelection(h2, b2, 'table-secondary');
