@@ -1,5 +1,5 @@
 <script>
-    const predictionsTableObject = new TableObject();
+    let predictionsEncodedData = [];
 </script>
 <div class="row justify-content-center">
     <div class="col-12 d-flex flex-column flex-md-row gap-2 justify-content-center align-items-center">
@@ -23,20 +23,15 @@
         <div class="px-2">
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="testDecodeDataCheck"
-                       checked onchange="handlePredictionsOptionsChange()">
+                       checked onchange="previewPredictionsTable()">
                 <label class="form-check-label" for="testDecodeDataCheck">Decode Data (If Necessary)</label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="testInputDataCheck"
-                       onchange="handlePredictionsOptionsChange()">
+                       checked onchange="previewPredictionsTable()">
                 <label class="form-check-label" for="testInputDataCheck">Show Input Data</label>
             </div>
         </div>
-        <script>
-            function handlePredictionsOptionsChange() {
-                previewPredictionsTable();
-            }
-        </script>
     </div>
 </div>
 <hr class="my-4">
@@ -51,20 +46,23 @@
     </div>
 </div>
 <script>
+    function getDecodedPredictions() {
+        return testOutputTableObject.decodeBasedOnMaxProbability(predictionsEncodedData);
+    }
+
     function handleClearPredictions() {
-        predictionsTableObject.clear();
+        predictionsEncodedData = [];
         previewPredictionsTable();
     }
 
     function handleGetPredictions() {
-        predictionsTableObject.headers = testOutputTableObject.headers;
-        const predictions = toArrArr(network.getPredictions());
-        predictionsTableObject.data = testOutputTableObject.decodeBasedOnMaxProbability(predictions);
+        predictionsEncodedData = toArrArr(network.getPredictions());
         previewPredictionsTable();
     }
 
     function handleDownloadPredictions() {
-        downloadCSV(arrArrToCsv(predictionsTableObject.data), "predictions.csv");
+        downloadCSV(arrArrToCsv(predictionsEncodedData), "predictions_encoded.csv");
+        downloadCSV(arrArrToCsv(getDecodedPredictions()), "predictions.csv");
     }
 
     function handleDownloadNetworkData() {
@@ -79,7 +77,7 @@
         document.getElementById('predictedTbody').innerHTML = "";
         document.getElementById("downloadOutputsButton").disabled = false;
 
-        if (predictionsTableObject.headers.length === 0) {
+        if (predictionsEncodedData.length === 0) {
             document.getElementById("downloadOutputsButton").disabled = true;
             return;
         }
@@ -100,7 +98,18 @@
         const b2 = appendTableCells(tbody, output.data);
         styleTableSelection(h2, b2, 'table-secondary');
 
-        const predictions = predictionsTableObject.getPreviewData(encoded);
+        let predictions;
+        if (encoded) {
+            predictions = {
+                headers: testOutputTableObject.getEncodedHeaders(),
+                data: sampleArrArr(predictionsEncodedData),
+            }
+        } else {
+            predictions = {
+                headers: testOutputTableObject.headers,
+                data: sampleArrArr(getDecodedPredictions()),
+            }
+        }
         const h3 = appendTableHeaders(thead, predictions.headers);
         const b3 = appendTableCells(tbody, predictions.data);
         styleTableSelection(h3, b3, 'table-primary');
