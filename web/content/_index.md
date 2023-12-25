@@ -62,7 +62,7 @@ expanded = false
 - Now that your neural network is configured, let’s put it to the test. Upload your data, train the network, and then
   evaluate its performance.
 
-{{< include-script "js/TableObject.js" >}}
+{{< include-script "js/Codec.js" >}}
 {{< include-script "js/table.js" >}}
 {{< accordion "control" >}}
 

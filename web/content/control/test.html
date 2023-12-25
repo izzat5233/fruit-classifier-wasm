@@ -45,14 +45,14 @@
         function handleCustomTest() {
             handleCustomTestClear();
             const data = csvToArrArr(document.getElementById('customTestInput').value);
-            const encodedData = trainInputTableObject.encodeData(data);
+            const encodedData = inputCodec.encode(data);
             const encodedPredictions = toArrArr(network.getCustomPredictions(toVecVecNum(encodedData)));
 
             const encoded = !document.getElementById('testDecodeDataCheck').checked;
             const thead = "#customPredictedThead";
             const tbody = "#customPredictedTbody";
 
-            let predictions = trainOutputTableObject.prepareSimilarData(encoded, encodedPredictions);
+            let predictions = outputCodec.get(encoded, encodedPredictions, true);
             const h = appendTableHeaders(thead, predictions.headers);
             const b = appendTableCells(tbody, predictions.data);
             styleTableSelection(h, b, 'table-primary');
@@ -95,7 +95,7 @@
 </div>
 <script>
     function getDecodedPredictions() {
-        return testOutputTableObject.decodeData(predictionsEncodedData);
+        return outputCodec.decode(predictionsEncodedData, false);
     }
 
     function handleClearPredictions() {
@@ -135,20 +135,20 @@
         const tbody = "#predictedTbody";
 
         if (document.getElementById('testInputDataCheck').checked) {
-            const input = trainInputTableObject.prepareSimilarData(encoded, testInputTableObject.data, false);
+            const input = inputCodec.get(encoded, testInputData, false);
             input.data = sampleArrArr(input.data);
             const h1 = appendTableHeaders(thead, input.headers);
             const b1 = appendTableCells(tbody, input.data);
             styleTableSelection(h1, b1, 'table-default');
         }
 
-        const output = trainOutputTableObject.prepareSimilarData(encoded, testOutputTableObject.data, false);
+        const output = outputCodec.get(encoded, testOutputData, false);
         output.data = sampleArrArr(output.data);
         const h2 = appendTableHeaders(thead, output.headers);
         const b2 = appendTableCells(tbody, output.data);
         styleTableSelection(h2, b2, 'table-secondary');
 
-        let predictions = trainOutputTableObject.prepareSimilarData(encoded, predictionsEncodedData);
+        let predictions = outputCodec.get(encoded, predictionsEncodedData, true, false);
         predictions.data = sampleArrArr(predictions.data);
         const h3 = appendTableHeaders(thead, predictions.headers);
         const b3 = appendTableCells(tbody, predictions.data);

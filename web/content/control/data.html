@@ -1,27 +1,49 @@
 <script>
-    const trainInputTableObject = new TableObject();
-    const trainOutputTableObject = new TableObject();
-    const testInputTableObject = new TableObject();
-    const testOutputTableObject = new TableObject();
+    const inputCodec = new Codec();
+    const outputCodec = new Codec();
+
+    let trainInputData = [];
+    let trainOutputData = [];
+    let testInputData = [];
+    let testOutputData = [];
+
+    function setInputCodec() {
+        inputCodec.use(trainInputData, getEncodingType(), "Input");
+    }
+
+    function setOutputCodec() {
+        outputCodec.use(trainOutputData, getEncodingType(), "Output");
+    }
 
     function setTrainInput() {
-        const arrArr = trainInputTableObject.getEncodedData();
+        setInputCodec();
+        const arrArr = inputCodec.encode(trainInputData);
         network.setTrainInput(toVecVecNum(arrArr));
     }
 
     function setTrainOutput() {
-        const arrArr = trainOutputTableObject.getEncodedData();
+        setOutputCodec();
+        const arrArr = outputCodec.encode(trainOutputData);
         network.setTrainOutput(toVecVecNum(arrArr));
     }
 
     function setTestInput() {
-        const arrArr = trainInputTableObject.encodeData(testInputTableObject.data);
+        setInputCodec();
+        const arrArr = inputCodec.encode(testInputData);
         network.setTestInput(toVecVecNum(arrArr));
     }
 
     function setTestOutput() {
-        const arrArr = trainOutputTableObject.encodeData(testOutputTableObject.data);
+        setOutputCodec();
+        const arrArr = outputCodec.encode(testOutputData);
         network.setTestOutput(toVecVecNum(arrArr));
+    }
+
+    function setAll() {
+        setTrainInput();
+        setTrainOutput();
+        setTestInput();
+        setTestOutput();
     }
 </script>
 <div class="row">
@@ -31,7 +53,7 @@
                 Data is always encoded if categorical columns are detected.</span>
             </p>
             <div class="px-2 d-flex flex-column gap-2">
-                <div onchange="handleDataEncodingOptionChange()">
+                <div onchange="setAll()">
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="dataEncodingRadio"
                                id="dataEncodingRadioLabelOption" checked>
@@ -56,17 +78,9 @@
             </div>
         </div>
         <script>
-            function handleDataEncodingOptionChange() {
+            function getEncodingType() {
                 const isLabelEncoding = document.getElementById('dataEncodingRadioLabelOption').checked;
-                const value = isLabelEncoding ? 'label' : 'oneHot';
-                trainInputTableObject.reset(value);
-                trainOutputTableObject.reset(value);
-                testInputTableObject.reset(value);
-                testOutputTableObject.reset(value);
-                handleTrainInputClear();
-                handleTrainOutputClear();
-                handleTestInputClear();
-                handleTestOutputClear();
+                return isLabelEncoding ? 'label' : 'oneHot';
             }
         </script>
     </div>
@@ -96,14 +110,13 @@
             async function handleLoadDataset(dataset) {
                 const read = async (set, name) =>
                     readTextFilePath("datasets/" + set + "/" + name + ".csv").then(csvToArrArr);
-                trainInputTableObject.setDataAndHeaders(await read(dataset, "train_in"), "Input");
-                trainOutputTableObject.setDataAndHeaders(await read(dataset, "train_out"), "Output");
-                testInputTableObject.setDataAndHeaders(await read(dataset, "test_in"), "Input");
-                testOutputTableObject.setDataAndHeaders(await read(dataset, "test_out"), "Output");
-                setTrainInput();
-                setTrainOutput();
-                setTestInput();
-                setTestOutput();
+                [trainInputData, trainOutputData, testInputData, testOutputData] = await Promise.all([
+                    read(dataset, "train_in"),
+                    read(dataset, "train_out"),
+                    read(dataset, "test_in"),
+                    read(dataset, "test_out")
+                ]);
+                setAll();
             }
         </script>
     </div>
@@ -138,17 +151,16 @@
         </div>
         <script>
             async function handleTrainInputUpload(fileInput) {
-                const data = await handleTextFileUpload(fileInput).then(csvToArrArr);
-                trainInputTableObject.setDataAndHeaders(data, "Input");
+                trainInputData = await handleTextFileUpload(fileInput).then(csvToArrArr);
                 setTrainInput();
             }
 
             function onTrainInputSet() {
                 const btn = document.getElementById('trainInputFileButton');
-                activateFileInputButton(btn, "Train Input Loaded", trainInputTableObject.data.length);
+                activateFileInputButton(btn, "Train Input Loaded", trainInputData.length);
                 document.getElementById('trainInputClearButton').disabled = false;
                 document.getElementById('trainInputDownloadButton').disabled = false;
-                setInputHeight(trainInputTableObject.getEncodedData()[0].length);
+                setInputHeight(inputCodec.getHeaders(true).length);
                 previewTrainTable();
             }
 
@@ -157,7 +169,8 @@
             }
 
             function onTrainInputCleared() {
-                trainInputTableObject.clear();
+                inputCodec.clear();
+                trainInputData = [];
                 const btn = document.getElementById('trainInputFileButton');
                 deactivateFileInputButton(btn, "Browse Input File");
                 document.getElementById('trainInputClearButton').disabled = true;
@@ -166,8 +179,7 @@
             }
 
             function handleTrainInputDownload() {
-                const arrArr = trainInputTableObject.data;
-                const csvString = arrArrToCsv(arrArr);
+                const csvString = arrArrToCsv(trainInputData);
                 downloadCSV(csvString, "train_input.csv");
             }
         </script>
@@ -186,17 +198,16 @@
         </div>
         <script>
             async function handleTrainOutputUpload(fileInput) {
-                const data = await handleTextFileUpload(fileInput).then(csvToArrArr);
-                trainOutputTableObject.setDataAndHeaders(data, "Output");
+                trainOutputData = await handleTextFileUpload(fileInput).then(csvToArrArr);
                 setTrainOutput();
             }
 
             function onTrainOutputSet() {
                 const btn = document.getElementById('trainOutputFileButton');
-                activateFileInputButton(btn, "Train Output Loaded", trainOutputTableObject.data.length);
+                activateFileInputButton(btn, "Train Output Loaded", trainOutputData.length);
                 document.getElementById('trainOutputClearButton').disabled = false;
                 document.getElementById('trainOutputDownloadButton').disabled = false;
-                setOutputHeight(trainOutputTableObject.getEncodedData()[0].length);
+                setOutputHeight(outputCodec.getHeaders(true).length);
                 previewTrainTable();
             }
 
@@ -205,7 +216,8 @@
             }
 
             function onTrainOutputCleared() {
-                trainOutputTableObject.clear();
+                outputCodec.clear();
+                testOutputData = [];
                 const btn = document.getElementById('trainOutputFileButton');
                 deactivateFileInputButton(btn, "Browse Output File");
                 document.getElementById('trainOutputClearButton').disabled = true;
@@ -214,8 +226,7 @@
             }
 
             function handleTrainOutputDownload() {
-                const arrArr = trainOutputTableObject.data;
-                const csvString = arrArrToCsv(arrArr);
+                const csvString = arrArrToCsv(trainOutputData);
                 downloadCSV(csvString, "train_output.csv");
             }
         </script>
@@ -233,12 +244,14 @@
                 document.getElementById('trainPreviewTbody').innerHTML = '';
                 const encoded = !document.getElementById('dataOriginalDataCheck').checked;
 
-                const input = trainInputTableObject.getPreviewData(encoded);
+                const input = inputCodec.get(encoded, trainInputData, false);
+                input.data = sampleArrArr(input.data);
                 const h1 = appendTableHeaders("#trainPreviewThead", input.headers);
                 const b1 = appendTableCells("#trainPreviewTbody", input.data);
                 styleTableSelection(h1, b1, 'table-default');
 
-                const output = trainOutputTableObject.getPreviewData(encoded);
+                const output = outputCodec.get(encoded, trainOutputData, false);
+                output.data = sampleArrArr(output.data);
                 const h2 = appendTableHeaders("#trainPreviewThead", output.headers);
                 const b2 = appendTableCells("#trainPreviewTbody", output.data);
                 styleTableSelection(h2, b2, 'table-secondary');
@@ -262,14 +275,13 @@
         </div>
         <script>
             async function handleTestInputUpload(fileInput) {
-                const data = await handleTextFileUpload(fileInput).then(csvToArrArr);
-                testInputTableObject.setDataAndHeaders(data, "Input");
+                testInputData = await handleTextFileUpload(fileInput).then(csvToArrArr);
                 setTestInput();
             }
 
             function onTestInputSet() {
                 const btn = document.getElementById('testInputFileButton');
-                activateFileInputButton(btn, "Test Input Loaded", testInputTableObject.data.length);
+                activateFileInputButton(btn, "Test Input Loaded", testInputData.length);
                 document.getElementById('testInputClearButton').disabled = false;
                 document.getElementById('testInputDownloadButton').disabled = false;
                 previewTestTable();
@@ -280,7 +292,7 @@
             }
 
             function onTestInputCleared() {
-                testInputTableObject.clear();
+                testInputData = [];
                 const btn = document.getElementById('testInputFileButton');
                 deactivateFileInputButton(btn, "Browse Input File");
                 document.getElementById('testInputClearButton').disabled = true;
@@ -289,8 +301,7 @@
             }
 
             function handleTestInputDownload() {
-                const arrArr = testInputTableObject.data;
-                const csvString = arrArrToCsv(arrArr);
+                const csvString = arrArrToCsv(testInputData);
                 downloadCSV(csvString, "test_input.csv");
             }
         </script>
@@ -309,14 +320,13 @@
         </div>
         <script>
             async function handleTestOutputUpload(fileInput) {
-                const data = await handleTextFileUpload(fileInput).then(csvToArrArr);
-                testOutputTableObject.setDataAndHeaders(data, "Output");
+                testOutputData = await handleTextFileUpload(fileInput).then(csvToArrArr);
                 setTestOutput();
             }
 
             function onTestOutputSet() {
                 const btn = document.getElementById('testOutputFileButton');
-                activateFileInputButton(btn, "Test Output Loaded", testOutputTableObject.data.length);
+                activateFileInputButton(btn, "Test Output Loaded", testOutputData.length);
                 document.getElementById('testOutputClearButton').disabled = false;
                 document.getElementById('testOutputDownloadButton').disabled = false;
                 previewTestTable();
@@ -327,7 +337,7 @@
             }
 
             function onTestOutputCleared() {
-                testOutputTableObject.clear();
+                testOutputData = [];
                 const btn = document.getElementById('testOutputFileButton');
                 deactivateFileInputButton(btn, "Browse Output File");
                 document.getElementById('testOutputClearButton').disabled = true;
@@ -336,8 +346,7 @@
             }
 
             function handleTestOutputDownload() {
-                const arrArr = testOutputTableObject.data;
-                const csvString = arrArrToCsv(arrArr);
+                const csvString = arrArrToCsv(testOutputData);
                 downloadCSV(csvString, "test_output.csv");
             }
         </script>
@@ -355,13 +364,13 @@
                 document.getElementById('testPreviewTbody').innerHTML = '';
                 const encoded = !document.getElementById('dataOriginalDataCheck').checked;
 
-                const input = trainInputTableObject.prepareSimilarData(encoded, testInputTableObject.data, false);
+                const input = inputCodec.get(encoded, testInputData, false);
                 input.data = sampleArrArr(input.data);
                 const h1 = appendTableHeaders("#testPreviewThead", input.headers);
                 const b1 = appendTableCells("#testPreviewTbody", input.data);
                 styleTableSelection(h1, b1, 'table-default');
 
-                const output = trainOutputTableObject.prepareSimilarData(encoded, testOutputTableObject.data, false);
+                const output = outputCodec.get(encoded, testOutputData, false);
                 output.data = sampleArrArr(output.data);
                 const h2 = appendTableHeaders("#testPreviewThead", output.headers);
                 const b2 = appendTableCells("#testPreviewTbody", output.data);

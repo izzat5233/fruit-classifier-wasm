@@ -1,45 +1,18 @@
-class TableObject {
-    constructor(encodingType = 'label') {
-        this.reset(encodingType);
+/**
+ * Data Encoder-Decoder
+ */
+class Codec {
+    constructor() {
+        this.clear();
     }
 
-    reset(encodingType) {
-        this._encodingType = encodingType;
+    clear() {
         this._headers = [];
-        this._data = [];
         this._categoricalColumns = [];
         this._encodedColumns = {};
     }
 
-    clear() {
-        this.reset(this._encodingType);
-    }
-
-    set headers(headers) {
-        if (!Array.isArray(headers)) {
-            throw new Error("Headers must be of type array");
-        }
-        this._headers = headers;
-        this.#updateCategoricalColumns();
-    }
-
-    get headers() {
-        return this._headers;
-    }
-
-    set data(arrArr) {
-        if (!Array.isArray(arrArr)) {
-            throw new Error("Data must be of type array");
-        }
-        this._data = arrArr;
-        this.#updateCategoricalColumns();
-    }
-
-    get data() {
-        return this._data;
-    }
-
-    setDataAndHeaders(arrArr, alt = "Col") {
+    use(arrArr, encodingType = 'label', headerAlt = "Col") {
         if (!Array.isArray(arrArr) || arrArr.length === 0) {
             throw new Error("Invalid input: arrArr must be a non-empty array");
         }
@@ -52,39 +25,33 @@ class TableObject {
             headers = firstRow;
             data = arrArr.slice(1);
         } else {
-            headers = firstRow.map((_, i) => `${alt}${i + 1}`);
+            headers = firstRow.map((_, i) => `${headerAlt}${i + 1}`);
             data = arrArr;
         }
 
-        // Set headers and data
-        this.headers = headers;
-        this.data = data;
+        this._encodingType = encodingType;
+        this._headers = headers;
+        this._categoricalColumns = this.#detectCategoricalColumns(data);
+        this._encodedColumns = this.#prepareEncodedColumns(data);
     }
 
-    #updateCategoricalColumns() {
-        if (this._data.length > 0 && this._headers.length > 0) {
-            this._categoricalColumns = this.#detectCategoricalColumns();
-            this._encodedColumns = this.#prepareEncodedColumns();
-        }
-    }
-
-    #detectCategoricalColumns() {
+    #detectCategoricalColumns(data) {
         let categoricalColumns = [];
-        this.data.forEach(row => {
+        data.forEach(row => {
             row.forEach((value, index) => {
-                if (isNaN(value) && !categoricalColumns.includes(this.headers[index])) {
-                    categoricalColumns.push(this.headers[index]);
+                if (isNaN(value) && !categoricalColumns.includes(this._headers[index])) {
+                    categoricalColumns.push(this._headers[index]);
                 }
             });
         });
         return categoricalColumns;
     }
 
-    #prepareEncodedColumns() {
+    #prepareEncodedColumns(data) {
         let encodedColumns = {};
 
         this._categoricalColumns.forEach(column => {
-            let uniqueValuesMap = new Set(this.data.map(row => row[this.headers.indexOf(column)]));
+            let uniqueValuesMap = new Set(data.map(row => row[this._headers.indexOf(column)]));
 
             if (this._encodingType === 'label') {
                 let labelMap = Array.from(uniqueValuesMap).reduce((acc, val, index) => {
@@ -97,10 +64,10 @@ class TableObject {
                     labelMap: labelMap
                 };
             } else {
-                let encodedColumnData = this.data.map(row => {
+                let encodedColumnData = data.map(row => {
                     let encodedRow = [];
                     uniqueValuesMap.forEach(uniqueValue => {
-                        encodedRow.push(row[this.headers.indexOf(column)] === uniqueValue ? 1 : 0);
+                        encodedRow.push(row[this._headers.indexOf(column)] === uniqueValue ? 1 : 0);
                     });
                     return encodedRow;
                 });
@@ -114,11 +81,15 @@ class TableObject {
         return encodedColumns;
     }
 
-    getEncodedHeaders() {
+    getHeaders(encoded = false) {
+        return encoded ? this.#getEncodedHeaders() : this._headers;
+    }
+
+    #getEncodedHeaders() {
         if (this._encodingType === 'label') return this._headers;
         let encodedHeaders = [];
 
-        this.headers.forEach(header => {
+        this._headers.forEach(header => {
             if (this._categoricalColumns.includes(header)) {
                 this._encodedColumns[header].uniqueValues.forEach(uniqueValue => {
                     encodedHeaders.push(`${header}_${uniqueValue}`);
@@ -131,11 +102,11 @@ class TableObject {
         return encodedHeaders;
     }
 
-    encodeData(decodedData) {
-        return decodedData.map(row => {
+    encode(data, skipHeaders = true) {
+        return data.slice(skipHeaders ? 1 : 0).map(row => {
             let encodedRow = [];
 
-            this.headers.forEach((header, headerIndex) => {
+            this._headers.forEach((header, headerIndex) => {
                 if (this._categoricalColumns.includes(header)) {
                     if (this._encodingType === 'label') {
                         // Label encoding
@@ -159,20 +130,16 @@ class TableObject {
         });
     }
 
-    getEncodedData() {
-        return this.encodeData(this.data);
-    }
-
-    decodeData(encodedData) {
-        if (!Array.isArray(encodedData)) {
+    decode(data, skipHeaders = true) {
+        if (!Array.isArray(data)) {
             throw new Error("Encoded data must be an array");
         }
 
-        return encodedData.map(encodedRow => {
+        return data.slice(skipHeaders ? 1 : 0).map(encodedRow => {
             let decodedRow = [];
             let encodedIndex = 0;
 
-            this.headers.forEach((header, headerIndex) => {
+            this._headers.forEach((header, headerIndex) => {
                 if (this._categoricalColumns.includes(header)) {
                     if (this._encodingType === 'label') {
                         // Decode label encoding with rounding and clipping
@@ -201,35 +168,16 @@ class TableObject {
         });
     }
 
-    getPreviewData(encoded) {
-        let headers;
-        let data;
+    get(encoded, data, isDataEncoded, skipHeaders = true) {
+        let res;
         if (encoded) {
-            headers = this.getEncodedHeaders();
-            data = this.getEncodedData();
+            res = isDataEncoded ? data.slice(skipHeaders ? 1 : 0) : this.encode(data, skipHeaders);
         } else {
-            headers = this._headers;
-            data = this._data;
+            res = isDataEncoded ? this.decode(data, skipHeaders) : data.slice(skipHeaders ? 1 : 0);
         }
         return {
-            headers: headers,
-            data: sampleArrArr(data),
-        }
-    }
-
-    prepareSimilarData(encoded, similarData, isDataEncoded = true) {
-        let headers;
-        let data;
-        if (encoded) {
-            headers = this.getEncodedHeaders();
-            data = isDataEncoded ? similarData : this.encodeData(similarData);
-        } else {
-            headers = this._headers;
-            data = isDataEncoded ? this.decodeData(similarData) : similarData;
-        }
-        return {
-            headers: headers,
-            data: data
+            headers: this.getHeaders(encoded),
+            data: res
         }
     }
 }
