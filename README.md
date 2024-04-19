@@ -1,10 +1,11 @@
-# Fruism | Fruit Classifier Neural Network in WASM
+# Fruism | Classifier Neural Network in WASM
 
-The Fruism is a lightweight, flexible neural network library written in C++, designed for the specific task of
-classifying different types of fruits. This library forms the core part of the larger Fruit Classifier project.
+Interactive general puposes, web-based, neural network written in C++ & Web Assembly.
+It's fast and runs directly on your device.
 
 ## Features:
 
+- *Web Based*: Although written in low level C++, it's integrated in the web and run directly on your local device using web assembly.
 - *Customizable Neural Network*: Create neural networks with varying structures, including different numbers of layers,
   neurons per layer, and activation functions.
 - *Multiple Activation Functions*: Includes several built-in activation functions like step, sign, linear, ReLU,
@@ -13,7 +14,7 @@ classifying different types of fruits. This library forms the core part of the l
 - *Efficient Computation*: Optimized for performance, utilizes WebAssembly to allow fast c++ near-native speed.
 - *Gradient Descent Training*: Utilizes gradient descent algorithm for network training.
 
-## Components
+## Core Library
 
 - **[```nn```](nn/nn.h)**: Main namespace containing all components.
   Check [this](nn/nn.h) header for documentation.
@@ -38,7 +39,7 @@ classifying different types of fruits. This library forms the core part of the l
   Located in the ```make``` namespace, these functions allow for the creation of Neurons, Layers, and Networks with
   specific configurations.
 
-## Usage
+### Usage
 
 - To create a neural network:
     - Define Network Structure: Determine the number of layers and neurons in each layer.
@@ -84,7 +85,7 @@ int main() {
 }
 ```
 
-## Development
+### Development
 
 To get started with development:
 
