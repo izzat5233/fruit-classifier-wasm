@@ -3,6 +3,8 @@
 Interactive general puposes, web-based, neural network written in C++ & Web Assembly.
 It's fast and runs directly on your device.
 
+Live here: [izzat5233.github.io/fruit-classifier-wasm/](https://izzat5233.github.io/fruit-classifier-wasm/)
+
 ## Features:
 
 - *Web Based*: Although written in low level C++, it's integrated in the web and run directly on your local device using web assembly.
